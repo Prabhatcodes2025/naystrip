@@ -1,0 +1,90 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ["./index.html", "./src/**/*.{js,jsx}"],
+  theme: {
+    extend: {
+      colors: {
+        navy: {
+          50: "#f0f4f5",
+          100: "#d9e3e5",
+          200: "#b3c7cb",
+          300: "#83a3aa",
+          400: "#547e87",
+          500: "#38636d",
+          600: "#294d56",
+          700: "#1e3a42",
+          800: "#152a30",
+          900: "#0d1b1f",
+          950: "#081215",
+        },
+        forest: {
+          50: "#f2f6f3",
+          100: "#dfe9e1",
+          200: "#bcd2c1",
+          300: "#8fb397",
+          400: "#5f8f6b",
+          500: "#3f7150",
+          600: "#2f5940",
+          700: "#264735",
+          800: "#1f392b",
+          900: "#122117",
+        },
+        gold: {
+          50: "#fdf8ee",
+          100: "#faecc9",
+          200: "#f4d78e",
+          300: "#edbd52",
+          400: "#e6a52a",
+          500: "#d68a1c",
+          600: "#b46915",
+          700: "#8f4d15",
+          800: "#743e17",
+          900: "#623518",
+        },
+        terracotta: {
+          50: "#fdf3ee",
+          100: "#fce1d2",
+          200: "#f8c0a4",
+          300: "#f2966d",
+          400: "#ea6f3f",
+          500: "#df5326",
+          600: "#c1401c",
+          700: "#9f321a",
+          800: "#7f2b1b",
+          900: "#682619",
+        },
+        cream: "#faf7f0",
+        ink: "#141b1e",
+      },
+      fontFamily: {
+        display: ["'Playfair Display'", "serif"],
+        serif2: ["'Cormorant Garamond'", "serif"],
+        sans: ["'Manrope'", "system-ui", "sans-serif"],
+      },
+      boxShadow: {
+        soft: "0 4px 24px -4px rgba(13,27,31,0.08), 0 2px 8px -2px rgba(13,27,31,0.06)",
+        card: "0 8px 30px -8px rgba(13,27,31,0.15)",
+        lift: "0 20px 40px -12px rgba(13,27,31,0.25)",
+        glow: "0 0 0 1px rgba(255,255,255,0.08), 0 8px 32px rgba(0,0,0,0.24)",
+      },
+      animation: {
+        "fade-up": "fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) forwards",
+        "float": "float 6s ease-in-out infinite",
+      },
+      keyframes: {
+        fadeUp: {
+          "0%": { opacity: 0, transform: "translateY(24px)" },
+          "100%": { opacity: 1, transform: "translateY(0)" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+      },
+      maxWidth: {
+        "8xl": "1440px",
+      },
+    },
+  },
+  plugins: [],
+};

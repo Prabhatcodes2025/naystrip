@@ -1,0 +1,107 @@
+import { useState } from "react";
+import { Navigate, NavLink, Outlet, useNavigate } from "react-router-dom";
+import {
+  LayoutDashboard, Map, Users, MessageSquare, Newspaper, Star, Settings,
+  Menu, X, Search, Bell, LogOut, Compass,
+} from "lucide-react";
+import { isAdminLoggedIn, adminLogout } from "../../utils/storage";
+
+const navItems = [
+  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
+  { to: "/admin/tours", label: "Tour Management", icon: Map },
+  { to: "/admin/leads", label: "Custom Trip Leads", icon: Users },
+  { to: "/admin/contact-leads", label: "Contact Leads", icon: MessageSquare },
+  { to: "/admin/blogs", label: "Blog Management", icon: Newspaper },
+  { to: "/admin/stories", label: "Happy Travellers", icon: Star },
+  { to: "/admin/settings", label: "Website Settings", icon: Settings },
+];
+
+export default function AdminLayout() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+
+  if (!isAdminLoggedIn()) return <Navigate to="/admin/login" replace />;
+
+  const handleLogout = () => {
+    adminLogout();
+    navigate("/admin/login");
+  };
+
+  const SidebarContent = (
+    <>
+      <div className="flex items-center gap-2.5 px-5 py-6">
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold-400 text-navy-950">
+          <Compass size={18} />
+        </span>
+        <span className="font-display text-lg font-bold text-white">Altiora Admin</span>
+      </div>
+      <nav className="flex-1 px-3 space-y-1">
+        {navItems.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.end}
+            onClick={() => setSidebarOpen(false)}
+            className={({ isActive }) =>
+              `flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${
+                isActive ? "bg-white/10 text-gold-300" : "text-white/60 hover:bg-white/5 hover:text-white"
+              }`
+            }
+          >
+            <item.icon size={17} /> {item.label}
+          </NavLink>
+        ))}
+      </nav>
+      <div className="p-3">
+        <button onClick={handleLogout} className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-white/60 hover:bg-white/5 hover:text-terracotta-400 transition-colors">
+          <LogOut size={17} /> Logout
+        </button>
+      </div>
+    </>
+  );
+
+  return (
+    <div className="min-h-screen bg-navy-50/40 flex">
+      {/* Desktop sidebar */}
+      <aside className="hidden lg:flex lg:flex-col w-64 shrink-0 bg-navy-950 min-h-screen sticky top-0">{SidebarContent}</aside>
+
+      {/* Mobile sidebar */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="absolute inset-0 bg-navy-950/60" onClick={() => setSidebarOpen(false)} />
+          <aside className="absolute left-0 top-0 h-full w-72 bg-navy-950 flex flex-col">
+            <button onClick={() => setSidebarOpen(false)} className="absolute right-4 top-6 text-white/60"><X size={20} /></button>
+            {SidebarContent}
+          </aside>
+        </div>
+      )}
+
+      <div className="flex-1 min-w-0">
+        {/* Topbar */}
+        <header className="sticky top-0 z-30 bg-white border-b border-navy-100 px-5 py-3.5 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 flex-1">
+            <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-navy-700"><Menu size={22} /></button>
+            <div className="relative hidden sm:block max-w-xs w-full">
+              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-navy-400" />
+              <input placeholder="Search..." className="w-full rounded-xl border border-navy-200 bg-navy-50/50 pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-terracotta-400" />
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <button className="relative text-navy-500"><Bell size={19} /><span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-terracotta-500" /></button>
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-navy-900 text-xs font-bold text-white">A</span>
+              <div className="hidden sm:block">
+                <p className="text-xs font-semibold text-navy-800">Admin User</p>
+                <p className="text-[11px] text-navy-400">admin@travel.com</p>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="p-5 sm:p-8">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: "Manrope", system-ui, sans-serif;
+  background-color: #faf7f0;
+  color: #141b1e;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+::selection {
+  background: #d68a1c;
+  color: #fff;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #d68a1c;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #f0f4f5;
+}
+::-webkit-scrollbar-thumb {
+  background: #83a3aa;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #547e87;
+}
+
+@layer components {
+  .container-lg {
+    @apply max-w-8xl mx-auto px-5 sm:px-8 lg:px-12;
+  }
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-xs sm:text-sm font-semibold tracking-[0.18em] uppercase text-gold-600;
+  }
+  .section-title {
+    @apply font-display text-3xl sm:text-4xl lg:text-5xl font-semibold text-navy-900 leading-[1.15];
+  }
+  .section-subtitle {
+    @apply text-navy-500 text-base sm:text-lg leading-relaxed max-w-2xl;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-terracotta-500 px-6 py-3.5 text-sm font-semibold text-white shadow-soft transition-all duration-300 hover:bg-terracotta-600 hover:shadow-lift active:scale-[0.98];
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border-2 border-navy-800 bg-transparent px-6 py-3.5 text-sm font-semibold text-navy-800 transition-all duration-300 hover:bg-navy-800 hover:text-white active:scale-[0.98];
+  }
+  .btn-ghost-light {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-white/40 bg-white/10 backdrop-blur-sm px-6 py-3.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-white/20 active:scale-[0.98];
+  }
+  .card-surface {
+    @apply bg-white rounded-2xl shadow-soft border border-navy-100/60 transition-all duration-300;
+  }
+  .glass-panel {
+    @apply bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-glow;
+  }
+  .badge-pill {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-forest-50 text-forest-700 text-xs font-semibold px-3 py-1.5;
+  }
+  .input-field {
+    @apply w-full rounded-xl border border-navy-200 bg-white px-4 py-3 text-sm text-navy-900 placeholder:text-navy-400 transition-colors focus:border-terracotta-400 focus:outline-none;
+  }
+  .label-field {
+    @apply block text-sm font-semibold text-navy-700 mb-1.5;
+  }
+}
+
+.reveal {
+  opacity: 0;
+}
+.reveal.in-view {
+  animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.text-shadow-sm {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
