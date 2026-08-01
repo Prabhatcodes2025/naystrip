@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { CheckCircle2, Save } from "lucide-react";
 import { defaultSiteSettings, getSiteSettings, saveSiteSettings } from "../../data/siteConfig";
+import BrandLogo from "../../components/branding/BrandLogo";
 
 export default function AdminSettings() {
   const [form, setForm] = useState(getSiteSettings());
@@ -33,7 +34,7 @@ export default function AdminSettings() {
         <div className="rounded-2xl bg-white border border-navy-100 shadow-soft p-6 space-y-4">
           <h3 className="text-sm font-semibold text-navy-800">General</h3>
           <div className="grid sm:grid-cols-2 gap-4">
-            <div><label className="label-field">Website Logo Text</label><input value={form.brandName} onChange={(e) => update("brandName", e.target.value)} className="input-field" /></div>
+            <div><span className="label-field">Official brand asset</span><div className="flex min-h-28 items-center bg-[#fffaf2] p-3"><BrandLogo className="h-24 w-auto"/></div><p className="mt-1 text-xs text-navy-400">Locked to the approved NaysTrip master logo.</p></div>
             <div><label className="label-field">Homepage CTA Text</label><input value={form.homepageCtaText} onChange={(e) => update("homepageCtaText", e.target.value)} className="input-field" /></div>
           </div>
         </div>

@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@media print {
+  header, footer, aside, button, .print\:hidden { display: none !important; }
+  body { background: #fff !important; color: #172033 !important; }
+  main, section { padding-top: 0 !important; padding-bottom: 0 !important; }
+  article { break-inside: avoid; }
+  a { color: inherit !important; text-decoration: none !important; }
+}
+
 * {
   box-sizing: border-box;
 }

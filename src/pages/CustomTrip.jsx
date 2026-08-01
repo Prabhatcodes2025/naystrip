@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   MapPin, Calendar, Moon, Users, Baby, Compass, Wallet, User, Phone, Mail,
   Plane, Hotel, Bus, Car, Ship, Landmark, FileCheck, Shield, CheckCircle2, ArrowRight, ArrowLeft,
@@ -6,6 +7,7 @@ import {
 import { PageBanner } from "../components/shared/Bits";
 import Seo from "../components/shared/Seo";
 import { saveCustomLead } from "../utils/storage";
+import { getTourBySlug } from "../data/tours";
 
 const serviceOptions = [
   { key: "flights", label: "Flights", icon: Plane },
@@ -19,17 +21,21 @@ const serviceOptions = [
 ];
 
 const initialState = {
-  from: "", to: "", departureDate: "", nights: "3", adults: "2", minors: "0",
-  tripType: "Adventure", budget: "50000-100000",
-  firstName: "", lastName: "", phone: "", email: "", details: "", consent: false,
+  from: "", to: "", departureDate: "", flexibleDates: false, nights: "3", adults: "2", minors: "0", rooms: "1",
+  tripType: "Adventure", budget: "50000-100000", hotelCategory: "3-star", mealPlan: "Breakfast", transportPreference: "Private car",
+  firstName: "", lastName: "", phone: "", email: "", details: "", packageSlug: "", consent: false, whatsappConsent: true,
   services: {},
 };
 
 export default function CustomTrip() {
+  const [params] = useSearchParams();
   const [step, setStep] = useState(1);
-  const [data, setData] = useState(initialState);
+  const [data, setData] = useState(()=>{try{return {...initialState,...JSON.parse(sessionStorage.getItem("naystrip_trip_draft")||"{}")}}catch{return initialState}});
   const [errors, setErrors] = useState({});
   const [result, setResult] = useState(null);
+
+  useEffect(()=>{const slug=params.get("package");const tour=slug&&getTourBySlug(slug);if(tour)setData((current)=>({...current,to:current.to||tour.destinations.join(", "),nights:String(Math.max(1,tour.itinerary.length-1)),packageSlug:slug,details:current.details||`Please customise the ${tour.title} itinerary.`}))},[params]);
+  useEffect(()=>{sessionStorage.setItem("naystrip_trip_draft",JSON.stringify(data))},[data]);
 
   const update = (field, value) => setData((d) => ({ ...d, [field]: value }));
   const toggleService = (key) => setData((d) => ({ ...d, services: { ...d.services, [key]: !d.services[key] } }));
@@ -39,13 +45,13 @@ export default function CustomTrip() {
     if (s === 1) {
       if (!data.from.trim()) e.from = "Required";
       if (!data.to.trim()) e.to = "Required";
-      if (!data.departureDate) e.departureDate = "Required";
+      if (!data.flexibleDates && !data.departureDate) e.departureDate = "Choose a date or mark dates flexible";
     }
     if (s === 3) {
       if (!data.firstName.trim()) e.firstName = "Required";
       if (!data.lastName.trim()) e.lastName = "Required";
-      if (!data.phone.trim()) e.phone = "Required";
-      if (!data.email.trim()) e.email = "Required";
+      if (!/^[+\d][\d\s()-]{7,20}$/.test(data.phone.trim())) e.phone = "Enter a valid phone number";
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) e.email = "Enter a valid email";
       if (!data.consent) e.consent = "Please accept to continue";
     }
     setErrors(e);
@@ -58,7 +64,7 @@ export default function CustomTrip() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateStep(3)) return;
-    try { const entry = await saveCustomLead(data); setResult(entry.id); }
+    try { const entry = await saveCustomLead(data); sessionStorage.removeItem("naystrip_trip_draft"); setResult(entry.id); }
     catch (error) { setErrors({ submit: error.message }); }
   };
 
@@ -146,6 +152,7 @@ export default function CustomTrip() {
                     <label htmlFor="trip-date" className="label-field"><Calendar size={14} className="inline mr-1.5 -mt-0.5" />Departure Date</label>
                     <input id="trip-date" type="date" value={data.departureDate} onChange={(e) => update("departureDate", e.target.value)} className="input-field" />
                     {errors.departureDate && <p className="text-xs text-terracotta-500 mt-1">{errors.departureDate}</p>}
+                    <label className="mt-2 flex items-center gap-2 text-xs text-navy-500"><input type="checkbox" checked={data.flexibleDates} onChange={(e)=>update("flexibleDates",e.target.checked)} className="accent-terracotta-500"/> My dates are flexible</label>
                   </div>
                   <div>
                     <label htmlFor="trip-nights" className="label-field"><Moon size={14} className="inline mr-1.5 -mt-0.5" />Number of Nights</label>
@@ -158,7 +165,7 @@ export default function CustomTrip() {
             {step === 2 && (
               <div className="space-y-6">
                 <h2 className="font-display text-xl font-semibold text-navy-900 mb-2">Who's travelling, and what do you need?</h2>
-                <div className="grid sm:grid-cols-3 gap-5">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
                   <div>
                     <label className="label-field"><Users size={14} className="inline mr-1.5 -mt-0.5" />Adults</label>
                     <input type="number" min="1" value={data.adults} onChange={(e) => update("adults", e.target.value)} className="input-field" />
@@ -170,10 +177,12 @@ export default function CustomTrip() {
                   <div>
                     <label className="label-field"><Compass size={14} className="inline mr-1.5 -mt-0.5" />Trip Type</label>
                     <select value={data.tripType} onChange={(e) => update("tripType", e.target.value)} className="input-field">
-                      <option>Adventure</option><option>Honeymoon</option><option>Family</option><option>Luxury</option><option>Wildlife</option><option>Religious</option>
+                      <optgroup label="Holiday"><option>Honeymoon</option><option>Family</option><option>Luxury</option><option>Wildlife</option><option>Religious</option><option>Leisure</option></optgroup><optgroup label="Adventure"><option>Adventure</option><option>Trek</option><option>Expedition</option></optgroup><optgroup label="Group"><option>Corporate</option><option>School or college</option><option>Friends group</option></optgroup>
                     </select>
                   </div>
+                  <div><label className="label-field">Rooms</label><input type="number" min="1" max="20" value={data.rooms} onChange={(e)=>update("rooms",e.target.value)} className="input-field"/></div>
                 </div>
+                <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <label className="label-field"><Wallet size={14} className="inline mr-1.5 -mt-0.5" />Budget (per person)</label>
                   <select value={data.budget} onChange={(e) => update("budget", e.target.value)} className="input-field">
@@ -182,6 +191,10 @@ export default function CustomTrip() {
                     <option value="50000-100000">₹50,000 – ₹1,00,000</option>
                     <option value="above-100000">Above ₹1,00,000</option>
                   </select>
+                </div>
+                <div><label className="label-field">Hotel category</label><select value={data.hotelCategory} onChange={(e)=>update("hotelCategory",e.target.value)} className="input-field"><option>Budget</option><option>3-star</option><option>4-star</option><option>5-star</option><option>Heritage or boutique</option></select></div>
+                <div><label className="label-field">Meal plan</label><select value={data.mealPlan} onChange={(e)=>update("mealPlan",e.target.value)} className="input-field"><option>Room only</option><option>Breakfast</option><option>Breakfast and dinner</option><option>All meals</option></select></div>
+                <div><label className="label-field">Transport preference</label><select value={data.transportPreference} onChange={(e)=>update("transportPreference",e.target.value)} className="input-field"><option>Private car</option><option>Tempo traveller</option><option>Coach</option><option>Self-drive</option><option>Public transport</option><option>Open to suggestions</option></select></div>
                 </div>
                 <div>
                   <label className="label-field mb-3">Services Needed</label>
@@ -237,6 +250,7 @@ export default function CustomTrip() {
                   <input type="checkbox" checked={data.consent} onChange={(e) => update("consent", e.target.checked)} className="mt-0.5 accent-terracotta-500" />
                   I agree to be contacted by NaysTrip &amp; Treks regarding my trip request via phone, email or WhatsApp.
                 </label>
+                <label className="flex items-start gap-2.5 text-xs text-navy-500"><input type="checkbox" checked={data.whatsappConsent} onChange={(e)=>update("whatsappConsent",e.target.checked)} className="mt-0.5 accent-terracotta-500"/>Send my enquiry reference and updates on WhatsApp.</label>
                 {errors.consent && <p className="text-xs text-terracotta-500">{errors.consent}</p>}
               </div>
             )}

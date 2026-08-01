@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { Navigate, NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard, Map, Users, MessageSquare, Newspaper, Star, Settings,
-  Menu, X, Search, Bell, LogOut, Compass,
+  LayoutDashboard, Map, Users, MessageSquare, Newspaper, Star, Settings, FileText,
+  Menu, X, Search, Bell, LogOut,
 } from "lucide-react";
 import { isAdminLoggedIn, adminLogout } from "../../utils/storage";
+import BrandLogo from "../../components/branding/BrandLogo";
 
 const navItems = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/admin/tours", label: "Tour Management", icon: Map },
   { to: "/admin/leads", label: "Custom Trip Leads", icon: Users },
   { to: "/admin/contact-leads", label: "Contact Leads", icon: MessageSquare },
+  { to: "/admin/quotations", label: "Quotations", icon: FileText },
   { to: "/admin/blogs", label: "Blog Management", icon: Newspaper },
   { to: "/admin/stories", label: "Happy Travellers", icon: Star },
   { to: "/admin/settings", label: "Website Settings", icon: Settings },
@@ -29,11 +31,9 @@ export default function AdminLayout() {
 
   const SidebarContent = (
     <>
-      <div className="flex items-center gap-2.5 px-5 py-6">
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold-400 text-navy-950">
-          <Compass size={18} />
-        </span>
-        <span className="font-display text-lg font-bold text-white">NaysTrip Admin</span>
+      <div className="px-5 py-5">
+        <BrandLogo className="h-20 w-auto" />
+        <span className="mt-1 block text-xs font-semibold uppercase tracking-[.16em] text-white/50">Admin console</span>
       </div>
       <nav className="flex-1 px-3 space-y-1">
         {navItems.map((item) => (

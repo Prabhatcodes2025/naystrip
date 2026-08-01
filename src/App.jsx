@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 import PublicLayout from "./components/layout/PublicLayout";
+import BrandLogo from "./components/branding/BrandLogo";
 
 const Home = lazy(() => import("./pages/Home"));
 const ToursListing = lazy(() => import("./pages/ToursListing"));
@@ -32,11 +33,12 @@ const AdminContactLeads = lazy(() => import("./pages/admin/AdminContactLeads"));
 const AdminBlogs = lazy(() => import("./pages/admin/AdminBlogs"));
 const AdminStories = lazy(() => import("./pages/admin/AdminStories"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
+const AdminQuotations = lazy(() => import("./pages/admin/AdminQuotations"));
 
 function PageLoader() {
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-terracotta-300 border-t-terracotta-500" />
+      <BrandLogo variant="symbol" eager className="h-20 w-20 animate-pulse" />
     </div>
   );
 }
@@ -84,6 +86,7 @@ export default function App() {
         <Route path="tours" element={<AdminTours />} />
         <Route path="leads" element={<AdminLeads />} />
         <Route path="contact-leads" element={<AdminContactLeads />} />
+        <Route path="quotations" element={<AdminQuotations />} />
         <Route path="blogs" element={<AdminBlogs />} />
         <Route path="stories" element={<AdminStories />} />
         <Route path="settings" element={<AdminSettings />} />

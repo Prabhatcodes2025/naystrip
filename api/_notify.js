@@ -1,0 +1,7 @@
+const safe=(value)=>String(value??"").replace(/[<>&]/g,(char)=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[char]));
+export async function notifyNewLead(record){
+ const jobs=[];const summary=`${record.id}: ${record.name} • ${record.phone} • ${record.destination||"Destination not set"}`;
+ if(process.env.RESEND_API_KEY&&process.env.LEADS_NOTIFICATION_EMAIL)jobs.push(fetch("https://api.resend.com/emails",{method:"POST",headers:{Authorization:`Bearer ${process.env.RESEND_API_KEY}`,"Content-Type":"application/json"},body:JSON.stringify({from:process.env.RESEND_FROM||"NaysTrip Website <website@naystrip.com>",to:[process.env.LEADS_NOTIFICATION_EMAIL],subject:`New ${record.kind.replace("_"," ")} enquiry ${record.id}`,html:`<div style="font-family:Arial,sans-serif"><img src="https://www.naystrip.com/branding/naystrip-logo.png" width="180" alt="NaysTrip – Leisure to Adventure"><h2>New website enquiry</h2><p>${safe(summary)}</p><p>Open the admin console to assign and follow up.</p></div>`})}));
+ if(process.env.WHATSAPP_API_URL&&process.env.WHATSAPP_API_TOKEN)jobs.push(fetch(process.env.WHATSAPP_API_URL,{method:"POST",headers:{Authorization:`Bearer ${process.env.WHATSAPP_API_TOKEN}`,"Content-Type":"application/json"},body:JSON.stringify({to:process.env.WHATSAPP_LEADS_TO,text:`NaysTrip new enquiry\n${summary}`})}));
+ const results=await Promise.allSettled(jobs);for(const result of results)if(result.status==="rejected")console.error("lead_notification_failed",result.reason);return results.length;
+}

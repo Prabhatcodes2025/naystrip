@@ -1,0 +1,3 @@
+import test from "node:test";import assert from "node:assert/strict";import {createHash} from "node:crypto";import {readFile,stat} from "node:fs/promises";
+test("official NaysTrip master logo is preserved byte-for-byte",async()=>{const bytes=await readFile("public/branding/naystrip-logo.png");assert.equal(createHash("sha256").update(bytes).digest("hex"),"316da823056d48f49b01637dd75b591fe3609d4efd00ae9331f00ccdabd236e2")});
+test("derived brand assets are present and non-empty",async()=>{for(const path of ["public/branding/naystrip-logo-transparent.png","public/branding/naystrip-symbol.png","public/apple-touch-icon.png","public/favicon.ico","public/og.png"])assert.ok((await stat(path)).size>1000,`${path} should be generated`)})
