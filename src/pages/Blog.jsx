@@ -26,7 +26,7 @@ export default function Blog() {
 
   return (
     <>
-      <Seo title="Travel Blog | Altiora Journeys" description="Destination guides, packing lists and travel tips from our team of travel experts." />
+      <Seo title="Travel Blog | NaysTrip & Treks" description="Destination guides, packing lists and practical travel notes." />
       <PageBanner
         eyebrow="Travel Inspiration"
         title="The Journal"

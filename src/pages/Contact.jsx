@@ -13,7 +13,7 @@ export default function Contact() {
 
   const update = (field, value) => setForm((f) => ({ ...f, [field]: value }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const e2 = {};
     if (!form.name.trim()) e2.name = "Required";
@@ -22,16 +22,15 @@ export default function Contact() {
     if (!form.message.trim()) e2.message = "Required";
     setErrors(e2);
     if (Object.keys(e2).length) return;
-    const entry = saveContactLead(form);
-    setResult(entry.id);
-    setForm({ name: "", phone: "", email: "", destination: "", message: "" });
+    try { const entry = await saveContactLead(form); setResult(entry.id); setForm({ name: "", phone: "", email: "", destination: "", message: "" }); }
+    catch (error) { setErrors({ submit: error.message }); }
   };
 
   const waLink = `https://wa.me/${settings.whatsapp.replace(/\D/g, "")}?text=${encodeURIComponent("Hi! I have a question about planning a trip.")}`;
 
   return (
     <>
-      <Seo title="Contact Us | Altiora Journeys" description="Get in touch with our travel experts for personalised trip planning and support." />
+      <Seo title="Contact Us | NaysTrip & Treks" description="Contact our Navi Mumbai travel team for personalised trip planning and support." />
       <PageBanner
         eyebrow="We'd Love to Hear From You"
         title="Contact Us"
@@ -68,13 +67,11 @@ export default function Contact() {
               </a>
             </div>
 
-            <div className="card-surface overflow-hidden aspect-[4/3] relative">
-              <div className="absolute inset-0 bg-navy-100 flex flex-col items-center justify-center gap-2">
-                <MapPin size={28} className="text-navy-400" />
-                <p className="text-sm font-semibold text-navy-500">Google Map Embed</p>
-                <p className="text-xs text-navy-400 px-6 text-center">Our office location will display here once connected to Google Maps.</p>
-              </div>
-            </div>
+            <a href="https://www.google.com/maps/search/?api=1&query=EL146%20Mahape%20Navi%20Mumbai" target="_blank" rel="noopener noreferrer" className="card-surface flex aspect-[4/3] flex-col items-center justify-center gap-3 bg-navy-50 text-center">
+              <MapPin size={28} className="text-terracotta-500" />
+              <p className="text-sm font-semibold text-navy-700">Open office location</p>
+              <p className="max-w-xs px-6 text-xs leading-5 text-navy-500">EL146, Mahape, Navi Mumbai, Maharashtra</p>
+            </a>
           </div>
 
           <div className="lg:col-span-3">
@@ -95,33 +92,34 @@ export default function Contact() {
                   <p className="text-sm text-navy-500 mb-6">Fill out the form and our travel experts will reach out shortly.</p>
                   <div className="grid sm:grid-cols-2 gap-5">
                     <div>
-                      <label className="label-field">Full Name</label>
-                      <input value={form.name} onChange={(e) => update("name", e.target.value)} className="input-field" />
+                      <label htmlFor="contact-name" className="label-field">Full Name</label>
+                      <input id="contact-name" value={form.name} onChange={(e) => update("name", e.target.value)} className="input-field" />
                       {errors.name && <p className="text-xs text-terracotta-500 mt-1">{errors.name}</p>}
                     </div>
                     <div>
-                      <label className="label-field">Phone Number</label>
-                      <input value={form.phone} onChange={(e) => update("phone", e.target.value)} className="input-field" />
+                      <label htmlFor="contact-phone" className="label-field">Phone Number</label>
+                      <input id="contact-phone" value={form.phone} onChange={(e) => update("phone", e.target.value)} className="input-field" />
                       {errors.phone && <p className="text-xs text-terracotta-500 mt-1">{errors.phone}</p>}
                     </div>
                     <div>
-                      <label className="label-field">Email Address</label>
-                      <input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} className="input-field" />
+                      <label htmlFor="contact-email" className="label-field">Email Address</label>
+                      <input id="contact-email" type="email" value={form.email} onChange={(e) => update("email", e.target.value)} className="input-field" />
                       {errors.email && <p className="text-xs text-terracotta-500 mt-1">{errors.email}</p>}
                     </div>
                     <div>
-                      <label className="label-field">Destination (optional)</label>
-                      <input value={form.destination} onChange={(e) => update("destination", e.target.value)} className="input-field" />
+                      <label htmlFor="contact-destination" className="label-field">Destination (optional)</label>
+                      <input id="contact-destination" value={form.destination} onChange={(e) => update("destination", e.target.value)} className="input-field" />
                     </div>
                   </div>
                   <div>
-                    <label className="label-field">Message</label>
-                    <textarea rows={5} value={form.message} onChange={(e) => update("message", e.target.value)} className="input-field resize-none" placeholder="Tell us about the trip you have in mind..." />
+                    <label htmlFor="contact-message" className="label-field">Message</label>
+                    <textarea id="contact-message" rows={5} value={form.message} onChange={(e) => update("message", e.target.value)} className="input-field resize-none" placeholder="Tell us about the trip you have in mind..." />
                     {errors.message && <p className="text-xs text-terracotta-500 mt-1">{errors.message}</p>}
                   </div>
                   <button type="submit" className="btn-primary w-full sm:w-auto">
                     <Send size={16} /> Send Message
                   </button>
+                  {errors.submit && <p role="alert" className="text-sm text-terracotta-600">{errors.submit}</p>}
                 </form>
               )}
             </div>

@@ -33,7 +33,7 @@ export default function AdminLayout() {
         <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold-400 text-navy-950">
           <Compass size={18} />
         </span>
-        <span className="font-display text-lg font-bold text-white">Altiora Admin</span>
+        <span className="font-display text-lg font-bold text-white">NaysTrip Admin</span>
       </div>
       <nav className="flex-1 px-3 space-y-1">
         {navItems.map((item) => (
@@ -92,7 +92,7 @@ export default function AdminLayout() {
               <span className="flex h-9 w-9 items-center justify-center rounded-full bg-navy-900 text-xs font-bold text-white">A</span>
               <div className="hidden sm:block">
                 <p className="text-xs font-semibold text-navy-800">Admin User</p>
-                <p className="text-[11px] text-navy-400">admin@travel.com</p>
+                <p className="text-[11px] text-navy-400">Authenticated staff</p>
               </div>
             </div>
           </div>

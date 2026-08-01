@@ -55,17 +55,17 @@ export default function CustomTrip() {
   const next = () => { if (validateStep(step)) setStep((s) => Math.min(3, s + 1)); };
   const back = () => setStep((s) => Math.max(1, s - 1));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateStep(3)) return;
-    const entry = saveCustomLead(data);
-    setResult(entry.id);
+    try { const entry = await saveCustomLead(data); setResult(entry.id); }
+    catch (error) { setErrors({ submit: error.message }); }
   };
 
   if (result) {
     return (
       <>
-        <Seo title="Trip Request Received | Altiora Journeys" />
+        <Seo title="Trip Request Received | NaysTrip & Treks" />
         <section className="min-h-[70vh] flex items-center justify-center py-20">
           <div className="container-lg max-w-lg text-center">
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-forest-50 text-forest-600 mb-6">
@@ -94,7 +94,7 @@ export default function CustomTrip() {
 
   return (
     <>
-      <Seo title="Plan a Custom Trip | Altiora Journeys" description="Build a fully personalised itinerary in three simple steps." />
+      <Seo title="Plan a Custom Trip | NaysTrip & Treks" description="Build a fully personalised itinerary in three simple steps." />
       <PageBanner
         eyebrow="Tailor-Made"
         title="Plan Your Custom Trip"
@@ -133,23 +133,23 @@ export default function CustomTrip() {
                 <h2 className="font-display text-xl font-semibold text-navy-900 mb-2">Where would you like to go?</h2>
                 <div className="grid sm:grid-cols-2 gap-5">
                   <div>
-                    <label className="label-field"><MapPin size={14} className="inline mr-1.5 -mt-0.5" />Leaving From</label>
-                    <input value={data.from} onChange={(e) => update("from", e.target.value)} placeholder="e.g. Delhi" className="input-field" />
+                    <label htmlFor="trip-from" className="label-field"><MapPin size={14} className="inline mr-1.5 -mt-0.5" />Leaving From</label>
+                    <input id="trip-from" value={data.from} onChange={(e) => update("from", e.target.value)} placeholder="e.g. Delhi" className="input-field" />
                     {errors.from && <p className="text-xs text-terracotta-500 mt-1">{errors.from}</p>}
                   </div>
                   <div>
-                    <label className="label-field"><Compass size={14} className="inline mr-1.5 -mt-0.5" />Going To</label>
-                    <input value={data.to} onChange={(e) => update("to", e.target.value)} placeholder="e.g. Leh Ladakh" className="input-field" />
+                    <label htmlFor="trip-to" className="label-field"><Compass size={14} className="inline mr-1.5 -mt-0.5" />Going To</label>
+                    <input id="trip-to" value={data.to} onChange={(e) => update("to", e.target.value)} placeholder="e.g. Leh Ladakh" className="input-field" />
                     {errors.to && <p className="text-xs text-terracotta-500 mt-1">{errors.to}</p>}
                   </div>
                   <div>
-                    <label className="label-field"><Calendar size={14} className="inline mr-1.5 -mt-0.5" />Departure Date</label>
-                    <input type="date" value={data.departureDate} onChange={(e) => update("departureDate", e.target.value)} className="input-field" />
+                    <label htmlFor="trip-date" className="label-field"><Calendar size={14} className="inline mr-1.5 -mt-0.5" />Departure Date</label>
+                    <input id="trip-date" type="date" value={data.departureDate} onChange={(e) => update("departureDate", e.target.value)} className="input-field" />
                     {errors.departureDate && <p className="text-xs text-terracotta-500 mt-1">{errors.departureDate}</p>}
                   </div>
                   <div>
-                    <label className="label-field"><Moon size={14} className="inline mr-1.5 -mt-0.5" />Number of Nights</label>
-                    <input type="number" min="1" value={data.nights} onChange={(e) => update("nights", e.target.value)} className="input-field" />
+                    <label htmlFor="trip-nights" className="label-field"><Moon size={14} className="inline mr-1.5 -mt-0.5" />Number of Nights</label>
+                    <input id="trip-nights" type="number" min="1" value={data.nights} onChange={(e) => update("nights", e.target.value)} className="input-field" />
                   </div>
                 </div>
               </div>
@@ -209,23 +209,23 @@ export default function CustomTrip() {
                 <h2 className="font-display text-xl font-semibold text-navy-900 mb-2">How can we reach you?</h2>
                 <div className="grid sm:grid-cols-2 gap-5">
                   <div>
-                    <label className="label-field"><User size={14} className="inline mr-1.5 -mt-0.5" />First Name</label>
-                    <input value={data.firstName} onChange={(e) => update("firstName", e.target.value)} className="input-field" />
+                    <label htmlFor="trip-first-name" className="label-field"><User size={14} className="inline mr-1.5 -mt-0.5" />First Name</label>
+                    <input id="trip-first-name" value={data.firstName} onChange={(e) => update("firstName", e.target.value)} className="input-field" />
                     {errors.firstName && <p className="text-xs text-terracotta-500 mt-1">{errors.firstName}</p>}
                   </div>
                   <div>
-                    <label className="label-field">Last Name</label>
-                    <input value={data.lastName} onChange={(e) => update("lastName", e.target.value)} className="input-field" />
+                    <label htmlFor="trip-last-name" className="label-field">Last Name</label>
+                    <input id="trip-last-name" value={data.lastName} onChange={(e) => update("lastName", e.target.value)} className="input-field" />
                     {errors.lastName && <p className="text-xs text-terracotta-500 mt-1">{errors.lastName}</p>}
                   </div>
                   <div>
-                    <label className="label-field"><Phone size={14} className="inline mr-1.5 -mt-0.5" />Phone</label>
-                    <input value={data.phone} onChange={(e) => update("phone", e.target.value)} className="input-field" />
+                    <label htmlFor="trip-phone" className="label-field"><Phone size={14} className="inline mr-1.5 -mt-0.5" />Phone</label>
+                    <input id="trip-phone" value={data.phone} onChange={(e) => update("phone", e.target.value)} className="input-field" />
                     {errors.phone && <p className="text-xs text-terracotta-500 mt-1">{errors.phone}</p>}
                   </div>
                   <div>
-                    <label className="label-field"><Mail size={14} className="inline mr-1.5 -mt-0.5" />Email</label>
-                    <input type="email" value={data.email} onChange={(e) => update("email", e.target.value)} className="input-field" />
+                    <label htmlFor="trip-email" className="label-field"><Mail size={14} className="inline mr-1.5 -mt-0.5" />Email</label>
+                    <input id="trip-email" type="email" value={data.email} onChange={(e) => update("email", e.target.value)} className="input-field" />
                     {errors.email && <p className="text-xs text-terracotta-500 mt-1">{errors.email}</p>}
                   </div>
                 </div>
@@ -235,7 +235,7 @@ export default function CustomTrip() {
                 </div>
                 <label className="flex items-start gap-2.5 text-xs text-navy-500">
                   <input type="checkbox" checked={data.consent} onChange={(e) => update("consent", e.target.checked)} className="mt-0.5 accent-terracotta-500" />
-                  I agree to be contacted by {`Altiora Journeys`} regarding my trip request via phone, email or WhatsApp.
+                  I agree to be contacted by NaysTrip &amp; Treks regarding my trip request via phone, email or WhatsApp.
                 </label>
                 {errors.consent && <p className="text-xs text-terracotta-500">{errors.consent}</p>}
               </div>
@@ -251,6 +251,7 @@ export default function CustomTrip() {
                 <button type="submit" className="btn-primary">Submit Trip Request</button>
               )}
             </div>
+            {errors.submit && <p role="alert" className="mt-4 text-sm text-terracotta-600">{errors.submit}</p>}
           </form>
         </div>
       </section>

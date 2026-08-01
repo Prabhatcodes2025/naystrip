@@ -1,263 +1,148 @@
-export const tours = [
-  {
-    slug: "magical-kashmir-escape",
-    title: "Magical Kashmir Escape",
-    destination: "Kashmir",
-    type: "Domestic",
-    tripType: "Honeymoon",
-    duration: "6 Days / 5 Nights",
-    groupSize: "2–12 people",
-    hotelCategory: "4 Star",
-    transport: "Private Sedan/SUV",
-    rating: 4.8,
-    reviews: 216,
-    originalPrice: 32999,
-    price: 24999,
-    departureMonths: ["April", "May", "June", "September"],
-    image: "https://images.unsplash.com/photo-1566837945700-30057527ade0?auto=format&fit=crop&w=1200&q=80",
-    gallery: [
-      "https://images.unsplash.com/photo-1566837945700-30057527ade0?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1611348586840-ea9872d33411?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1573551110315-8b8fc6d9b8fd?auto=format&fit=crop&w=1200&q=80",
-    ],
-    featured: true,
-    overview:
-      "Drift on a houseboat across Dal Lake, wander through Mughal gardens and ride the Gulmarg gondola on this beautifully paced Kashmir holiday, designed for couples and families alike.",
-    itinerary: [
-      { day: 1, title: "Arrival in Srinagar", details: "Airport pickup, transfer to a deluxe houseboat on Dal Lake, evening shikara ride." },
-      { day: 2, title: "Srinagar Sightseeing", details: "Visit Mughal Gardens (Nishat & Shalimar), Shankaracharya Temple and local markets." },
-      { day: 3, title: "Srinagar to Gulmarg", details: "Drive to Gulmarg, ride the Gondola (Phase 1), leisure time in the meadows." },
-      { day: 4, title: "Gulmarg to Pahalgam", details: "Scenic drive to Pahalgam via Awantipora ruins, evening at leisure by the Lidder river." },
-      { day: 5, title: "Pahalgam Exploration", details: "Visit Betaab Valley, Aru Valley and Chandanwari (subject to weather/road conditions)." },
-      { day: 6, title: "Departure", details: "Transfer to Srinagar airport for your onward journey." },
-    ],
-    inclusions: [
-      "5 nights accommodation (1 houseboat + 4 hotel nights)",
-      "Daily breakfast and dinner",
-      "All transfers in private AC vehicle",
-      "Shikara ride on Dal Lake",
-      "Gulmarg Gondola Phase 1 tickets",
-      "All applicable toll and parking charges",
-    ],
-    exclusions: ["Airfare/train fare", "Gondola Phase 2 tickets", "Personal expenses", "Travel insurance", "Anything not mentioned in inclusions"],
-    accommodation: "Handpicked 4-star hotels and a deluxe houseboat with lake-facing rooms.",
-    transportDetails: "Private Innova/Sedan throughout, driven by experienced local drivers.",
-    importantInfo: "Gulmarg and Pahalgam excursions are subject to weather and road conditions. Itinerary order may change locally for logistical reasons.",
-    cancellationPolicy: "Free cancellation up to 15 days before departure. 50% refund 7–14 days before. No refund within 7 days.",
-    faqs: [
-      { q: "Is this trip suitable for a honeymoon?", a: "Yes, this itinerary is one of our most-booked honeymoon packages, with candle-light dinner add-ons available on request." },
-      { q: "Can we customise the itinerary?", a: "Absolutely — use our Custom Trip planner or send an inquiry and our team will tailor it to your dates and preferences." },
-    ],
-  },
-  {
-    slug: "leh-ladakh-road-adventure",
-    title: "Leh Ladakh Road Adventure",
-    destination: "Leh Ladakh",
-    type: "Domestic",
-    tripType: "Adventure",
-    duration: "8 Days / 7 Nights",
-    groupSize: "4–16 people",
-    hotelCategory: "3 Star",
-    transport: "Innova/Tempo Traveller",
-    rating: 4.9,
-    reviews: 341,
-    originalPrice: 38999,
-    price: 29999,
-    departureMonths: ["June", "July", "August", "September"],
-    image: "https://images.unsplash.com/photo-1585116938581-6f7ad9fbb7ea?auto=format&fit=crop&w=1200&q=80",
-    gallery: [
-      "https://images.unsplash.com/photo-1585116938581-6f7ad9fbb7ea?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1626621331169-5f34be280e85?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1573551110315-8b8fc6d9b8fd?auto=format&fit=crop&w=1200&q=80",
-    ],
-    featured: true,
-    overview:
-      "A classic Ladakh road trip covering Pangong Lake, Nubra Valley and Khardung La, with proper acclimatisation days built in for a safe, unhurried high-altitude experience.",
-    itinerary: [
-      { day: 1, title: "Arrival in Leh", details: "Airport pickup, rest and acclimatisation, evening walk on Leh market." },
-      { day: 2, title: "Leh Local Sightseeing", details: "Shanti Stupa, Leh Palace, Hall of Fame — light activity to continue acclimatising." },
-      { day: 3, title: "Leh to Nubra Valley via Khardung La", details: "Cross one of the world's highest motorable passes, overnight in Hunder." },
-      { day: 4, title: "Nubra Valley Exploration", details: "Double-humped camel safari at Hunder sand dunes, visit Diskit Monastery." },
-      { day: 5, title: "Nubra to Pangong Lake", details: "Drive via Shyok route to the stunning Pangong Tso, overnight by the lake." },
-      { day: 6, title: "Pangong to Leh", details: "Return drive via Chang La pass, evening at leisure in Leh." },
-      { day: 7, title: "Leh to Sham Valley", details: "Visit Magnetic Hill, Gurudwara Pathar Sahib and Sangam viewpoint." },
-      { day: 8, title: "Departure", details: "Transfer to Leh airport for your onward journey." },
-    ],
-    inclusions: [
-      "7 nights hotel/camp accommodation",
-      "Daily breakfast and dinner",
-      "Private vehicle for the entire circuit",
-      "Inner Line Permits for Nubra and Pangong",
-      "Oxygen cylinder on board for emergencies",
-      "Experienced high-altitude driver",
-    ],
-    exclusions: ["Airfare", "Camel safari charges at Nubra", "Personal expenses", "Travel/medical insurance"],
-    accommodation: "Comfortable 3-star hotels in Leh and Nubra, premium Swiss tents by Pangong Lake.",
-    transportDetails: "Toyota Innova or Tempo Traveller depending on group size, suited for high-altitude terrain.",
-    importantInfo: "Basic fitness and prior medical check-up recommended. Ladakh's altitude requires gradual acclimatisation — please avoid strenuous activity on Day 1.",
-    cancellationPolicy: "Free cancellation up to 20 days before departure. 50% refund 10–19 days before. No refund within 10 days.",
-    faqs: [
-      { q: "Is oxygen support available?", a: "Yes, all vehicles carry oxygen cylinders and our team is trained in basic altitude sickness response." },
-      { q: "What is the best time to travel?", a: "June to September, when all high passes are typically open and roads are in the best condition." },
-    ],
-  },
-  {
-    slug: "romantic-manali-getaway",
-    title: "Romantic Manali Getaway",
-    destination: "Manali",
-    type: "Domestic",
-    tripType: "Honeymoon",
-    duration: "5 Days / 4 Nights",
-    groupSize: "2–10 people",
-    hotelCategory: "4 Star",
-    transport: "Private Sedan",
-    rating: 4.7,
-    reviews: 189,
-    originalPrice: 19999,
-    price: 14999,
-    departureMonths: ["Year-round"],
-    image: "https://images.unsplash.com/photo-1626016909965-b5b5b5b5b5b5?auto=format&fit=crop&w=1200&q=80",
-    gallery: [
-      "https://images.unsplash.com/photo-1626016909965-b5b5b5b5b5b5?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1533130061792-64b345e4a833?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1626197031507-c17099753214?auto=format&fit=crop&w=1200&q=80",
-    ],
-    featured: true,
-    overview:
-      "A cosy mountain escape through Solang Valley, Old Manali's cafés and riverside resorts — designed for couples wanting relaxation over rush.",
-    itinerary: [
-      { day: 1, title: "Arrival in Manali", details: "Transfer to a riverside resort, evening at leisure exploring the Mall Road." },
-      { day: 2, title: "Solang Valley Excursion", details: "Optional paragliding and zorbing, scenic valley views." },
-      { day: 3, title: "Old Manali & Cafés", details: "Explore Hadimba Temple, Old Manali lanes and riverside cafés at your own pace." },
-      { day: 4, title: "Naggar & Jogini Falls", details: "Day trip to Naggar Castle and a short walk to Jogini Falls." },
-      { day: 5, title: "Departure", details: "Check out and transfer to Bhuntar Airport / Volvo stand." },
-    ],
-    inclusions: ["4 nights riverside resort stay", "Daily breakfast and dinner", "Private sedan for all transfers and sightseeing", "Bonfire evening (weather permitting)"],
-    exclusions: ["Adventure activity charges (paragliding, zorbing)", "Personal expenses", "5% GST"],
-    accommodation: "4-star riverside resort with mountain-facing rooms.",
-    transportDetails: "Private sedan throughout the trip.",
-    importantInfo: "Solang Valley activities depend on weather and are payable directly at the venue.",
-    cancellationPolicy: "Free cancellation up to 10 days before departure. 50% refund 5–9 days before.",
-    faqs: [{ q: "Is this good for a honeymoon on a budget?", a: "Yes, this is one of our most popular value-for-money honeymoon itineraries." }],
-  },
-  {
-    slug: "goa-beach-holiday",
-    title: "Goa Beach Holiday",
-    destination: "Goa",
-    type: "Domestic",
-    tripType: "Family",
-    duration: "4 Days / 3 Nights",
-    groupSize: "2–20 people",
-    hotelCategory: "4 Star",
-    transport: "Private AC Vehicle",
-    rating: 4.6,
-    reviews: 275,
-    originalPrice: 16999,
-    price: 12499,
-    departureMonths: ["November", "December", "January", "February"],
-    image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1200&q=80",
-    gallery: [
-      "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1587922546307-776227941871?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1512100356356-de1b84283e18?auto=format&fit=crop&w=1200&q=80",
-    ],
-    featured: true,
-    overview:
-      "A relaxed North Goa holiday covering beaches, forts and flea markets, with enough free time built in for you to explore at your own pace.",
-    itinerary: [
-      { day: 1, title: "Arrival & Baga Beach", details: "Check in to your beach resort, evening at Baga Beach." },
-      { day: 2, title: "North Goa Sightseeing", details: "Fort Aguada, Chapora Fort, Anjuna Beach and the flea market (seasonal)." },
-      { day: 3, title: "Leisure Day / Optional Cruise", details: "Free day for water sports or an optional sunset river cruise." },
-      { day: 4, title: "Departure", details: "Check out and transfer to Goa airport/railway station." },
-    ],
-    inclusions: ["3 nights 4-star resort stay", "Daily breakfast", "Airport/station transfers", "North Goa sightseeing by private vehicle"],
-    exclusions: ["Water sports and cruise charges", "Lunch and dinner", "Entry fees at forts (nominal)"],
-    accommodation: "4-star beachside resort, 5 minutes from Baga Beach.",
-    transportDetails: "Private AC vehicle for all transfers and sightseeing.",
-    importantInfo: "Flea markets operate seasonally (Oct–Apr) and are subject to local schedules.",
-    cancellationPolicy: "Free cancellation up to 7 days before departure.",
-    faqs: [{ q: "Is this suitable for families with kids?", a: "Yes, the pace is relaxed and the resort has a kids' pool and play area." }],
-  },
-  {
-    slug: "kerala-backwater-experience",
-    title: "Kerala Backwater Experience",
-    destination: "Kerala",
-    type: "Domestic",
-    tripType: "Family",
-    duration: "6 Days / 5 Nights",
-    groupSize: "2–14 people",
-    hotelCategory: "4 Star",
-    transport: "Private Sedan/SUV",
-    rating: 4.8,
-    reviews: 198,
-    originalPrice: 27999,
-    price: 21999,
-    departureMonths: ["September", "October", "November", "December", "January", "February"],
-    image: "https://images.unsplash.com/photo-1602301413530-b8d5b8d5b8d5?auto=format&fit=crop&w=1200&q=80",
-    gallery: [
-      "https://images.unsplash.com/photo-1602301413530-b8d5b8d5b8d5?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1580289143186-3939fca10dcf?auto=format&fit=crop&w=1200&q=80",
-    ],
-    featured: true,
-    overview:
-      "Cruise through the palm-fringed backwaters of Alleppey on a private houseboat, unwind in Munnar's tea gardens and end with Kochi's colonial charm.",
-    itinerary: [
-      { day: 1, title: "Arrival in Kochi", details: "Airport pickup, evening Kathakali performance (optional)." },
-      { day: 2, title: "Kochi to Munnar", details: "Scenic drive through spice plantations to the tea hills of Munnar." },
-      { day: 3, title: "Munnar Sightseeing", details: "Tea Museum, Eravikulam National Park, Mattupetty Dam." },
-      { day: 4, title: "Munnar to Alleppey Houseboat", details: "Drive to Alleppey, board your private houseboat for an overnight backwater cruise." },
-      { day: 5, title: "Alleppey to Kochi", details: "Disembark after breakfast, explore Fort Kochi's colonial quarter." },
-      { day: 6, title: "Departure", details: "Transfer to Kochi airport for your onward journey." },
-    ],
-    inclusions: ["5 nights accommodation including 1 night houseboat", "All meals on houseboat, breakfast elsewhere", "Private vehicle throughout", "Houseboat cruise with sundeck"],
-    exclusions: ["Airfare", "Kathakali show tickets", "Entry fees at national park", "Personal expenses"],
-    accommodation: "4-star hill resort in Munnar, premium private houseboat in Alleppey, boutique hotel in Kochi.",
-    transportDetails: "Private Innova/Sedan for road travel, dedicated houseboat crew for the cruise.",
-    importantInfo: "Houseboat cruising routes may vary slightly based on water levels and season.",
-    cancellationPolicy: "Free cancellation up to 15 days before departure. 50% refund 7–14 days before.",
-    faqs: [{ q: "Is the houseboat private?", a: "Yes, it's exclusively for your group with a dedicated chef and crew." }],
-  },
-  {
-    slug: "dubai-luxury-escape",
-    title: "Dubai Luxury Escape",
-    destination: "Dubai",
-    type: "International",
-    tripType: "Luxury",
-    duration: "5 Days / 4 Nights",
-    groupSize: "2–16 people",
-    hotelCategory: "5 Star",
-    transport: "Private Chauffeur",
-    rating: 4.9,
-    reviews: 154,
-    originalPrice: 89999,
-    price: 74999,
-    departureMonths: ["Year-round"],
-    image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80",
-    gallery: [
-      "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1518684079-3c830dcef090?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1580418827493-f2b22c0a76cb?auto=format&fit=crop&w=1200&q=80",
-    ],
-    featured: true,
-    overview:
-      "Experience Dubai's skyline, desert and shopping in five-star comfort — from Burj Khalifa's observation deck to a private desert safari under the stars.",
-    itinerary: [
-      { day: 1, title: "Arrival in Dubai", details: "Private airport transfer, evening at leisure at your 5-star hotel." },
-      { day: 2, title: "Dubai City Tour", details: "Burj Khalifa (124th floor), Dubai Mall, Dubai Fountain show." },
-      { day: 3, title: "Desert Safari Experience", details: "Dune bashing, camel ride, BBQ dinner with live entertainment." },
-      { day: 4, title: "Abu Dhabi Day Trip", details: "Sheikh Zayed Grand Mosque and Louvre Abu Dhabi (optional)." },
-      { day: 5, title: "Departure", details: "Free morning for shopping, transfer to Dubai International Airport." },
-    ],
-    inclusions: ["4 nights 5-star hotel stay", "Daily breakfast", "Burj Khalifa entry tickets", "Private desert safari with dinner", "Airport transfers by private chauffeur"],
-    exclusions: ["International airfare", "Visa fees", "Abu Dhabi day trip (optional add-on)", "Travel insurance"],
-    accommodation: "5-star hotel in Downtown Dubai or Dubai Marina.",
-    transportDetails: "Private chauffeur-driven vehicle for all transfers and tours.",
-    importantInfo: "UAE tourist visa required; our team can assist with the application process.",
-    cancellationPolicy: "Free cancellation up to 21 days before departure. 50% refund 10–20 days before.",
-    faqs: [{ q: "Do you assist with visas?", a: "Yes, our team handles the full visa application process for this package." }],
-  },
+const commonInclusions = [
+  "Accommodation on twin sharing basis for all mentioned nights as per itinerary",
+  "Breakfast at all hotels as per itinerary",
+  "All pickup, drop and sightseeing as per itinerary",
+  "Toll tax, parking and driver allowances",
+  "Child below 5 years sharing the same bed with a parent",
 ];
 
-export const getTourBySlug = (slug) => tours.find((t) => t.slug === slug);
+const commonExclusions = [
+  "Entry fees, green tax, travel insurance and monument entry charges",
+  "Personal expenses, optional tours, detours and extra meals",
+  "Early check-in or late check-out at hotels",
+  "Adventure activities unless explicitly included",
+  "Airfare and train fare",
+  "GST and vehicle entry tax, as applicable",
+  "Anything not mentioned in inclusions",
+];
+
+export const cancellationSlabs = [
+  { from: 91, to: 120, fee: 10 }, { from: 61, to: 90, fee: 15 },
+  { from: 46, to: 60, fee: 25 }, { from: 31, to: 45, fee: 40 },
+  { from: 16, to: 30, fee: 50 }, { from: 6, to: 15, fee: 75 },
+  { from: 0, to: 5, fee: 100 },
+];
+
+const img = {
+  mumbai: "https://images.unsplash.com/photo-1595658658481-d53d3f999875?auto=format&fit=crop&w=1600&q=82",
+  caves: "https://images.unsplash.com/photo-1590766940554-634a7ed41450?auto=format&fit=crop&w=1600&q=82",
+  temple: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1600&q=82",
+  hills: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=82",
+  coast: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1600&q=82",
+  fort: "https://images.unsplash.com/photo-1585136917228-9e5c7e8d0d3f?auto=format&fit=crop&w=1600&q=82",
+};
+
+const makeTour = ({ slug, title, duration, destinations, image, itinerary, notes = [] }) => {
+  const [nights, days] = duration.split("N/").map((v) => Number(v.replace("D", "")));
+  return {
+    slug, title, destination: destinations[0], destinations, type: "Domestic",
+    tripType: destinations.some((d) => /Shirdi|Nashik|Ashtavinayak/i.test(d)) ? "Pilgrimage" : "Maharashtra",
+    duration: `${days} Days / ${nights} Nights`, nights, days, image, itinerary,
+    inclusions: commonInclusions, exclusions: commonExclusions, notes,
+    price: null, priceLabel: "Price on request", source: "Supplied Maharashtra package itinerary",
+    overview: `${days}-day Maharashtra circuit covering ${destinations.join(", ")}. The route and day sequence are preserved from the supplied NaysTrip itinerary.`,
+  };
+};
+
+export const tours = [
+  makeTour({slug:"mumbai-city-tour-3-days",title:"Mumbai City Tour",duration:"2N/3D",destinations:["Mumbai"],image:img.mumbai,itinerary:[
+    {day:1,title:"Arrival and South Mumbai",details:"Pickup from Mumbai airport or railway station, hotel check-in, then Elephanta Caves, Gateway of India, Taj Mahal Palace Hotel photo stop, CST photography, CSMVS Museum, Marine Drive and Girgaon Chowpatty. Overnight in Mumbai."},
+    {day:2,title:"Mumbai Sightseeing",details:"After breakfast visit Siddhivinayak Temple, Mahalaxmi Temple, Haji Ali Dargah causeway, celebrity homes drive, Bandra Fort, Bandra-Worli Sea Link, Bandstand and Juhu Beach. Overnight in Mumbai."},
+    {day:3,title:"Shopping and Departure",details:"After breakfast check out. Shopping options include Phoenix Palladium, Linking Road, Hill Road and Crawford Market, followed by airport drop."}
+  ]}),
+  makeTour({slug:"aurangabad-ajanta-ellora-3-days",title:"Chhatrapati Sambhajinagar, Ajanta & Ellora",duration:"2N/3D",destinations:["Chhatrapati Sambhajinagar","Ajanta","Ellora"],image:img.caves,notes:["Chhatrapati Sambhajinagar to Ajanta is approximately a 3-4 hour drive."],itinerary:[
+    {day:1,title:"Arrival and Ajanta Caves",details:"Morning arrival and railway station pickup. Check in, freshen up, then visit the UNESCO-listed Ajanta Caves. Evening at leisure or in the local market. Overnight in Chhatrapati Sambhajinagar."},
+    {day:2,title:"Ellora and Ghrishneshwar",details:"After breakfast visit Ghrishneshwar Jyotirlinga, the UNESCO-listed Ellora Caves, Sleeping Hanumanji and the silk market. Overnight in Chhatrapati Sambhajinagar."},
+    {day:3,title:"City Sights and Departure",details:"After breakfast visit Bibi Ka Maqbara, Aurangabad Caves and Panchakki. Evening railway station drop."}
+  ]}),
+  makeTour({slug:"pune-nashik-shirdi-sambhajinagar-5-days",title:"Pune, Nashik, Shirdi & Chhatrapati Sambhajinagar",duration:"4N/5D",destinations:["Pune","Bhimashankar","Nashik","Shirdi","Chhatrapati Sambhajinagar"],image:img.temple,itinerary:[
+    {day:1,title:"Pune to Bhimashankar and Nashik",details:"Arrival in Pune, airport or railway pickup, drive to Bhimashankar for temple darshan, then Nashik check-in and Godavari Ghat. Overnight in Nashik."},
+    {day:2,title:"Trimbakeshwar and Nashik",details:"After breakfast visit Trimbakeshwar Jyotirlinga, Brahmagiri and the optional origin point of the Godavari River. Evening at Gangapur Dam. Overnight in Nashik."},
+    {day:3,title:"Nashik to Shirdi",details:"Drive to Shirdi, Sai Baba Temple darshan, Dwarkamai and museum, followed by evening aarti. Overnight in Shirdi."},
+    {day:4,title:"Shani Shingnapur to Chhatrapati Sambhajinagar",details:"After breakfast visit Shani Shingnapur, then continue after lunch to Chhatrapati Sambhajinagar and visit Bibi Ka Maqbara. Overnight in Chhatrapati Sambhajinagar."},
+    {day:5,title:"Ellora to Pune",details:"After breakfast visit Ghrishneshwar Jyotirlinga and Ellora Caves, then start the return journey to Pune."}
+  ]}),
+  makeTour({slug:"pune-nashik-shirdi-aurangabad-4-days",title:"Pune, Nashik, Shirdi & Aurangabad",duration:"3N/4D",destinations:["Pune","Bhimashankar","Nashik","Shirdi","Aurangabad"],image:img.temple,notes:["Aurangabad to Pune is approximately a 6-hour drive."],itinerary:[
+    {day:1,title:"Pune to Bhimashankar and Nashik",details:"Pune arrival and pickup, Bhimashankar temple darshan, then Nashik check-in and Godavari Ghat or Panchvati. Overnight in Nashik."},
+    {day:2,title:"Trimbakeshwar to Shirdi",details:"After breakfast visit Trimbakeshwar Jyotirlinga. After lunch continue to Shirdi for evening temple darshan. Overnight in Shirdi."},
+    {day:3,title:"Shani Shingnapur to Aurangabad",details:"After breakfast visit Shani Shingnapur, then Ghrishneshwar Jyotirlinga and Ellora Caves if time permits. Overnight in Aurangabad."},
+    {day:4,title:"Aurangabad to Pune",details:"After breakfast visit Bibi Ka Maqbara and begin the return journey to Pune."}
+  ]}),
+  makeTour({slug:"mumbai-mahabaleshwar-3-days",title:"Mumbai to Mahabaleshwar",duration:"2N/3D",destinations:["Mumbai","Mahabaleshwar","Panchgani"],image:img.hills,notes:["Paragliding is optional and payable directly."],itinerary:[
+    {day:1,title:"Mumbai to Mahabaleshwar",details:"Airport or railway pickup in Mumbai and drive to Mahabaleshwar. Hotel check-in, Mapro Garden, Venna Lake and the local market. Overnight in Mahabaleshwar."},
+    {day:2,title:"Mahabaleshwar Sightseeing",details:"Arthur's Seat, Elephant's Head Point, Kate's Point, strawberry farm, Bombay Point and optional paragliding on direct payment. Overnight in Mahabaleshwar or Panchgani."},
+    {day:3,title:"Panchgani and Mumbai Departure",details:"After breakfast visit Table Land and Sydney Point, then return towards Mumbai for an evening airport drop."}
+  ]}),
+  makeTour({slug:"mumbai-mahabaleshwar-5-days",title:"Mumbai & Mahabaleshwar Explorer",duration:"4N/5D",destinations:["Mumbai","Mahabaleshwar","Panchgani","Tapola"],image:img.hills,notes:["Paragliding and boating or kayaking at Tapola are payable directly unless quoted as included."],itinerary:[
+    {day:1,title:"South Mumbai",details:"Pickup and hotel check-in, then Gateway of India, Taj Mahal Palace photo stop, CST photography, CSMVS Museum and Marine Drive. Overnight in Mumbai."},
+    {day:2,title:"Mumbai to Mahabaleshwar",details:"After breakfast drive to Mahabaleshwar and visit Mapro Garden, Venna Lake and the local market. Overnight in Mahabaleshwar."},
+    {day:3,title:"Mahabaleshwar Sightseeing",details:"Arthur's Seat, Elephant's Head Point, Kate's Point, strawberry farm and Bombay Point. Overnight in Mahabaleshwar."},
+    {day:4,title:"Panchgani and Tapola",details:"Table Land, Sydney Point, optional paragliding, then Tapola for boating, kayaking and local food. Return to Mahabaleshwar for the night."},
+    {day:5,title:"Return to Mumbai",details:"Proceed towards Mumbai with an en-route lunch stop and evening airport or railway station drop."}
+  ]}),
+  makeTour({slug:"pune-mahabaleshwar-mumbai-6-days",title:"Pune, Mahabaleshwar & Mumbai",duration:"5N/6D",destinations:["Pune","Mahabaleshwar","Panchgani","Mumbai"],image:img.hills,itinerary:[
+    {day:1,title:"Pune Arrival and Sightseeing",details:"Pickup, hotel check-in, Shaniwar Wada, Dagdusheth Halwai Ganpati Temple and Sinhagad Fort. Overnight in Pune."},
+    {day:2,title:"Pune to Mahabaleshwar",details:"Drive to Mahabaleshwar, visit Mapro Garden, Venna Lake and the local market. Overnight in Mahabaleshwar."},
+    {day:3,title:"Mahabaleshwar Sightseeing",details:"Arthur's Seat, Elephant's Head Point, Kate's Point and Bombay Point."},
+    {day:4,title:"Panchgani Sightseeing",details:"Table Land, strawberry farm, Sydney Point and optional paragliding. Overnight in Mahabaleshwar."},
+    {day:5,title:"Mahabaleshwar to Mumbai",details:"Early start for Mumbai, hotel check-in, Gateway of India, Taj Mahal Palace photo stop, CST photography, CSMVS Museum and Marine Drive. Overnight in Mumbai."},
+    {day:6,title:"Mumbai Sightseeing and Departure",details:"Siddhivinayak Temple, Mahalaxmi Temple, Haji Ali Dargah, Bandra-Worli Sea Link drive, Juhu Beach and Bandstand, followed by airport or railway drop."}
+  ]}),
+  makeTour({slug:"mumbai-konkan-5-days",title:"Mumbai & Konkan Coast",duration:"4N/5D",destinations:["Mumbai","Alibaug","Diveagar","Harihareshwar","Ganpatipule"],image:img.coast,notes:["Beach activities and the Ganpatipule zipline are on a direct-payment basis."],itinerary:[
+    {day:1,title:"Mumbai Arrival",details:"Pickup, hotel check-in, Gateway of India, Taj Mahal Palace photo stop, CST, CSMVS Museum, Siddhivinayak Temple, Mahalaxmi Temple and Marine Drive. Overnight in Mumbai."},
+    {day:2,title:"Mumbai to Alibaug",details:"Alibaug Beach, Kolaba Fort, Mandwa Jetty, Nagaon Beach and optional beach activities. Overnight in Alibaug."},
+    {day:3,title:"Alibaug to Diveagar and Harihareshwar",details:"Diveagar Beach with optional activities, then Harihareshwar Beach and Shiva Temple. Overnight in Harihareshwar."},
+    {day:4,title:"Harihareshwar to Ganpatipule",details:"Ganpatipule Beach, optional zipline over the Arabian Sea and Ganpatipule Ganpati Temple. Overnight in Ganpatipule."},
+    {day:5,title:"Return to Mumbai",details:"After breakfast proceed towards Mumbai with an en-route lunch stop and evening airport or railway drop."}
+  ]}),
+  makeTour({slug:"pune-lonavala-mahabaleshwar-4-days",title:"Pune, Lonavala & Mahabaleshwar",duration:"3N/4D",destinations:["Pune","Lonavala","Pawna","Mahabaleshwar","Panchgani"],image:img.hills,itinerary:[
+    {day:1,title:"Pune to Lonavala",details:"Pune airport or railway pickup, drive to Lonavala and local sightseeing. Overnight in Lonavala."},
+    {day:2,title:"Lonavala and Pawna",details:"Pawna Lake, Lohagad Fort, Bhaja Caves and Karla Caves. Overnight in Lonavala."},
+    {day:3,title:"Mahabaleshwar",details:"Check out after breakfast, drive to Mahabaleshwar and complete local sightseeing. Overnight in Mahabaleshwar."},
+    {day:4,title:"Panchgani to Pune",details:"Check out, visit Panchgani for local sightseeing, then continue to Pune for an evening airport or railway drop."}
+  ]}),
+  makeTour({slug:"lonavala-khandala-3-days",title:"Lonavala & Khandala",duration:"2N/3D",destinations:["Lonavala","Khandala","Pawna"],image:img.hills,itinerary:[
+    {day:1,title:"Lonavala Arrival",details:"Pickup and hotel check-in, then Tiger Point, Lion's Point and Bhushi Dam. Evening in the local market. Overnight in Lonavala."},
+    {day:2,title:"Lonavala and Khandala",details:"Pawna Lake, Lohagad Fort, Bhaja Caves, Karla Caves and Khandala Sunset Point. Overnight in Lonavala."},
+    {day:3,title:"Lonavala and Return",details:"After breakfast check out, visit the wax museum and Narayani Dham Temple, then railway station drop."}
+  ]}),
+  makeTour({slug:"mumbai-matheran-3-days",title:"Mumbai & Matheran",duration:"2N/3D",destinations:["Mumbai","Matheran","Karjat"],image:img.hills,notes:["Matheran is vehicle-free beyond Dasturi Naka and is reached by narrow-gauge train, horse or trek.","Bhivpuri Waterfalls are seasonal; ND Studios is the alternative visit."],itinerary:[
+    {day:1,title:"Mumbai to Matheran",details:"Airport pickup and drive to Dasturi Naka, then toy train or horse ride to Matheran. Hotel check-in and evening sightseeing. Overnight in Matheran."},
+    {day:2,title:"Matheran Sightseeing",details:"Panorama Point, Louisa Point, One Tree Hill Point, Alexander Point and Porcupine Point. Overnight in Matheran."},
+    {day:3,title:"Matheran, Karjat and Return",details:"Check out, return to Dasturi Naka, then visit seasonal Bhivpuri Waterfalls or ND Studios in Karjat before the Mumbai airport drop."}
+  ]}),
+  makeTour({slug:"konkan-coast-5-days",title:"Konkan Coast: Dapoli to Tarkarli",duration:"4N/5D",destinations:["Dapoli","Ganpatipule","Tarkarli","Malvan","Devbag"],image:img.coast,notes:["Zipline, scuba diving, snorkelling, parasailing, dolphin safari and water activities are on a direct-payment basis."],itinerary:[
+    {day:1,title:"Mumbai to Dapoli",details:"Mumbai pickup and drive to Dapoli. Hotel check-in, Karde Beach, Ladghar Beach and sunset. Overnight in Dapoli."},
+    {day:2,title:"Dapoli to Ganpatipule",details:"Drive to Ganpatipule, hotel check-in, beach visit, optional zipline and Ganpatipule Ganpati Temple. Overnight in Ganpatipule."},
+    {day:3,title:"Ganpatipule to Tarkarli and Malvan",details:"Drive to Tarkarli, check-in, Sindhudurg Fort, Tarkarli Beach, Rock Garden and optional marine activities. Overnight in Tarkarli or Malvan."},
+    {day:4,title:"Devbag and Tsunami Island",details:"Devbag, Tsunami Island and Karli River backwaters with optional water activities. Overnight in Tarkarli."},
+    {day:5,title:"Malvan to Mumbai",details:"After breakfast proceed towards Mumbai with an en-route lunch stop and evening airport or railway drop."}
+  ]}),
+  makeTour({slug:"mumbai-nashik-shirdi-3-days",title:"Mumbai, Nashik & Shirdi",duration:"2N/3D",destinations:["Mumbai","Nashik","Trimbakeshwar","Shirdi","Shani Shingnapur"],image:img.temple,itinerary:[
+    {day:1,title:"Mumbai to Nashik",details:"Mumbai arrival and pickup, drive to Nashik, hotel check-in, Godavari Ghat, Panchvati, Ram Kund and Sita Gufa. Overnight in Nashik."},
+    {day:2,title:"Trimbakeshwar to Shirdi",details:"After breakfast visit Trimbakeshwar Jyotirlinga and Kushavarta Kund. After lunch continue to Shirdi for evening temple darshan. Overnight in Shirdi."},
+    {day:3,title:"Shani Shingnapur to Mumbai",details:"After breakfast visit Shani Shingnapur, then continue after lunch to Mumbai for an evening airport drop."}
+  ]}),
+  makeTour({slug:"mumbai-nashik-shirdi-aurangabad-6-days",title:"Mumbai, Nashik, Shirdi & Aurangabad",duration:"5N/6D",destinations:["Mumbai","Nashik","Shirdi","Aurangabad","Ellora","Ajanta"],image:img.caves,itinerary:[
+    {day:1,title:"Mumbai to Nashik",details:"Mumbai pickup, drive to Nashik, then Godavari Ghat, Panchvati, Ram Kund, Sita Gufa and Muktidham Temple. Overnight in Nashik."},
+    {day:2,title:"Trimbakeshwar to Shirdi",details:"Trimbakeshwar Jyotirlinga and Kushavarta Kund, then Shirdi evening darshan. Overnight in Shirdi."},
+    {day:3,title:"Shani Shingnapur to Aurangabad",details:"Visit Shani Shingnapur, continue to Aurangabad, check in, then Bibi Ka Maqbara and Panchakki. Overnight in Aurangabad."},
+    {day:4,title:"Ellora and Ghrishneshwar",details:"Ghrishneshwar Jyotirlinga, Ellora Caves, Sleeping Hanumanji, Daulatabad Fort and silk market. Overnight in Aurangabad."},
+    {day:5,title:"Ajanta Caves Excursion",details:"Visit the UNESCO-listed Ajanta Caves. Evening at leisure or in the local market. Overnight in Chhatrapati Sambhajinagar."},
+    {day:6,title:"Departure",details:"After breakfast check out and transfer to Mumbai airport."}
+  ]}),
+  makeTour({slug:"ashtavinayak-darshan-4-days",title:"Ashtavinayak Ganpati Darshan",duration:"3N/4D",destinations:["Mahad","Pali","Morgaon","Siddhatek","Theur","Ranjangaon","Ozar","Lenyadri"],image:img.temple,itinerary:[
+    {day:1,title:"Mumbai to Mahad and Pali",details:"Mumbai arrival and pickup, Varad Vinayak darshan at Mahad, then Ballaleshwar darshan at Pali. Overnight in Lonavala or Pune."},
+    {day:2,title:"Morgaon and Siddhatek",details:"Mayureshwar darshan at Morgaon, then Siddhivinayak darshan at Siddhatek. Return to Pune for the night."},
+    {day:3,title:"Theur, Ranjangaon and Ozar",details:"Chintamani darshan at Theur, Mahaganpati at Ranjangaon and Vighnahar at Ozar. Overnight in Junnar or Ozar."},
+    {day:4,title:"Lenyadri to Mumbai",details:"Girijatmaj darshan at Lenyadri, then continue to Mumbai for airport drop."}
+  ]}),
+  makeTour({slug:"mumbai-kolhapur-panhala-4-days",title:"Mumbai, Kolhapur & Panhala",duration:"3N/4D",destinations:["Mumbai","Kolhapur","Panhala"],image:img.fort,itinerary:[
+    {day:1,title:"Mumbai to Kolhapur",details:"Mumbai pickup and drive to Kolhapur. Hotel check-in, Rankala Lake, Shalini Palace and local market for Kolhapuri chappals and handicrafts. Overnight in Kolhapur."},
+    {day:2,title:"Kolhapur Sightseeing",details:"Mahalaxmi Temple, New Palace Museum, Bhavani Mandap and evening shopping. Overnight in Kolhapur."},
+    {day:3,title:"Panhala Excursion",details:"Panhala Fort, Teen Darwaza, Sajja Kothi, Ambarkhana and Jyotiba Temple, then return to Kolhapur. Overnight in Kolhapur."},
+    {day:4,title:"Kolhapur to Mumbai",details:"After breakfast proceed towards Mumbai with an en-route lunch stop and evening airport or railway drop."}
+  ]}),
+];
+
+export const getTourBySlug = (slug) => tours.find((tour) => tour.slug === slug);

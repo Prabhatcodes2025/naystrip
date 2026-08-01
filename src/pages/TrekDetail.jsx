@@ -24,17 +24,17 @@ export default function TrekDetail() {
 
   if (!trek) return <Navigate to="/treks" replace />;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.phone) return;
-    const entry = saveContactLead({ ...form, destination: trek.name, source: `${trek.category}: ${trek.name}` });
+    const entry = await saveContactLead({ ...form, destination: trek.name, source: `${trek.category}: ${trek.name}` });
     setSubmitted(entry.id);
     setForm({ name: "", phone: "", email: "" });
   };
 
   return (
     <>
-      <Seo title={`${trek.name} ${trek.category} | Altiora Journeys`} description={trek.overview} />
+      <Seo title={`${trek.name} ${trek.category} | NaysTrip & Treks`} description={trek.overview} />
       <PageBanner eyebrow={trek.category} title={trek.name} subtitle={trek.overview} image={trek.image} />
 
       <section className="py-10 sm:py-14">
@@ -166,7 +166,7 @@ export default function TrekDetail() {
                   </form>
                 )}
                 <a
-                  href={`https://wa.me/919876543210?text=${encodeURIComponent(`Hi! I'm interested in the ${trek.name} ${trek.category}.`)}`}
+                  href={`https://wa.me/917710991126?text=${encodeURIComponent(`Hi NaysTrip! I'm interested in the ${trek.name} ${trek.category}.`)}`}
                   target="_blank" rel="noopener noreferrer"
                   className="w-full inline-flex items-center justify-center gap-2 rounded-full border-2 border-forest-600 py-3.5 mt-3 text-sm font-semibold text-forest-700 hover:bg-forest-600 hover:text-white transition-colors"
                 >

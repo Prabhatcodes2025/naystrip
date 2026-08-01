@@ -11,7 +11,7 @@ export default function Holidays() {
 
   return (
     <>
-      <Seo title="Holiday Categories | Altiora Journeys" description="Browse holidays by category — adventure, honeymoon, family, luxury, wildlife and more." />
+      <Seo title="Holiday Categories | NaysTrip & Treks" description="Browse adventure, honeymoon, family, religious and weekend holiday ideas." />
       <PageBanner
         eyebrow="Travel Your Way"
         title="Holidays By Category"

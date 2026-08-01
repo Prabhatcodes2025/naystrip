@@ -22,7 +22,7 @@ export function CorporateTravelSection() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-navy-950/70 to-transparent" />
               <div className="absolute bottom-6 left-6 right-6 glass-panel !bg-white/15 p-4">
-                <p className="text-white text-sm font-semibold">"Altiora managed our 120-person offsite flawlessly, start to finish."</p>
+                <p className="text-white text-sm font-semibold">Dedicated group logistics from first brief to return travel.</p>
                 <p className="text-white/60 text-xs mt-1">— HR Director, leading fintech company</p>
               </div>
             </div>

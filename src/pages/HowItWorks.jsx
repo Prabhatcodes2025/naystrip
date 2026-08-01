@@ -8,7 +8,7 @@ import { CheckCircle2 } from "lucide-react";
 export default function HowItWorks() {
   return (
     <>
-      <Seo title="How It Works | Altiora Journeys" description="See how easy it is to plan your trip with Altiora Journeys, from first inquiry to departure." />
+      <Seo title="How It Works | NaysTrip & Treks" description="See how NaysTrip plans a trip from first enquiry to departure." />
       <PageBanner
         eyebrow="Simple, Start To Finish"
         title="How It Works"

@@ -9,7 +9,7 @@ const icons = [Briefcase, Award, Building2, Users, Mic2];
 export default function CorporateTravel() {
   return (
     <>
-      <Seo title="Corporate Travel Services | Altiora Journeys" description="Dedicated corporate travel management for offsites, incentive trips, MICE and conference travel." />
+      <Seo title="Corporate Travel Services | NaysTrip & Treks" description="Corporate tours, incentive travel, MICE, offsites and group logistics." />
       <PageBanner
         eyebrow="For Businesses"
         title="Corporate Travel"

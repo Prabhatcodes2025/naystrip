@@ -30,7 +30,7 @@ export default function BlogDetail() {
 
   return (
     <>
-      <Seo title={`${blog.title} | Altiora Journeys Blog`} description={blog.excerpt} />
+      <Seo title={`${blog.title} | NaysTrip & Treks Blog`} description={blog.excerpt} />
       <PageBanner eyebrow={blog.category} title={blog.title} image={blog.image} />
 
       <section className="py-12 sm:py-16">

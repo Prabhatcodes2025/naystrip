@@ -15,7 +15,7 @@ export default function FixedDepartures() {
 
   return (
     <>
-      <Seo title="Fixed Departures | Altiora Journeys" description="Join our upcoming fixed-date tours, treks, expeditions and Volvo packages — no planning required." />
+      <Seo title="Fixed Departures | NaysTrip & Treks" description="Ask for currently confirmed fixed departures, batches and seat availability." />
       <PageBanner
         eyebrow="Set Dates"
         title="Fixed Departures"

@@ -7,7 +7,7 @@ import Seo from "../components/shared/Seo";
 export default function Transport() {
   return (
     <>
-      <Seo title="Transport &amp; Vehicle Rentals | Altiora Journeys" description="Reliable, well-maintained vehicles for every group size — from sedans to Volvo coaches." />
+      <Seo title="Transport &amp; Vehicle Rentals | NaysTrip & Treks" description="Request transport for groups, holidays and airport transfers." />
       <PageBanner
         eyebrow="Move With Ease"
         title="Transport Services"

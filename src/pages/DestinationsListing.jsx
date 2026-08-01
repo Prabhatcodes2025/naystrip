@@ -22,7 +22,7 @@ export default function DestinationsListing() {
 
   return (
     <>
-      <Seo title="All Destinations | Altiora Journeys" description="Explore destinations across India, from the Himalayas to the coasts, each with curated packages, travel tips and guides." />
+      <Seo title="All Destinations | NaysTrip & Treks" description="Explore destinations across India and abroad with NaysTrip & Treks." />
       <PageBanner
         eyebrow="Explore"
         title="All Destinations"

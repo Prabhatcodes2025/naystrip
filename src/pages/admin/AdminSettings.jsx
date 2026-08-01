@@ -5,21 +5,22 @@ import { defaultSiteSettings, getSiteSettings, saveSiteSettings } from "../../da
 export default function AdminSettings() {
   const [form, setForm] = useState(getSiteSettings());
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
 
   const update = (field, value) => setForm((f) => ({ ...f, [field]: value }));
   const updateSocial = (field, value) => setForm((f) => ({ ...f, social: { ...f.social, [field]: value } }));
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    saveSiteSettings(form);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    setError("");
+    try { await saveSiteSettings(form); setSaved(true); setTimeout(() => setSaved(false), 3000); }
+    catch { setError("Settings were not saved. Check your admin session and database connection."); }
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
     if (confirm("Reset all settings to default?")) {
       setForm(defaultSiteSettings);
-      saveSiteSettings(defaultSiteSettings);
+      try { await saveSiteSettings(defaultSiteSettings); } catch { setError("Default settings could not be saved."); }
     }
   };
 
@@ -70,6 +71,7 @@ export default function AdminSettings() {
           <button type="submit" className="btn-primary"><Save size={16} /> Save Settings</button>
           <button type="button" onClick={handleReset} className="btn-secondary">Reset to Default</button>
           {saved && <span className="flex items-center gap-1.5 text-sm font-semibold text-forest-600"><CheckCircle2 size={16} /> Saved!</span>}
+          {error && <span role="alert" className="text-sm text-terracotta-600">{error}</span>}
         </div>
       </form>
     </div>

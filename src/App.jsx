@@ -21,6 +21,7 @@ const BlogDetail = lazy(() => import("./pages/BlogDetail"));
 const Contact = lazy(() => import("./pages/Contact"));
 const StaticPage = lazy(() => import("./pages/StaticPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const PortalAccess = lazy(() => import("./pages/PortalAccess"));
 
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
@@ -74,6 +75,10 @@ export default function App() {
       </Route>
 
       <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/account/login" element={<PortalAccess />} />
+      <Route path="/account/register" element={<PortalAccess />} />
+      <Route path="/b2b/login" element={<PortalAccess />} />
+      <Route path="/b2b/register" element={<PortalAccess />} />
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
         <Route path="tours" element={<AdminTours />} />

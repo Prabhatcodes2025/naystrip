@@ -17,7 +17,7 @@ export default function DestinationDetail() {
 
   return (
     <>
-      <Seo title={`${destination.name} Travel Guide | Altiora Journeys`} description={destination.overview} />
+      <Seo title={`${destination.name} Travel Guide | NaysTrip & Treks`} description={destination.overview} />
       <PageBanner eyebrow={destination.region} title={destination.name} subtitle={destination.tagline} image={destination.image} />
 
       <section className="py-12 sm:py-16">

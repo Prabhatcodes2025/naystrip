@@ -1,17 +1,3 @@
 import { useEffect } from "react";
-
-export default function Seo({ title, description }) {
-  useEffect(() => {
-    if (title) document.title = title;
-    if (description) {
-      let tag = document.querySelector('meta[name="description"]');
-      if (!tag) {
-        tag = document.createElement("meta");
-        tag.setAttribute("name", "description");
-        document.head.appendChild(tag);
-      }
-      tag.setAttribute("content", description);
-    }
-  }, [title, description]);
-  return null;
-}
+const upsert=(selector,attr,value)=>{let tag=document.querySelector(selector);if(!tag){tag=document.createElement("meta");for(const [k,v] of Object.entries(attr))tag.setAttribute(k,v);document.head.appendChild(tag)}tag.setAttribute("content",value)};
+export default function Seo({title,description}){useEffect(()=>{const pageTitle=title||"NaysTrip & Treks";const summary=description||"Tours, treks, expeditions and custom holidays from Mumbai.";document.title=pageTitle;upsert('meta[name="description"]',{name:"description"},summary);upsert('meta[property="og:title"]',{property:"og:title"},pageTitle);upsert('meta[property="og:description"]',{property:"og:description"},summary);upsert('meta[property="og:image"]',{property:"og:image"},"https://www.naystrip.com/og.png");upsert('meta[name="twitter:card"]',{name:"twitter:card"},"summary_large_image");upsert('meta[name="twitter:title"]',{name:"twitter:title"},pageTitle);upsert('meta[name="twitter:description"]',{name:"twitter:description"},summary);upsert('meta[name="twitter:image"]',{name:"twitter:image"},"https://www.naystrip.com/og.png");let canonical=document.querySelector('link[rel="canonical"]');if(!canonical){canonical=document.createElement("link");canonical.rel="canonical";document.head.appendChild(canonical)}canonical.href=`https://www.naystrip.com${window.location.pathname}`;},[title,description]);return null;}

@@ -22,7 +22,7 @@ export const holidayCategories = [
   { slug: "weekend-getaways", name: "Weekend Getaways", image: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=800&q=80", count: 38 },
 ];
 
-export const fixedDepartures = [
+const _illustrativeFixedDepartures = [
   { id: "fd1", type: "Tour", destination: "Leh Ladakh", date: "12 Aug 2026", duration: "8 Days", seatsLeft: 6, price: 29999 },
   { id: "fd2", type: "Tour", destination: "Kashmir", date: "20 Aug 2026", duration: "6 Days", seatsLeft: 9, price: 24999 },
   { id: "fd3", type: "Trek", destination: "Kedarkantha", date: "26 Dec 2026", duration: "6 Days", seatsLeft: 4, price: 12999 },
@@ -32,6 +32,7 @@ export const fixedDepartures = [
   { id: "fd7", type: "Tour", destination: "Spiti Valley", date: "02 Sep 2026", duration: "7 Days", seatsLeft: 5, price: 26999 },
   { id: "fd8", type: "Volvo Package", destination: "Shimla (Volvo)", date: "Every Saturday", duration: "4 Days", seatsLeft: 15, price: 7499 },
 ];
+export const fixedDepartures = [];
 
 export const weekendGetaways = [
   { name: "Lonavala", driveTime: "3 hrs from Mumbai", duration: "2 Days / 1 Night", price: 4999, image: "https://images.unsplash.com/photo-1580289143186-3939fca10dcf?auto=format&fit=crop&w=800&q=80" },
@@ -59,7 +60,7 @@ export const transportFleet = [
   { name: "Caravan", seats: "4–6 Seater (with beds)", luggage: "Built-in storage", ac: true, bestFor: "Road trips and offbeat camping", priceText: "Starting ₹25/km", image: "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=800&q=80" },
 ];
 
-export const testimonials = [
+const _illustrativeTestimonials = [
   { name: "Ananya & Rohit Sharma", destination: "Kashmir Honeymoon", rating: 5, image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80", text: "Every single detail was thought through — from the houseboat upgrade to the Gulmarg timing. It genuinely felt like a curated experience, not a package." },
   { name: "Vikram Malhotra", destination: "Ladakh Road Trip", rating: 5, image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80", text: "Our driver's knowledge of the passes and the acclimatisation plan made all the difference. No altitude issues for anyone in our group of 8." },
   { name: "Priya Nair", destination: "Kerala Backwaters", rating: 5, image: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=200&q=80", text: "The houseboat was even better than the photos. Our kids still talk about the sunset on the backwaters." },
@@ -67,13 +68,15 @@ export const testimonials = [
   { name: "Sneha Kulkarni", destination: "Kedarkantha Trek", rating: 5, image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=200&q=80", text: "First snow trek and I felt completely safe throughout. The trek leader was fantastic with beginners." },
   { name: "Arjun & Family", destination: "Goa Family Holiday", rating: 4.9, image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80", text: "Relaxed pace, great resort, and the kids loved the pool. Exactly what we needed for a family break." },
 ];
+export const testimonials = [];
 
-export const googleReviews = [
-  { name: "Rahul Verma", rating: 5, text: "Booked our Spiti trip through Altiora — smooth planning and genuinely helpful support throughout.", date: "2 weeks ago" },
+const _illustrativeGoogleReviews = [
+  { name: "Rahul Verma", rating: 5, text: "Booked our Spiti trip through NaysTrip — smooth planning and genuinely helpful support throughout.", date: "2 weeks ago" },
   { name: "Meera Iyer", rating: 5, text: "Best travel agency we've used. The custom itinerary for our Europe trip was spot on.", date: "1 month ago" },
   { name: "Sandeep Rao", rating: 4, text: "Great experience overall, minor delay in one transfer but the team resolved it quickly.", date: "1 month ago" },
   { name: "Divya Prakash", rating: 5, text: "Our corporate offsite to Coorg was flawlessly organised. Will definitely book again.", date: "2 months ago" },
 ];
+export const googleReviews = [];
 
 export const blogs = [
   {

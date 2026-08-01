@@ -1,0 +1,11 @@
+import { tours } from "../src/data/tours.js";
+const url=process.env.SUPABASE_URL;const key=process.env.SUPABASE_SERVICE_ROLE_KEY;
+if(!url||!key)throw new Error("Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY before seeding.");
+const headers={apikey:key,Authorization:`Bearer ${key}`,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates,return=representation"};
+async function upsert(table,rows,onConflict){const response=await fetch(`${url}/rest/v1/${table}?on_conflict=${onConflict}`,{method:"POST",headers,body:JSON.stringify(rows)});if(!response.ok)throw new Error(`${table}: ${response.status} ${await response.text()}`);return response.json();}
+await upsert("tour_categories",[{slug:"domestic",name:"Domestic"},{slug:"maharashtra",name:"Maharashtra"},{slug:"pilgrimage",name:"Pilgrimage"}],"slug");
+await upsert("holiday_types",[{slug:"family",name:"Family"},{slug:"heritage",name:"Heritage"},{slug:"adventure",name:"Adventure"},{slug:"religious",name:"Religious"},{slug:"weekend-getaways",name:"Weekend Getaways"}],"slug");
+const packageRows=tours.map(t=>({slug:t.slug,title:t.title,package_type:"tour",destination_names:t.destinations,nights:t.nights,days:t.days,overview:t.overview,hero_image:t.image,source:t.source,status:"published",seo:{title:`${t.title} | NaysTrip & Treks`,description:t.overview}}));
+const saved=await upsert("packages",packageRows,"slug");const bySlug=new Map(saved.map(p=>[p.slug,p.id]));
+for(const tour of tours){const packageId=bySlug.get(tour.slug);if(!packageId)continue;await fetch(`${url}/rest/v1/package_itinerary_days?package_id=eq.${packageId}`,{method:"DELETE",headers});await upsert("package_itinerary_days",tour.itinerary.map(x=>({package_id:packageId,day_number:x.day,title:x.title,description:x.details,sort_order:x.day})),"package_id,day_number");await fetch(`${url}/rest/v1/package_items?package_id=eq.${packageId}`,{method:"DELETE",headers});const items=[...tour.inclusions.map((body,i)=>({package_id:packageId,item_type:"inclusion",body,sort_order:i})),...tour.exclusions.map((body,i)=>({package_id:packageId,item_type:"exclusion",body,sort_order:i})),...tour.notes.map((body,i)=>({package_id:packageId,item_type:"note",body,sort_order:i}))];if(items.length)await upsert("package_items",items,"id");}
+console.log(`Seeded ${tours.length} Maharashtra packages.`);

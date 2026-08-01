@@ -57,7 +57,7 @@ export default {
         ink: "#141b1e",
       },
       fontFamily: {
-        display: ["'Playfair Display'", "serif"],
+        display: ["'DM Serif Display'", "serif"],
         serif2: ["'Cormorant Garamond'", "serif"],
         sans: ["'Manrope'", "system-ui", "sans-serif"],
       },

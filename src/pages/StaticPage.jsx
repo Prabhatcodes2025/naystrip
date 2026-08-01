@@ -7,7 +7,7 @@ const pageContent = {
   about: {
     title: "About Us",
     body: [
-      "Altiora Journeys was founded with a simple belief: travel planning should feel exciting, not exhausting. What began as a small team of destination specialists has grown into a full-service travel company trusted by thousands of travellers across India.",
+      "NaysTrip & Treks is a Mumbai and Navi Mumbai-based travel and adventure company specialising in group travel, tailor-made itineraries, mountain trekking, educational travel and corporate journeys.",
       "We combine real, on-ground expertise with transparent pricing and genuine 24/7 support — whether you're booking a weekend escape or a two-week international holiday.",
       "Every itinerary we create is reviewed by someone who has either travelled the route themselves or worked closely with verified local partners, so you always know exactly what to expect.",
     ],
@@ -22,7 +22,7 @@ const pageContent = {
   terms: {
     title: "Terms and Conditions",
     body: [
-      "By booking a trip with Altiora Journeys, you agree to our booking, payment and cancellation terms as communicated at the time of confirmation. All package prices are subject to availability and may vary based on season, group size and current exchange rates for international trips.",
+      "By booking with NaysTrip & Treks, you agree to the booking, payment and cancellation terms issued with your quotation. Package prices remain subject to availability, season, group size and current supplier charges.",
       "Full payment terms, applicable cancellation charges and rescheduling policies are shared in your personalised quotation before booking confirmation.",
     ],
   },
@@ -71,7 +71,7 @@ export default function StaticPage({ slug }) {
     <>
       <Seo title={`${content.title} | ${settings.brandName}`} />
       <PageBanner
-        eyebrow="Altiora Journeys"
+        eyebrow="NaysTrip & Treks"
         title={content.title}
         image="https://images.unsplash.com/photo-1500835556837-99ac94a94552?auto=format&fit=crop&w=1600&q=80"
       />

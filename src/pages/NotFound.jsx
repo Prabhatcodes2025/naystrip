@@ -5,7 +5,7 @@ import Seo from "../components/shared/Seo";
 export default function NotFound() {
   return (
     <>
-      <Seo title="Page Not Found | Altiora Journeys" />
+      <Seo title="Page Not Found | NaysTrip & Treks" />
       <section className="min-h-[70vh] flex items-center justify-center py-20">
         <div className="container-lg text-center">
           <Compass size={48} className="mx-auto text-terracotta-400 mb-6" />

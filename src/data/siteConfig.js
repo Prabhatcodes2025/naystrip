@@ -1,34 +1,32 @@
 export const defaultSiteSettings = {
-  brandName: "Altiora Journeys",
-  tagline: "Journeys Designed Around Your Dreams",
-  phone: "+91 98765 43210",
-  supportPhone: "+91 1800 202 4040",
-  email: "hello@altiorajourneys.com",
-  whatsapp: "+919876543210",
-  address: "4th Floor, Sapphire Business Park, MG Road, Bengaluru, Karnataka 560001",
-  businessHours: "Mon – Sat, 9:00 AM – 8:00 PM IST",
-  footerText:
-    "Altiora Journeys crafts thoughtfully designed holidays, treks and expeditions across India and the world — backed by real travel experts and 24/7 support.",
+  brandName: "NaysTrip & Treks",
+  shortBrand: "NaysTrip",
+  tagline: "Leisure to Adventure",
+  phone: "+91 8097132424",
+  supportPhone: "+91 8097132424",
+  whatsapp: "+91 7710991126",
+  email: "hello@naystrip.com",
+  trekEmail: "naystrek@gmail.com",
+  cancellationEmail: "cancellation@naystrip.com",
+  address: "EL146, Mahape, Navi Mumbai, Maharashtra, India",
+  businessHours: "Hours confirmed when you call",
+  footerText: "Mumbai-based trip planners for tailor-made holidays, group travel, Maharashtra circuits, treks, expeditions and corporate journeys.",
   social: {
-    instagram: "https://instagram.com",
-    facebook: "https://facebook.com",
-    youtube: "https://youtube.com",
-    twitter: "https://twitter.com",
-    linkedin: "https://linkedin.com",
+    instagram: "https://www.instagram.com/naystrek?igsh=ZG9yenBiZXZ5bjA4",
+    facebook: "https://www.facebook.com/share/18TqoKXvSo/",
+    youtube: "https://www.youtube.com/channel/UCvktlYqp_dKUwN2EIgR0rsg",
+    telegram: "https://t.me/trektoworld",
   },
-  homepageCtaText: "Your Next Great Story Starts Here",
+  homepageCtaText: "Plan it your way",
 };
 
 export function getSiteSettings() {
-  try {
-    const raw = localStorage.getItem("altiora_site_settings");
-    if (raw) return { ...defaultSiteSettings, ...JSON.parse(raw) };
-  } catch {
-    /* noop */
-  }
   return defaultSiteSettings;
 }
 
-export function saveSiteSettings(settings) {
-  localStorage.setItem("altiora_site_settings", JSON.stringify(settings));
+export async function saveSiteSettings(settings) {
+  const token = sessionStorage.getItem("naystrip_admin_session");
+  const response = await fetch("/api/settings", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token || ""}` }, body: JSON.stringify(settings) });
+  if (!response.ok) throw new Error("Settings could not be saved");
+  return response.json();
 }

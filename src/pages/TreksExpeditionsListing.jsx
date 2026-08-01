@@ -40,7 +40,7 @@ function TrekGrid({ items }) {
 export function Treks() {
   return (
     <>
-      <Seo title="Himalayan Treks | Altiora Journeys" description="Guided Himalayan treks from beginner-friendly trails to challenging high-altitude routes." />
+      <Seo title="Himalayan Treks | NaysTrip & Treks" description="Explore trek routes and request current batch, leader and safety details." />
       <PageBanner
         eyebrow="For The Bold"
         title="Treks"
@@ -55,7 +55,7 @@ export function Treks() {
 export function Expeditions() {
   return (
     <>
-      <Seo title="Mountain Expeditions | Altiora Journeys" description="Technical mountaineering expeditions across the Indian Himalayas, led by certified instructors." />
+      <Seo title="Mountain Expeditions | NaysTrip & Treks" description="Explore expedition routes and request current permits, batch and leader details." />
       <PageBanner
         eyebrow="Technical Climbs"
         title="Expeditions"
