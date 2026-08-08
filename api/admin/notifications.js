@@ -1,0 +1,2 @@
+import {requireAdmin} from "../_admin.js";import {json,supabaseRequest} from "../_shared.js";
+export default async function handler(req,res){const admin=await requireAdmin(req,res);if(!admin)return;if(req.method!=="GET")return json(res,405,{error:"Method not allowed"});const response=await supabaseRequest("notifications?select=*&order=created_at.desc&limit=500");return response.ok?json(res,200,{notifications:await response.json()}):json(res,502,{error:"Notification log could not be loaded"})}

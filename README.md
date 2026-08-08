@@ -27,7 +27,7 @@ The repository retains its original `package-lock.json`. The lockfile-free pnpm 
 
 ## Database
 
-Apply `supabase/migrations/001_initial.sql` with the Supabase CLI or SQL editor. Then configure the server variables and run:
+Apply every file in `supabase/migrations/` in numeric order with the Supabase CLI or SQL editor. Then configure the server variables and run:
 
 ```bash
 corepack pnpm run seed
@@ -41,7 +41,7 @@ Copy `.env.example` to the relevant local/Vercel environment and provide:
 
 - `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
 - `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`
-- `RESEND_API_KEY`, `NOTIFICATION_FROM_EMAIL` when email delivery is enabled
+- `RESEND_API_KEY`, `RESEND_FROM`, `BOOKINGS_NOTIFICATION_EMAIL`, `LEADS_NOTIFICATION_EMAIL`, `SUPPORT_EMAIL` when email delivery is enabled
 - `WHATSAPP_API_URL`, `WHATSAPP_API_TOKEN` when WhatsApp notifications are enabled
 - `TURNSTILE_SECRET_KEY`, `VITE_TURNSTILE_SITE_KEY` for production bot protection
 
@@ -50,6 +50,8 @@ Never expose service-role, gateway-secret or notification tokens through a `VITE
 ## Deployment
 
 Vercel serves the Vite output from `dist` and the functions under `api/`. Configure all secrets in the Vercel project, apply the database migration, seed content, create approved admin accounts in Supabase Auth, and register `/api/payments/webhook` in Razorpay before accepting payments.
+
+The exact dashboard paths, webhook events, DNS work and acceptance tests are in [docs/OWNER_SETUP.md](docs/OWNER_SETUP.md).
 
 ## Source-content policy
 

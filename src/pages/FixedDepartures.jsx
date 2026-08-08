@@ -1,66 +1,90 @@
-import { useSearchParams } from "react-router-dom";
-import { Calendar, Users2, Clock } from "lucide-react";
-import { fixedDepartures } from "../data/content";
-import { PageBanner, PriceTag, EmptyState } from "../components/shared/Bits";
-import Reveal from "../components/shared/Reveal";
+import { useEffect, useState } from "react";
+import { Calendar, Clock, Users2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { PageBanner, EmptyState } from "../components/shared/Bits";
 import Seo from "../components/shared/Seo";
-
-const types = ["All", "Tour", "Trek", "Expedition", "Volvo Package"];
-
 export default function FixedDepartures() {
-  const [params, setParams] = useSearchParams();
-  const active = params.get("type") || "All";
-
-  const filtered = fixedDepartures.filter((d) => active === "All" || d.type === active);
-
+  const [departures, setDepartures] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    fetch("/api/departures")
+      .then(async (response) => {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok)
+          throw new Error(data.error || "Live departures are unavailable");
+        return data;
+      })
+      .then((data) => setDepartures(data.departures || []))
+      .catch((reason) => setError(reason.message))
+      .finally(() => setLoading(false));
+  }, []);
   return (
     <>
-      <Seo title="Fixed Departures | NaysTrip & Treks" description="Ask for currently confirmed fixed departures, batches and seat availability." />
+      <Seo
+        title="Fixed Departures | NaysTrip & Treks"
+        description="Live scheduled tours with current capacity and booking status."
+      />
       <PageBanner
         eyebrow="Set Dates"
         title="Fixed Departures"
-        subtitle="Small-group trips with confirmed dates, ready for you to join."
+        subtitle="Real scheduled departures configured by the NaysTrip operations team."
         image="https://images.unsplash.com/photo-1533130061792-64b345e4a833?auto=format&fit=crop&w=1600&q=80"
       />
-
-      <section className="py-10 sm:py-14">
+      <section className="py-12">
         <div className="container-lg">
-          <div className="flex flex-wrap gap-2 mb-10">
-            {types.map((t) => (
-              <button
-                key={t}
-                onClick={() => setParams(t === "All" ? {} : { type: t })}
-                className={`rounded-full px-4 py-2 text-xs font-semibold border transition-colors ${
-                  active === t ? "bg-navy-900 text-white border-navy-900" : "border-navy-200 text-navy-600 hover:border-navy-400"
-                }`}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
-
-          {filtered.length === 0 ? (
-            <EmptyState title="No departures found" subtitle="Check back soon for new dates." />
+          {loading ? (
+            <p>Loading live departures…</p>
+          ) : error ? (
+            <EmptyState
+              title="Live departures could not be loaded"
+              subtitle="Please retry shortly or ask NaysTrip for current departure dates."
+            />
+          ) : departures.length === 0 ? (
+            <EmptyState
+              title="No live departures currently listed"
+              subtitle="Ask NaysTrip for upcoming dates or plan a custom journey."
+            />
           ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filtered.map((d, i) => (
-                <Reveal key={d.id} delay={(i % 3) * 0.07}>
-                  <div className="card-surface p-6 h-full hover:shadow-lift hover:-translate-y-1 transition-all">
-                    <span className="badge-pill mb-3">{d.type}</span>
-                    <h3 className="font-display text-lg font-semibold text-navy-900">{d.destination}</h3>
-                    <div className="mt-4 space-y-2 text-sm text-navy-500">
-                      <span className="flex items-center gap-2"><Calendar size={15} /> {d.date}</span>
-                      <span className="flex items-center gap-2"><Clock size={15} /> {d.duration}</span>
-                      <span className="flex items-center gap-2"><Users2 size={15} /> {d.seatsLeft} seats left</span>
-                    </div>
-                    <div className="mt-5 pt-5 border-t border-navy-100 flex items-center justify-between">
-                      <PriceTag price={d.price} />
-                      <a href="/contact" className="rounded-full bg-terracotta-500 px-4 py-2.5 text-xs font-semibold text-white hover:bg-terracotta-600 transition-colors">
-                        Reserve Seat
-                      </a>
-                    </div>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {departures.map((item) => (
+                <article key={item.id} className="card-surface p-6">
+                  <span className="badge-pill">
+                    {item.status.replaceAll("_", " ")}
+                  </span>
+                  <h2 className="mt-3 font-display text-xl">
+                    {item.package?.title}
+                  </h2>
+                  <div className="mt-4 space-y-2 text-sm text-navy-500">
+                    <p className="flex gap-2">
+                      <Calendar size={15} />
+                      {item.start_date} – {item.end_date}
+                    </p>
+                    <p className="flex gap-2">
+                      <Clock size={15} />
+                      {item.package?.days} days / {item.package?.nights} nights
+                    </p>
+                    <p className="flex gap-2">
+                      <Users2 size={15} />
+                      {item.available_seats} seats available
+                    </p>
                   </div>
-                </Reveal>
+                  <p className="mt-5 font-bold">
+                    {item.price_override != null
+                      ? `INR ${Number(item.price_override).toLocaleString("en-IN")}`
+                      : item.package?.price_from != null
+                        ? `From INR ${Number(item.package.price_from).toLocaleString("en-IN")}`
+                        : "Price on request"}
+                  </p>
+                  {item.status !== "sold_out" && (
+                    <Link
+                      to={`/checkout/${item.package?.slug}`}
+                      className="btn-primary mt-5"
+                    >
+                      Book departure
+                    </Link>
+                  )}
+                </article>
               ))}
             </div>
           )}

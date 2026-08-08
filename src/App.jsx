@@ -23,6 +23,13 @@ const Contact = lazy(() => import("./pages/Contact"));
 const StaticPage = lazy(() => import("./pages/StaticPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const PortalAccess = lazy(() => import("./pages/PortalAccess"));
+const PasswordRecovery = lazy(() => import("./pages/PasswordRecovery"));
+const BookingCheckout = lazy(() => import("./pages/BookingCheckout"));
+const BookingConfirmation = lazy(() => import("./pages/BookingConfirmation"));
+const BookingVerify = lazy(() => import("./pages/BookingVerify"));
+const CustomerDashboard = lazy(() => import("./pages/CustomerDashboard"));
+const B2BDashboard = lazy(() => import("./pages/B2BDashboard"));
+const QuotationView = lazy(() => import("./pages/QuotationView"));
 
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
@@ -34,6 +41,9 @@ const AdminBlogs = lazy(() => import("./pages/admin/AdminBlogs"));
 const AdminStories = lazy(() => import("./pages/admin/AdminStories"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 const AdminQuotations = lazy(() => import("./pages/admin/AdminQuotations"));
+const AdminBookings = lazy(() => import("./pages/admin/AdminBookings"));
+const AdminDepartures = lazy(() => import("./pages/admin/AdminDepartures"));
+const AdminNotifications = lazy(() => import("./pages/admin/AdminNotifications"));
 
 function PageLoader() {
   return (
@@ -61,6 +71,7 @@ export default function App() {
         <Route path="/expeditions/:slug" element={<TrekDetail />} />
         <Route path="/transport" element={<Transport />} />
         <Route path="/custom-trip" element={<CustomTrip />} />
+        <Route path="/checkout/:slug" element={<BookingCheckout />} />
         <Route path="/corporate-travel" element={<CorporateTravel />} />
         <Route path="/how-it-works" element={<HowItWorks />} />
         <Route path="/blog" element={<Blog />} />
@@ -79,14 +90,26 @@ export default function App() {
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/account/login" element={<PortalAccess />} />
       <Route path="/account/register" element={<PortalAccess />} />
+      <Route path="/account/forgot-password" element={<PasswordRecovery />} />
+      <Route path="/account/reset-password" element={<PasswordRecovery />} />
+      <Route path="/account/dashboard" element={<CustomerDashboard />} />
       <Route path="/b2b/login" element={<PortalAccess />} />
       <Route path="/b2b/register" element={<PortalAccess />} />
+      <Route path="/b2b/forgot-password" element={<PasswordRecovery />} />
+      <Route path="/b2b/reset-password" element={<PasswordRecovery />} />
+      <Route path="/b2b/dashboard" element={<B2BDashboard />} />
+      <Route path="/booking/confirmation/:reference" element={<BookingConfirmation />} />
+      <Route path="/booking/verify/:reference" element={<BookingVerify />} />
+      <Route path="/quotation/:reference" element={<QuotationView />} />
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
         <Route path="tours" element={<AdminTours />} />
+        <Route path="bookings" element={<AdminBookings />} />
+        <Route path="departures" element={<AdminDepartures />} />
         <Route path="leads" element={<AdminLeads />} />
         <Route path="contact-leads" element={<AdminContactLeads />} />
         <Route path="quotations" element={<AdminQuotations />} />
+        <Route path="notifications" element={<AdminNotifications />} />
         <Route path="blogs" element={<AdminBlogs />} />
         <Route path="stories" element={<AdminStories />} />
         <Route path="settings" element={<AdminSettings />} />

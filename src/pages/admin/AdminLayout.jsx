@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Navigate, NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard, Map, Users, MessageSquare, Newspaper, Star, Settings, FileText,
+  LayoutDashboard, Map, Users, MessageSquare, Newspaper, Star, Settings, FileText, CalendarDays, BellRing,
   Menu, X, Search, Bell, LogOut,
 } from "lucide-react";
 import { isAdminLoggedIn, adminLogout } from "../../utils/storage";
@@ -10,9 +10,12 @@ import BrandLogo from "../../components/branding/BrandLogo";
 const navItems = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/admin/tours", label: "Tour Management", icon: Map },
+  { to: "/admin/bookings", label: "Bookings", icon: FileText },
+  { to: "/admin/departures", label: "Fixed Departures", icon: CalendarDays },
   { to: "/admin/leads", label: "Custom Trip Leads", icon: Users },
   { to: "/admin/contact-leads", label: "Contact Leads", icon: MessageSquare },
   { to: "/admin/quotations", label: "Quotations", icon: FileText },
+  { to: "/admin/notifications", label: "Notifications", icon: BellRing },
   { to: "/admin/blogs", label: "Blog Management", icon: Newspaper },
   { to: "/admin/stories", label: "Happy Travellers", icon: Star },
   { to: "/admin/settings", label: "Website Settings", icon: Settings },

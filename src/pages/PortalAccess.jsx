@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowRight, Building2, LockKeyhole, UserRound } from "lucide-react";
 import BrandLogo from "../components/branding/BrandLogo";
 import Seo from "../components/shared/Seo";
 
 export default function PortalAccess() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
   const agent = pathname.startsWith("/b2b");
   const register = pathname.endsWith("/register");
   const [form, setForm] = useState({ email: "", password: "", name: "", businessName: "", phone: "" });
@@ -25,6 +27,7 @@ export default function PortalAccess() {
       if (!response.ok) throw new Error(data.error || "Unable to continue");
       if (data.access_token) sessionStorage.setItem(`naystrip_${agent ? "agent" : "customer"}_session`, data.access_token);
       setState({ loading: false, error: "", ok: register ? "Check your email to confirm the account." : "Signed in securely." });
+      if (!register) navigate(params.get("returnTo") || (agent ? "/b2b/dashboard" : "/account/dashboard"));
     } catch (error) { setState({ loading: false, error: error.message, ok: "" }); }
   };
 
@@ -53,6 +56,7 @@ export default function PortalAccess() {
           {state.ok && <p role="status" className="text-sm text-emerald-700">{state.ok}</p>}
           <button disabled={state.loading} className="btn-primary w-full">{state.loading ? "Please wait…" : register ? "Create account" : "Sign in"}<ArrowRight size={16} /></button>
         </form>
+        {!register && <Link className="mt-4 block text-sm font-bold text-orange-600" to={agent ? "/b2b/forgot-password" : "/account/forgot-password"}>Forgot password?</Link>}
         <p className="mt-6 text-sm text-slate-500">{register ? "Already registered? " : "New here? "}<Link className="font-bold text-orange-600" to={agent ? (register ? "/b2b/login" : "/b2b/register") : (register ? "/account/login" : "/account/register")}>{register ? "Sign in" : "Create an account"}</Link></p>
         {agent && register && <p className="mt-4 text-xs leading-5 text-slate-500">Partner access is granted only after NaysTrip verifies your business details and documents.</p>}
       </div></section>

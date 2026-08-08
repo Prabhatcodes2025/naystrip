@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Download, Eye, RefreshCw, Search, X } from "lucide-react";
 import { getContactLeads, getCustomLeads, updateCustomLeadStatus } from "../../utils/storage";
 
-const statuses=["new","contacted","follow-up","converted","closed"];
+const statuses=["new","contacted","qualified","quotation_sent","follow-up","converted","lost","spam","closed"];
 const label=(value)=>value?value.charAt(0).toUpperCase()+value.slice(1):"—";
 const payload=(lead)=>{const raw=lead.payload||{};return Object.fromEntries(Object.entries(raw).map(([key,value])=>{if(typeof value==="string"&&(value.startsWith("{")||value.startsWith("[")))try{return [key,JSON.parse(value)]}catch{return [key,value]}return [key,value]}))};
 const csvCell=(value)=>`"${String(value??"").replaceAll('"','""')}"`;

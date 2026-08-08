@@ -1,0 +1,6 @@
+import {json,supabaseRequest} from "./_shared.js";
+
+async function authUser(req){const token=String(req.headers.authorization||"").replace(/^Bearer\s+/i,"");if(!token)return null;const url=process.env.SUPABASE_URL;const anon=process.env.SUPABASE_ANON_KEY;if(!url||!anon)throw new Error("SERVICE_NOT_CONFIGURED");const response=await fetch(`${url}/auth/v1/user`,{headers:{apikey:anon,Authorization:`Bearer ${token}`}});if(!response.ok)return null;return response.json()}
+export async function optionalUser(req){return authUser(req)}
+export async function requirePortalUser(req,res,portal="customer"){const user=await authUser(req);if(!user){json(res,401,{error:"Please sign in to continue"});return null}const table=portal==="agent"?"b2b_agents":"customers";const key=portal==="agent"?"user_id":"user_id";const response=await supabaseRequest(`${table}?${key}=eq.${encodeURIComponent(user.id)}&select=*&limit=1`);const rows=await response.json();if(!response.ok||!rows[0]){json(res,403,{error:portal==="agent"?"Approved partner access is required":"Customer access is required"});return null}if(portal==="agent"&&rows[0].verification_status!=="approved"){json(res,403,{error:"Your partner account is awaiting approval",verification_status:rows[0].verification_status});return null}return {user,profile:rows[0]}}
+export {authUser};
