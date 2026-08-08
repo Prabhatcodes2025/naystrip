@@ -3,17 +3,21 @@ import {readdirSync,statSync} from "node:fs";
 import {join} from "node:path";
 import {spawnSync} from "node:child_process";
 import test from "node:test";
-import {bookingReference,validateTravellers} from "../api/_validation.js";
-import {encryptPrivate,decryptPrivate,maskName} from "../api/_crypto.js";
-import {bookingDocument} from "../api/documents/_booking-docs.js";
+import {bookingReference,validateTravellers} from "../server/_validation.js";
+import {encryptPrivate,decryptPrivate,maskName} from "../server/_crypto.js";
+import {bookingDocument} from "../server/documents/_booking-docs.js";
 
 function filesBelow(directory){return readdirSync(directory).flatMap(name=>{const path=join(directory,name);return statSync(path).isDirectory()?filesBelow(path):[path]})}
 
-test("every serverless API module parses",()=>{
-  for(const file of filesBelow(join(process.cwd(),"api")).filter(file=>file.endsWith(".js"))){
+test("every server and Vercel entry module parses",()=>{
+  for(const directory of ["api","server"]){for(const file of filesBelow(join(process.cwd(),directory)).filter(file=>file.endsWith(".js"))){
     const result=spawnSync(process.execPath,["--check",file],{encoding:"utf8"});
     assert.equal(result.status,0,`${file}\n${result.stderr}`);
-  }
+  }}
+});
+
+test("Vercel Hobby deployment has exactly one function entry",()=>{
+  assert.deepEqual(filesBelow(join(process.cwd(),"api")).filter(file=>file.endsWith(".js")).map(file=>file.replaceAll("\\","/").split("/api/")[1]),["[...route].js"]);
 });
 
 test("booking references and traveller validation enforce expected shape",()=>{

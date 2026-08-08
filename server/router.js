@@ -1,0 +1,110 @@
+import adminBookings from "./admin/bookings.js";
+import adminDepartures from "./admin/departures.js";
+import adminLeads from "./admin/leads.js";
+import adminNotifications from "./admin/notifications.js";
+import adminPackages from "./admin/packages.js";
+import adminQuotationActions from "./admin/quotation-actions.js";
+import adminQuotations from "./admin/quotations.js";
+import authAdmin from "./auth/admin.js";
+import authPortal from "./auth/portal.js";
+import authRecover from "./auth/recover.js";
+import authRegister from "./auth/register.js";
+import authUpdatePassword from "./auth/update-password.js";
+import b2bCreateBooking from "./b2b/create-booking.js";
+import b2bDashboard from "./b2b/dashboard.js";
+import bookingCreate from "./bookings/create.js";
+import bookingOptions from "./bookings/options.js";
+import bookingPreview from "./bookings/preview.js";
+import bookingVerify from "./bookings/verify.js";
+import cronReminders from "./cron/reminders.js";
+import departures from "./departures.js";
+import documentBooking from "./documents/booking.js";
+import documentItinerary from "./documents/itinerary.js";
+import documentQuotation from "./documents/quotation.js";
+import leads from "./leads.js";
+import paymentCreateOrder from "./payments/create-order.js";
+import paymentVerify from "./payments/verify.js";
+import paymentWebhook from "./payments/webhook.js";
+import portalCancel from "./portal/cancel.js";
+import portalDashboard from "./portal/dashboard.js";
+import portalProfile from "./portal/profile.js";
+import quotationView from "./quotations/view.js";
+import settings from "./settings.js";
+
+export const routes = new Map([
+  ["admin/bookings", adminBookings],
+  ["admin/departures", adminDepartures],
+  ["admin/leads", adminLeads],
+  ["admin/notifications", adminNotifications],
+  ["admin/packages", adminPackages],
+  ["admin/quotation-actions", adminQuotationActions],
+  ["admin/quotations", adminQuotations],
+  ["auth/admin", authAdmin],
+  ["auth/portal", authPortal],
+  ["auth/recover", authRecover],
+  ["auth/register", authRegister],
+  ["auth/update-password", authUpdatePassword],
+  ["b2b/create-booking", b2bCreateBooking],
+  ["b2b/dashboard", b2bDashboard],
+  ["bookings/create", bookingCreate],
+  ["bookings/options", bookingOptions],
+  ["bookings/preview", bookingPreview],
+  ["bookings/verify", bookingVerify],
+  ["cron/reminders", cronReminders],
+  ["departures", departures],
+  ["documents/booking", documentBooking],
+  ["documents/itinerary", documentItinerary],
+  ["documents/quotation", documentQuotation],
+  ["leads", leads],
+  ["payments/create-order", paymentCreateOrder],
+  ["payments/verify", paymentVerify],
+  ["payments/webhook", paymentWebhook],
+  ["portal/cancel", portalCancel],
+  ["portal/dashboard", portalDashboard],
+  ["portal/profile", portalProfile],
+  ["quotations/view", quotationView],
+  ["settings", settings],
+]);
+
+export function routeFromRequest(req){
+  const parameter=req.query?.route;
+  if(Array.isArray(parameter))return parameter.map(String).join("/").replace(/^\/+|\/+$/g,"");
+  if(typeof parameter==="string")return parameter.replace(/^\/+|\/+$/g,"");
+  const pathname=new URL(req.url||"/", "http://localhost").pathname;
+  return pathname.replace(/^\/api\//,"").replace(/^\/+|\/+$/g,"");
+}
+
+async function parseBody(req){
+  if(req.body!==undefined||["GET","HEAD"].includes(req.method))return;
+  const type=String(req.headers["content-type"]||"").toLowerCase();
+  const chunks=[];
+  let bytes=0;
+  for await(const chunk of req){
+    const value=Buffer.from(chunk);
+    bytes+=value.length;
+    if(bytes>2_000_000)throw Object.assign(new Error("Request body too large"),{statusCode:413});
+    chunks.push(value);
+  }
+  const raw=Buffer.concat(chunks).toString("utf8");
+  if(!raw){req.body={};return}
+  if(type.includes("application/json")){
+    try{req.body=JSON.parse(raw)}catch{throw Object.assign(new Error("Invalid JSON payload"),{statusCode:400})}
+    return;
+  }
+  if(type.includes("application/x-www-form-urlencoded")){req.body=Object.fromEntries(new URLSearchParams(raw));return}
+  req.body=raw;
+}
+
+export default async function dispatch(req,res){
+  const route=routeFromRequest(req);
+  const handler=routes.get(route);
+  if(!handler)return res.status(404).json({error:"API route not found"});
+  try{
+    if(route!=="payments/webhook")await parseBody(req);
+    return await handler(req,res);
+  }catch(error){
+    if(error?.statusCode)return res.status(error.statusCode).json({error:error.message});
+    console.error("api_router_failed",{route,error});
+    return res.status(500).json({error:"API request failed"});
+  }
+}

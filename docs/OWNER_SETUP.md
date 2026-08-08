@@ -56,7 +56,7 @@ Purpose: enquiry, quotation, booking, payment and reminder email.
 Purpose: optional operational notifications. No WhatsApp success is fabricated when this integration is absent.
 
 1. Choose Meta WhatsApp Cloud API or an approved BSP and obtain an approved sending number, permanent/server token, and approved templates for transactional events.
-2. Configure the provider endpoint to accept the payload `{to, event, data}` used by `api/_notifications.js`, or place a provider adapter/proxy at that endpoint.
+2. Configure the provider endpoint to accept the payload `{to, event, data}` used by `server/_notifications.js`, or place a provider adapter/proxy at that endpoint.
 3. Add:
    - `WHATSAPP_PROVIDER` (for example `meta-cloud` or the BSP name)
    - `WHATSAPP_API_URL`

@@ -49,7 +49,7 @@ Never expose service-role, gateway-secret or notification tokens through a `VITE
 
 ## Deployment
 
-Vercel serves the Vite output from `dist` and the functions under `api/`. Configure all secrets in the Vercel project, apply the database migration, seed content, create approved admin accounts in Supabase Auth, and register `/api/payments/webhook` in Razorpay before accepting payments.
+Vercel serves the Vite output from `dist`. A single Hobby-compatible catch-all function at `api/[...route].js` dispatches the unchanged API URLs to implementation modules under `server/`. Configure all secrets in the Vercel project, apply the database migration, seed content, create approved admin accounts in Supabase Auth, and register `/api/payments/webhook` in Razorpay before accepting payments. The full route map is in [docs/API_ARCHITECTURE.md](docs/API_ARCHITECTURE.md).
 
 The exact dashboard paths, webhook events, DNS work and acceptance tests are in [docs/OWNER_SETUP.md](docs/OWNER_SETUP.md).
 
