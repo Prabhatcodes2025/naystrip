@@ -1,6 +1,6 @@
 # NaysTrip & Treks
 
-Production-oriented travel catalogue and enquiry platform for NaysTrip & Treks ("Leisure to Adventure"). The public experience is built with React 19, Vite, React Router and Tailwind CSS. Vercel serverless functions handle protected enquiries, Supabase authentication/data access and Razorpay order verification.
+Production-oriented travel catalogue and enquiry platform for NaysTrip & Treks ("Leisure to Adventure"). The public experience is built with React 19, Vite, React Router and Tailwind CSS. Vercel serverless functions handle protected enquiries, Supabase authentication/data access and Cashfree order verification.
 
 ## Included
 
@@ -11,7 +11,7 @@ Production-oriented travel catalogue and enquiry platform for NaysTrip & Treks (
 - Customer, B2B partner and admin authentication entry points backed by Supabase Auth
 - PostgreSQL/Supabase schema for roles, customers, agents, packages, departures, enquiries, bookings, travellers, payments, refunds, content, media and audit logs
 - Idempotent REST seed script using the structured package source
-- Server-side Razorpay order creation, signature verification and signed webhook processing
+- Server-side Cashfree order creation, payment-status verification and signed webhook processing
 - Static sitemap, robots policy, manifest, canonical metadata and TravelAgency structured data
 
 ## Local development
@@ -40,7 +40,7 @@ The seed upserts categories and packages by stable slugs, replaces itinerary/ite
 Copy `.env.example` to the relevant local/Vercel environment and provide:
 
 - Required platform: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `PUBLIC_SITE_URL`, `ID_ENCRYPTION_KEY`, `CRON_SECRET`
-- Required for online payments: `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`
+- Required for online payments: `CASHFREE_CLIENT_ID`, `CASHFREE_CLIENT_SECRET`, `CASHFREE_ENV`
 - `RESEND_API_KEY`, `RESEND_FROM`, `BOOKINGS_NOTIFICATION_EMAIL`, `LEADS_NOTIFICATION_EMAIL`, `SUPPORT_EMAIL` when email delivery is enabled
 - `WHATSAPP_API_URL`, `WHATSAPP_API_TOKEN` when WhatsApp notifications are enabled
 - `TURNSTILE_SECRET_KEY`, `VITE_TURNSTILE_SITE_KEY` together for production bot protection; omit both to keep enquiry forms available without CAPTCHA
@@ -49,7 +49,7 @@ Never expose service-role, gateway-secret or notification tokens through a `VITE
 
 ## Deployment
 
-Vercel serves the Vite output from `dist`. An API-first rewrite sends every unchanged `/api/*` URL to the single Hobby-compatible function at `api/index.js`, which delegates to implementation modules under `server/`. Configure all secrets in the Vercel project, apply the database migration, seed content, create approved admin accounts in Supabase Auth, and register `/api/payments/webhook` in Razorpay before accepting payments. The full route map is in [docs/API_ARCHITECTURE.md](docs/API_ARCHITECTURE.md).
+Vercel serves the Vite output from `dist`. An API-first rewrite sends every unchanged `/api/*` URL to the single Hobby-compatible function at `api/index.js`, which delegates to implementation modules under `server/`. Configure all secrets in the Vercel project, apply the database migration, seed content, create approved admin accounts in Supabase Auth, and register `/api/payments/webhook` in Cashfree before accepting payments. The full route map is in [docs/API_ARCHITECTURE.md](docs/API_ARCHITECTURE.md).
 
 The exact dashboard paths, webhook events, DNS work and acceptance tests are in [docs/OWNER_SETUP.md](docs/OWNER_SETUP.md).
 

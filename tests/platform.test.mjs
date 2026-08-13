@@ -29,7 +29,9 @@ test("every Admin lazy import resolves to source and no hashed chunk is hardcode
 
 test("booking references and traveller validation enforce expected shape",()=>{
   assert.match(bookingReference(),/^NTB-\d{8}-[A-Z0-9]{6}$/);
-  assert.equal(validateTravellers([{fullName:"Asha Patil",nationality:"Indian",idType:"Passport",idNumber:"P123"}],{adults:1,children:0,infants:0}),null);
+  const adult={type:"adult",fullName:"Asha Patil",dob:"1990-02-10",nationality:"Indian",idType:"Passport",idNumber:"P123"};
+  assert.equal(validateTravellers([adult],{adults:1,children:0,infants:0},"2026-10-01"),null);
+  assert.match(validateTravellers([{...adult,dob:"2020-02-10"}],{adults:1,children:0,infants:0},"2026-10-01"),/at least 12/);
   assert.match(validateTravellers([],{adults:1,children:0,infants:0}),/do not match/);
 });
 

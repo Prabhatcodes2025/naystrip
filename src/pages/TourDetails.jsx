@@ -328,6 +328,7 @@ export default function TourDetails() {
                 INR within 15 working days after final confirmation. No interest
                 is payable.
               </p>
+              <div className="mt-4 flex flex-wrap gap-4 text-sm font-bold text-orange-600"><Link to="/cancellation-policy">Full cancellation policy</Link><Link to="/refund-policy">Refund policy</Link><Link to="/payment-policy">Payment policy</Link></div>
             </section>
           </div>
           <aside className="lg:sticky lg:top-28 lg:self-start">

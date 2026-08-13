@@ -10,6 +10,11 @@
   <url><loc>https://www.naystrip.com/transport</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://www.naystrip.com/blog</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://www.naystrip.com/contact</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.naystrip.com/privacy-policy</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.naystrip.com/terms-and-conditions</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.naystrip.com/cancellation-policy</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.naystrip.com/refund-policy</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.naystrip.com/payment-policy</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
   <url><loc>https://www.naystrip.com/tours/mumbai-city-tour-3-days</loc></url>
   <url><loc>https://www.naystrip.com/tours/aurangabad-ajanta-ellora-3-days</loc></url>
   <url><loc>https://www.naystrip.com/tours/pune-nashik-shirdi-sambhajinagar-5-days</loc></url>

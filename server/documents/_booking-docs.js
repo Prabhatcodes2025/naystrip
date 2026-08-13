@@ -172,7 +172,7 @@ export async function bookingDocument(booking, type = "voucher") {
       "Balance due",
       `INR ${Number(booking.balance_due).toLocaleString("en-IN")}`,
     );
-    field("Transaction", booking.razorpay_payment_id || "Not available");
+    field("Transaction", booking.payments?.find((payment)=>payment.status==="successful")?.gateway_payment_id || "Not available");
     heading("Important information");
     text(
       "Carry the original identity documents entered during booking. This voucher confirms NaysTrip tour services only and is not an airline or railway ticket. Supplier vouchers may be issued separately. Contact NaysTrip immediately if any detail is incorrect.",
@@ -247,7 +247,7 @@ export async function bookingDocument(booking, type = "voucher") {
       "Balance",
       `INR ${Number(booking.balance_due).toLocaleString("en-IN")}`,
     );
-    field("Payment reference", booking.razorpay_payment_id || "Pending");
+    field("Payment reference", booking.payments?.find((payment)=>payment.status==="successful")?.gateway_payment_id || "Pending");
     text(
       "GST registration and legal invoice fields are controlled from NaysTrip business settings and must be configured by the owner before issuing a tax invoice.",
       { size: 8, color: C.grey },

@@ -8,7 +8,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import Seo from "../components/shared/Seo";
-import { getToken, openRazorpay, portalFetch } from "../utils/portal";
+import { getToken, openCashfree, portalFetch } from "../utils/portal";
 const emptyTraveller = (type = "adult") => ({
   type,
   fullName: "",
@@ -127,11 +127,20 @@ export default function BookingCheckout() {
         i === index ? { ...item, [key]: value } : item,
       ),
     }));
-  const validateTravellers = () =>
-    form.travellers.every(
-      (item) =>
-        item.fullName && item.nationality && item.idType && item.idNumber,
-    );
+  const travellerDobError = (item) => {
+    if (!item.dob) return "Date of birth is required";
+    const onDate = form.travelDate || new Date().toISOString().slice(0, 10);
+    const birth = new Date(`${item.dob}T00:00:00Z`);
+    const travel = new Date(`${onDate}T00:00:00Z`);
+    if (Number.isNaN(birth.getTime()) || birth > travel) return "Enter a valid date before travel";
+    let age = travel.getUTCFullYear() - birth.getUTCFullYear();
+    if (travel.getUTCMonth() < birth.getUTCMonth() || (travel.getUTCMonth() === birth.getUTCMonth() && travel.getUTCDate() < birth.getUTCDate())) age -= 1;
+    if (item.type === "adult" && age < 12) return "Adult must be 12 or older on the travel date";
+    if (item.type === "child" && (age < 2 || age >= 12)) return "Child must be 2–11 on the travel date";
+    if (item.type === "infant" && age >= 2) return "Infant must be under 2 on the travel date";
+    return "";
+  };
+  const validateTravellers = () => form.travellers.every((item) => item.fullName && !travellerDobError(item) && item.nationality && item.idType && item.idNumber);
   const submit = async () => {
     if (!getToken("customer")) {
       navigate(
@@ -147,6 +156,7 @@ export default function BookingCheckout() {
         headers: { "Idempotency-Key": crypto.randomUUID() },
         body: JSON.stringify({
           ...form,
+          travellers: form.travellers.map((item) => ({ ...item, travelDate: form.travelDate })),
           packageId: options.id,
           idempotencyKey: crypto.randomUUID(),
         }),
@@ -163,7 +173,7 @@ export default function BookingCheckout() {
     setBusy(true);
     setError("");
     try {
-      const result = await openRazorpay(booking.reference, "advance");
+      const result = await openCashfree(booking.reference, "advance");
       navigate(`/booking/confirmation/${booking.reference}`, {
         state: { payment: result },
       });
@@ -431,12 +441,15 @@ export default function BookingCheckout() {
                             <span className="label-field">Date of birth</span>
                             <input
                               type="date"
+                              required
+                              max={form.travelDate || new Date().toISOString().slice(0, 10)}
                               value={traveller.dob}
                               onChange={(e) =>
                                 updateTraveller(index, "dob", e.target.value)
                               }
                               className="input-field"
                             />
+                            {traveller.dob && travellerDobError(traveller) && <span className="mt-1 block text-xs font-semibold text-rose-600">{travellerDobError(traveller)}</span>}
                           </label>
                           <label>
                             <span className="label-field">Nationality</span>

@@ -30,8 +30,8 @@ The public API contract remains unchanged. An API-first rewrite sends all `/api/
 | `/api/admin/notifications` | GET | `server/admin/notifications.js` | Notification log |
 | `/api/settings` | POST | `server/settings.js` | Admin settings |
 | `/api/payments/create-order` | POST | `server/payments/create-order.js` | Advance/balance checkout |
-| `/api/payments/verify` | POST | `server/payments/verify.js` | Razorpay browser callback verification |
-| `/api/payments/webhook` | POST | `server/payments/webhook.js` | Razorpay signed webhook |
+| `/api/payments/verify` | POST | `server/payments/verify.js` | Cashfree server-side payment-status verification |
+| `/api/payments/webhook` | POST | `server/payments/webhook.js` | Cashfree signed webhook |
 | `/api/documents/booking` | GET | `server/documents/booking.js` | Protected voucher/invoice/receipt/itinerary download |
 | `/api/documents/itinerary` | GET | `server/documents/itinerary.js` | Public package itinerary PDF |
 | `/api/documents/quotation` | GET | `server/documents/quotation.js` | Protected admin quotation PDF |
@@ -40,7 +40,7 @@ The public API contract remains unchanged. An API-first rewrite sends all `/api/
 
 ## Raw-body and authorization behavior
 
-The catch-all entry disables automatic body parsing. `server/router.js` parses JSON and form data only for ordinary routes and deliberately leaves `/api/payments/webhook` untouched. Razorpay HMAC verification therefore runs against the exact received bytes. Customer ownership, approved-agent authorization, admin roles/financial permissions, private document checks and `CRON_SECRET` verification remain inside their existing handlers.
+The catch-all entry disables automatic body parsing. `server/router.js` parses JSON and form data only for ordinary routes and deliberately leaves `/api/payments/webhook` untouched. Cashfree HMAC verification therefore runs against the exact received bytes. Customer ownership, approved-agent authorization, admin roles/financial permissions, private document checks and `CRON_SECRET` verification remain inside their existing handlers.
 
 ## Function count
 

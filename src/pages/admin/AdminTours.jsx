@@ -60,6 +60,7 @@ export default function AdminTours() {
   const [form, setForm] = useState(empty);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [readiness, setReadiness] = useState("all");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const load = async () => {
@@ -164,14 +165,17 @@ export default function AdminTours() {
     });
     await load();
   };
+  const readinessCode = (item) => {
+    if (item.price_from == null) return "price_missing";
+    if (!item.booking_enabled || item.custom_enquiry_only || item.policies?.booking_mode === "enquiry_only") return "enquiry_only";
+    return "online_ready";
+  };
   const filtered = useMemo(
-    () =>
-      packages.filter((item) =>
-        `${item.title} ${(item.destination_names || []).join(" ")}`
+    () => packages.filter((item) =>
+        (readiness === "all" || readinessCode(item) === readiness) && `${item.title} ${(item.destination_names || []).join(" ")}`
           .toLowerCase()
-          .includes(search.toLowerCase()),
-      ),
-    [packages, search],
+          .includes(search.toLowerCase())),
+    [packages, search, readiness],
   );
   return (
     <div>
@@ -194,7 +198,7 @@ export default function AdminTours() {
         </button>
       </div>
       {error && <p className="mt-4 bg-rose-50 p-3 text-sm">{error}</p>}
-      <label className="relative mt-5 block max-w-sm">
+      <div className="mt-5 flex flex-wrap gap-3"><label className="relative block max-w-sm flex-1">
         <Search size={15} className="absolute left-3 top-3.5" />
         <input
           value={search}
@@ -202,7 +206,7 @@ export default function AdminTours() {
           className="input-field pl-9"
           placeholder="Search packages"
         />
-      </label>
+      </label><label><span className="sr-only">Filter by booking readiness</span><select value={readiness} onChange={(event) => setReadiness(event.target.value)} className="input-field min-w-56"><option value="all">All readiness states</option><option value="price_missing">PRICE MISSING</option><option value="enquiry_only">ENQUIRY ONLY</option><option value="online_ready">ONLINE BOOKING READY</option></select></label></div>
       <div className="mt-5 overflow-x-auto rounded-2xl border bg-white">
         <table className="w-full min-w-[850px] text-sm">
           <thead>
@@ -232,11 +236,7 @@ export default function AdminTours() {
                     ? "On request"
                     : `INR ${Number(item.price_from).toLocaleString("en-IN")}`}
                 </td>
-                <td className="p-4">
-                  {item.booking_enabled && !item.custom_enquiry_only
-                    ? "Enabled"
-                    : "Enquiry only"}
-                </td>
+                <td className="p-4"><span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-extrabold tracking-wide ${readinessCode(item) === "online_ready" ? "bg-emerald-50 text-emerald-700" : readinessCode(item) === "price_missing" ? "bg-amber-50 text-amber-800" : "bg-slate-100 text-slate-600"}`}>{readinessCode(item) === "online_ready" ? "ONLINE BOOKING READY" : readinessCode(item) === "price_missing" ? "PRICE MISSING" : "ENQUIRY ONLY"}</span></td>
                 <td className="p-4">{item.status}</td>
                 <td className="p-4">
                   <div className="flex gap-2">

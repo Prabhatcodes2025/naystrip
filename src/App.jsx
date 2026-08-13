@@ -81,7 +81,13 @@ export default function App() {
         <Route path="/about" element={<StaticPage slug="about" />} />
         <Route path="/careers" element={<StaticPage slug="careers" />} />
         <Route path="/terms" element={<StaticPage slug="terms" />} />
+        <Route path="/terms-and-conditions" element={<StaticPage slug="terms" />} />
+        <Route path="/user-agreement" element={<StaticPage slug="terms" />} />
         <Route path="/privacy" element={<StaticPage slug="privacy" />} />
+        <Route path="/privacy-policy" element={<StaticPage slug="privacy" />} />
+        <Route path="/refund-policy" element={<StaticPage slug="refund" />} />
+        <Route path="/cancellation-policy" element={<StaticPage slug="cancellation" />} />
+        <Route path="/payment-policy" element={<StaticPage slug="payment" />} />
         <Route path="/disclaimer" element={<StaticPage slug="disclaimer" />} />
         <Route path="/faqs" element={<StaticPage slug="faqs" />} />
         <Route path="/sitemap" element={<StaticPage slug="sitemap" />} />

@@ -26,6 +26,7 @@ import leads from "./leads.js";
 import paymentCreateOrder from "./payments/create-order.js";
 import paymentVerify from "./payments/verify.js";
 import paymentWebhook from "./payments/webhook.js";
+import packages from "./packages.js";
 import portalCancel from "./portal/cancel.js";
 import portalDashboard from "./portal/dashboard.js";
 import portalProfile from "./portal/profile.js";
@@ -62,6 +63,7 @@ export const routes = new Map([
   ["payments/create-order", paymentCreateOrder],
   ["payments/verify", paymentVerify],
   ["payments/webhook", paymentWebhook],
+  ["packages", packages],
   ["portal/cancel", portalCancel],
   ["portal/dashboard", portalDashboard],
   ["portal/profile", portalProfile],

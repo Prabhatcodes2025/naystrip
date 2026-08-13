@@ -24,17 +24,16 @@ Purpose: production database, authentication, row-level authorization and privat
 8. Run `corepack pnpm seed` once with the production Supabase variables available. This upserts the 16 supplied Maharashtra packages, preserves their stable slugs, and explicitly leaves them in enquiry-only mode. In Admin, approve a real price and choose **Flexible date** or create a priced departure and choose **Fixed departures** before enabling online booking.
 9. Test by registering a customer and confirming that only that customer can read their own booking/document rows.
 
-## 2. Razorpay
+## 2. Cashfree Payments
 
 Purpose: advance and remaining-balance payments.
 
-1. Open **Razorpay Dashboard > Account & Settings > API Keys** and generate **Test Mode** keys first.
-2. Add `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` to Vercel for Preview/Test deployments. The key secret is server-only.
-3. Open **Account & Settings > Webhooks > Add New Webhook**.
-4. Set URL to `https://YOUR_DOMAIN/api/payments/webhook` and create a unique webhook secret. Add it as `RAZORPAY_WEBHOOK_SECRET`.
-5. Subscribe to: `order.paid`, `payment.captured`, `payment.failed`, `refund.created`, `refund.processed`, and `refund.failed` (only the events available in the account need to be selected).
-6. Test in Razorpay Test Mode: create a low-value approved test departure, complete checkout with Razorpay test payment data, verify the callback says verification pending, then confirm the signed webhook changes the booking to confirmed and produces one payment/ticket only.
-7. Review Razorpay account activation/KYC and settlement settings. When approved, replace test keys with Live Mode keys in Vercel Production, recreate the production webhook, and run one controlled live payment/refund.
+1. Open **Cashfree Merchant Dashboard > Developers > API Keys**, switch to Sandbox, and copy the Sandbox App ID and Secret Key.
+2. Add `CASHFREE_CLIENT_ID`, `CASHFREE_CLIENT_SECRET`, and `CASHFREE_ENV=sandbox` to Vercel Preview/Production while testing. Both credentials are server-only.
+3. Open **Developers > Webhooks**, add `https://YOUR_DOMAIN/api/payments/webhook`, and select the latest supported webhook version.
+4. Subscribe to payment success, payment failed, and user-dropped payment events. The application verifies `x-webhook-signature` with the Cashfree client secret and the exact raw request body.
+5. Test in Sandbox: create a low-value approved booking, pay its advance, and confirm the booking changes to confirmed only after Cashfree reports `SUCCESS`. Confirm repeated webhooks do not create duplicate payment credit or notifications.
+6. After Cashfree account activation/KYC, replace the Sandbox App ID/Secret with production credentials and set `CASHFREE_ENV=production`. Run one controlled live payment before launch.
 
 ## 3. Resend and email DNS
 
@@ -74,7 +73,7 @@ Purpose: serverless APIs, scheduled reminders and production delivery.
 3. Generate a long random secret for `CRON_SECRET`.
 4. Redeploy after variables are saved. Never commit `.env` files or expose service-role/payment secrets as `VITE_` variables.
 5. Confirm **Settings > Cron Jobs** shows `/api/cron/reminders` at `0 4 * * *`. Vercel automatically sends the configured cron authorization; manually calling it requires `Authorization: Bearer YOUR_CRON_SECRET`.
-6. In **Settings > Domains**, add the production domain and apply the A/CNAME records Vercel displays. Update Supabase redirects, Razorpay webhook URL, Resend links and `PUBLIC_SITE_URL` after the domain is final.
+6. In **Settings > Domains**, add the production domain and apply the A/CNAME records Vercel displays. Update Supabase redirects, Cashfree webhook URL, Resend links and `PUBLIC_SITE_URL` after the domain is final.
 7. Run the acceptance checks: enquiry, customer recovery, checkout/payment/webhook, protected document download, admin actions, approved-agent login, quotation share, and cron endpoint.
 
 ## 6. Business and legal details

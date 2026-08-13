@@ -13,7 +13,7 @@ import Seo from "../components/shared/Seo";
 import {
   downloadProtectedDocument,
   getToken,
-  openRazorpay,
+  openCashfree,
   portalFetch,
   sessionKey,
 } from "../utils/portal";
@@ -44,7 +44,7 @@ export default function CustomerDashboard() {
   const pay = async (reference) => {
     setBusy(reference);
     try {
-      await openRazorpay(reference, "balance");
+      await openCashfree(reference, "balance");
       await load();
     } catch (err) {
       setError(err.message);

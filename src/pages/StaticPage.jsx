@@ -2,6 +2,7 @@ import { PageBanner } from "../components/shared/Bits";
 import Seo from "../components/shared/Seo";
 import { Link } from "react-router-dom";
 import { getSiteSettings } from "../data/siteConfig";
+import { policyPages } from "../data/policies";
 
 const pageContent = {
   about: {
@@ -63,7 +64,7 @@ const pageContent = {
 };
 
 export default function StaticPage({ slug }) {
-  const content = pageContent[slug];
+  const content = policyPages[slug] || pageContent[slug];
   const settings = getSiteSettings();
   if (!content) return null;
 
@@ -77,7 +78,18 @@ export default function StaticPage({ slug }) {
       />
       <section className="py-14 sm:py-20">
         <div className="container-lg max-w-3xl">
-          {content.links ? (
+          {content.sections ? (
+            <article>
+              <p className="text-lg leading-8 text-slate-600">{content.intro}</p>
+              <p className="mt-3 text-xs font-bold uppercase tracking-[.12em] text-slate-400">Last updated {content.updated}</p>
+              <div className="mt-10 space-y-10">
+                {content.sections.map(([heading, paragraphs]) => <section key={heading}>
+                  <h2 className="font-display text-3xl text-[#173c34]">{heading}</h2>
+                  <div className="mt-4 space-y-3">{paragraphs.map((paragraph) => <p key={paragraph} className="leading-7 text-slate-600">{paragraph}</p>)}</div>
+                </section>)}
+              </div>
+            </article>
+          ) : content.links ? (
             <div className="grid sm:grid-cols-2 gap-3">
               {content.links.map(([label, to]) => (
                 <Link key={to} to={to} className="card-surface px-5 py-4 text-sm font-semibold text-navy-700 hover:text-terracotta-600 transition-colors">
