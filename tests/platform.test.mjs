@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import {readdirSync,statSync} from "node:fs";
+import {existsSync,readdirSync,readFileSync,statSync} from "node:fs";
 import {join} from "node:path";
 import {spawnSync} from "node:child_process";
 import test from "node:test";
@@ -18,6 +18,13 @@ test("every server and Vercel entry module parses",()=>{
 
 test("Vercel Hobby deployment has exactly one function entry",()=>{
   assert.deepEqual(filesBelow(join(process.cwd(),"api")).filter(file=>file.endsWith(".js")).map(file=>file.replaceAll("\\","/").split("/api/")[1]),["index.js"]);
+});
+
+test("every Admin lazy import resolves to source and no hashed chunk is hardcoded",()=>{
+  const app=readFileSync(join(process.cwd(),"src","App.jsx"),"utf8");
+  const names=["AdminLayout","AdminDashboard","AdminBookings","AdminLeads","AdminTours","AdminQuotations","AdminDepartures","AdminNotifications","AdminSettings","AdminBlogs","AdminStories"];
+  for(const name of names){assert.match(app,new RegExp(`lazy\\(\\(\\) => import\\(\\"\\./pages/admin/${name}\\"\\)\\)`));assert.equal(existsSync(join(process.cwd(),"src","pages","admin",`${name}.jsx`)),true)}
+  assert.doesNotMatch(app,/assets\/[A-Za-z]+-[A-Za-z0-9_-]+\.js/);
 });
 
 test("booking references and traveller validation enforce expected shape",()=>{

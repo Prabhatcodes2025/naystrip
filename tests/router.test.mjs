@@ -5,7 +5,7 @@ import {join} from "node:path";
 import test from "node:test";
 import dispatch,{routeFromRequest,routes} from "../server/router.js";
 
-const expected=["admin/bookings","admin/departures","admin/leads","admin/notifications","admin/packages","admin/quotation-actions","admin/quotations","auth/admin","auth/portal","auth/recover","auth/register","auth/update-password","b2b/create-booking","b2b/dashboard","bookings/create","bookings/options","bookings/preview","bookings/verify","config","cron/reminders","departures","documents/booking","documents/itinerary","documents/quotation","leads","payments/create-order","payments/verify","payments/webhook","portal/cancel","portal/dashboard","portal/profile","quotations/view","settings"];
+const expected=["admin/bookings","admin/departures","admin/leads","admin/notifications","admin/packages","admin/tours","admin/quotation-actions","admin/quotations","auth/admin","auth/portal","auth/recover","auth/register","auth/update-password","b2b/create-booking","b2b/dashboard","bookings/create","bookings/options","bookings/preview","bookings/verify","config","cron/reminders","departures","documents/booking","documents/itinerary","documents/quotation","leads","payments/create-order","payments/verify","payments/webhook","portal/cancel","portal/dashboard","portal/profile","quotations/view","settings"];
 
 function response(){return {statusCode:200,headers:{},body:null,status(code){this.statusCode=code;return this},setHeader(key,value){this.headers[key]=value;return this},json(value){this.body=value;return this},end(value){this.body=value;return this},send(value){this.body=value;return this}}}
 function request({path,method="GET",body,headers={}}){const req=Readable.from(body===undefined?[]:[Buffer.from(body)]);req.method=method;req.url=`/api/${path}`;req.query={route:path.split("/")};req.headers=headers;return req}
@@ -14,6 +14,7 @@ function filesBelow(directory){return readdirSync(directory).flatMap(name=>{cons
 test("router preserves every legacy endpoint plus public environment config",()=>{
   assert.deepEqual([...routes.keys()].sort(),expected.sort());
   for(const handler of routes.values())assert.equal(typeof handler,"function");
+  assert.equal(routes.get("admin/tours"),routes.get("admin/packages"));
 });
 
 test("all preserved endpoint groups dispatch to a real handler",async()=>{
@@ -36,10 +37,15 @@ test("route resolution supports Vercel params and direct legacy URLs",()=>{
   assert.equal(routeFromRequest({query:{},url:"/api/bookings/verify?reference=NTB-1"}),"bookings/verify");
 });
 
-test("Vercel routes API requests before the SPA fallback",()=>{
+test("Vercel routes API, existing files, then the SPA fallback",()=>{
   const configuration=JSON.parse(readFileSync(join(process.cwd(),"vercel.json"),"utf8"));
-  assert.deepEqual(configuration.rewrites?.[0],{source:"/api/:route*",destination:"/api/index?route=:route*"});
-  assert.deepEqual(configuration.rewrites?.[1],{source:"/(.*)",destination:"/index.html"});
+  assert.deepEqual(configuration.routes?.[0],{src:"/api/(.*)",dest:"/api/index?route=$1"});
+  assert.deepEqual(configuration.routes?.[1],{handle:"filesystem"});
+  assert.deepEqual(configuration.routes?.[2],{src:"/assets/(.*)",status:404});
+  assert.equal(configuration.routes?.[3]?.status,404);
+  assert.equal(configuration.routes?.[4]?.status,404);
+  assert.equal(configuration.routes?.[5]?.dest,"/index.html");
+  assert.equal(configuration.routes?.[5]?.headers?.["Cache-Control"],"public, max-age=0, must-revalidate");
 });
 
 test("router returns JSON 404 for unknown endpoints",async()=>{

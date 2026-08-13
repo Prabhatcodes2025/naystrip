@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid,
@@ -20,15 +20,17 @@ const categoryChart = [
 ];
 
 export default function AdminDashboard() {
-  const customLeads = getCustomLeads();
-  const contactLeads = getContactLeads();
+  const [leadState,setLeadState]=useState({custom:[],contact:[],loading:true,error:""});
+  useEffect(()=>{let active=true;Promise.all([getCustomLeads(),getContactLeads()]).then(([custom,contact])=>{if(active)setLeadState({custom:Array.isArray(custom)?custom:[],contact:Array.isArray(contact)?contact:[],loading:false,error:""})}).catch((error)=>{if(active)setLeadState({custom:[],contact:[],loading:false,error:error.message||"Dashboard data could not be loaded"})});return()=>{active=false}},[]);
+  const customLeads = leadState.custom;
+  const contactLeads = leadState.contact;
   const adminBlogs = getAdminBlogs();
   const adminTours = getAdminTours();
   const adminStories = getAdminStories();
 
   const stats = useMemo(() => {
     const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    const newThisWeek = [...customLeads, ...contactLeads].filter((l) => new Date(l.submittedAt).getTime() > weekAgo).length;
+    const newThisWeek = [...customLeads, ...contactLeads].filter((l) => new Date(l.created_at||l.submittedAt).getTime() > weekAgo).length;
     return [
       { label: "Total Tours", value: tours.length + adminTours.length, icon: Map, color: "bg-forest-50 text-forest-600" },
       { label: "Custom Trip Leads", value: customLeads.length, icon: Users, color: "bg-terracotta-50 text-terracotta-600" },
@@ -56,6 +58,9 @@ export default function AdminDashboard() {
           </Link>
         </div>
       </div>
+
+      {leadState.loading&&<p role="status" className="mb-5 rounded-xl bg-white p-4 text-sm text-navy-500">Loading live dashboard data…</p>}
+      {leadState.error&&<div role="alert" className="mb-5 rounded-xl bg-rose-50 p-4 text-sm text-rose-700"><p>{leadState.error}</p><p className="mt-1 text-xs">The dashboard remains available; open a section or retry by refreshing this page.</p></div>}
 
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
         {stats.map((s) => (
@@ -126,7 +131,7 @@ export default function AdminDashboard() {
                     <tr key={l.id} className="border-b border-navy-50 last:border-0">
                       <td className="py-2.5 font-medium text-navy-800">{l.name || `${l.firstName || ""} ${l.lastName || ""}`}</td>
                       <td className="py-2.5 text-navy-500">{l.kind}</td>
-                      <td className="py-2.5 text-navy-500">{new Date(l.submittedAt).toLocaleDateString("en-IN")}</td>
+                      <td className="py-2.5 text-navy-500">{new Date(l.created_at||l.submittedAt).toLocaleDateString("en-IN")}</td>
                       <td className="py-2.5">
                         <span className="rounded-full bg-forest-50 text-forest-700 px-2.5 py-1 text-[11px] font-semibold">{l.status}</span>
                       </td>

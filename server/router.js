@@ -38,6 +38,7 @@ export const routes = new Map([
   ["admin/leads", adminLeads],
   ["admin/notifications", adminNotifications],
   ["admin/packages", adminPackages],
+  ["admin/tours", adminPackages],
   ["admin/quotation-actions", adminQuotationActions],
   ["admin/quotations", adminQuotations],
   ["auth/admin", authAdmin],

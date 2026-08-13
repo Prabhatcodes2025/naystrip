@@ -60,7 +60,7 @@ export default function AdminQuotations() {
   const [message, setMessage] = useState("");
   const load = async () => {
     try {
-      setQuotes((await request("/api/admin/quotations")).quotations);
+      setQuotes((await request("/api/admin/quotations")).quotations || []);
     } catch (error) {
       setMessage(error.message);
     }

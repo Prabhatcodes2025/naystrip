@@ -2,6 +2,7 @@ import { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 import PublicLayout from "./components/layout/PublicLayout";
 import BrandLogo from "./components/branding/BrandLogo";
+import AdminErrorBoundary from "./components/admin/AdminErrorBoundary";
 
 const Home = lazy(() => import("./pages/Home"));
 const ToursListing = lazy(() => import("./pages/ToursListing"));
@@ -101,7 +102,7 @@ export default function App() {
       <Route path="/booking/confirmation/:reference" element={<BookingConfirmation />} />
       <Route path="/booking/verify/:reference" element={<BookingVerify />} />
       <Route path="/quotation/:reference" element={<QuotationView />} />
-      <Route path="/admin" element={<AdminLayout />}>
+      <Route path="/admin" element={<AdminErrorBoundary><AdminLayout /></AdminErrorBoundary>}>
         <Route index element={<AdminDashboard />} />
         <Route path="tours" element={<AdminTours />} />
         <Route path="bookings" element={<AdminBookings />} />

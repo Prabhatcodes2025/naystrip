@@ -1,8 +1,19 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "crons": [{ "path": "/api/cron/reminders", "schedule": "0 4 * * *" }],
-  "rewrites": [
-    { "source": "/api/:route*", "destination": "/api/index?route=:route*" },
-    { "source": "/(.*)", "destination": "/index.html" }
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index?route=$1" },
+    { "handle": "filesystem" },
+    { "src": "/assets/(.*)", "status": 404 },
+    { "src": "/(branding|images)/(.*)", "status": 404 },
+    {
+      "src": "/(favicon.ico|apple-touch-icon.png|og.png|robots.txt|sitemap.xml|site.webmanifest)",
+      "status": 404
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html",
+      "headers": { "Cache-Control": "public, max-age=0, must-revalidate" }
+    }
   ]
 }

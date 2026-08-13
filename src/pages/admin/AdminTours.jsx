@@ -65,7 +65,7 @@ export default function AdminTours() {
   const load = async () => {
     setBusy(true);
     try {
-      setPackages((await request("/api/admin/packages")).packages);
+      setPackages((await request("/api/admin/packages")).packages || []);
     } catch (err) {
       setError(err.message);
     } finally {
