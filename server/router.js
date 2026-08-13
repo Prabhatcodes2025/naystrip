@@ -2,6 +2,7 @@ import adminBookings from "./admin/bookings.js";
 import adminDepartures from "./admin/departures.js";
 import adminLeads from "./admin/leads.js";
 import adminNotifications from "./admin/notifications.js";
+import adminMedia from "./admin/media.js";
 import adminPackages from "./admin/packages.js";
 import adminQuotationActions from "./admin/quotation-actions.js";
 import adminQuotations from "./admin/quotations.js";
@@ -38,6 +39,7 @@ export const routes = new Map([
   ["admin/departures", adminDepartures],
   ["admin/leads", adminLeads],
   ["admin/notifications", adminNotifications],
+  ["admin/media", adminMedia],
   ["admin/packages", adminPackages],
   ["admin/tours", adminPackages],
   ["admin/quotation-actions", adminQuotationActions],
@@ -125,7 +127,7 @@ export default async function dispatch(req, res) {
   const handler = routes.get(route);
   if (!handler) return res.status(404).json({ error: "API route not found" });
   try {
-    if (route !== "payments/webhook") await parseBody(req);
+    if (!["payments/webhook", "admin/media"].includes(route)) await parseBody(req);
     return await handler(req, res);
   } catch (error) {
     if (error?.statusCode)

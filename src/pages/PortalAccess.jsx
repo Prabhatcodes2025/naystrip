@@ -35,13 +35,13 @@ export default function PortalAccess() {
     <Seo title={`${agent ? "B2B Partner" : "Customer"} ${register ? "Registration" : "Login"} | NaysTrip & Treks`} />
     <main className="grid min-h-[75vh] bg-[#fffaf2] lg:grid-cols-2">
       <section className="hidden bg-[#173c34] p-16 text-white lg:flex lg:flex-col lg:justify-end">
-        <BrandLogo className="mb-auto h-32 w-auto self-start" />
+        <BrandLogo animated className="mb-auto h-32 w-auto self-start" />
         <Icon size={32} className="text-orange-300" />
         <h1 className="mt-6 max-w-lg font-display text-6xl">{agent ? "A working desk for travel partners." : "Your journeys, documents and payments in one place."}</h1>
         <p className="mt-5 max-w-md leading-7 text-white/65">{agent ? "Approved partners can access private rates, bookings, ledgers and marketing material." : "Access booking status, payment records and documents tied to your verified account."}</p>
       </section>
       <section className="grid place-items-center p-6 sm:p-12"><div className="w-full max-w-md">
-        <BrandLogo className="mb-8 h-24 w-auto lg:hidden" />
+        <BrandLogo animated className="mb-8 h-24 w-auto lg:hidden" />
         <p className="eyebrow">{agent ? "Partner portal" : "Customer portal"}</p>
         <h2 className="mt-3 font-display text-4xl text-[#173c34]">{register ? "Create your account" : "Welcome back"}</h2>
         <form onSubmit={submit} className="mt-8 space-y-4">

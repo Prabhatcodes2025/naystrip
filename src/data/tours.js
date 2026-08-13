@@ -40,7 +40,7 @@ const makeTour = ({ slug, title, duration, destinations, image, itinerary, notes
     duration: `${days} Days / ${nights} Nights`, nights, days, image, itinerary,
     inclusions: commonInclusions, exclusions: commonExclusions, notes,
     price: null, priceLabel: "Price on request", source: "Supplied Maharashtra package itinerary",
-    overview: `${days}-day Maharashtra circuit covering ${destinations.join(", ")}. The route and day sequence are preserved from the supplied NaysTrip itinerary.`,
+    overview: `${days}-day Maharashtra journey covering ${destinations.join(", ")}, planned to balance key attractions, local experiences and a comfortable travel pace.`,
   };
 };
 

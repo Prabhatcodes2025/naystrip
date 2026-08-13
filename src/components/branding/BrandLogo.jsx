@@ -4,12 +4,12 @@ const assets = {
   symbol: "/branding/naystrip-symbol.png",
 };
 
-export default function BrandLogo({ variant = "full", className = "", eager = false }) {
+export default function BrandLogo({ variant = "full", className = "", eager = false, animated = false }) {
   return (
     <img
       src={assets[variant] || assets.full}
       alt="NaysTrip – Leisure to Adventure"
-      className={`block object-contain ${className}`}
+      className={`block object-contain ${animated ? "brand-logo-reveal" : ""} ${className}`}
       loading={eager ? "eager" : "lazy"}
       decoding="async"
     />

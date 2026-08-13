@@ -6,6 +6,7 @@ import { getAdminBlogs } from "../utils/storage";
 import { PageBanner } from "../components/shared/Bits";
 import Reveal from "../components/shared/Reveal";
 import Seo from "../components/shared/Seo";
+import SmartImage from "../components/shared/SmartImage";
 
 export default function Blog() {
   const [search, setSearch] = useState("");
@@ -61,7 +62,7 @@ export default function Blog() {
               <Reveal key={b.slug || b.id} delay={(i % 3) * 0.07}>
                 <div className="card-surface overflow-hidden group h-full hover:shadow-lift hover:-translate-y-1 transition-all">
                   <Link to={`/blog/${b.slug || b.id}`} className="block relative aspect-[16/10] overflow-hidden">
-                    <img src={b.image} alt={b.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <SmartImage src={b.image} context={`blog ${b.category}`} alt={b.title} loading="lazy" className="object-cover transition-transform duration-700 group-hover:scale-110" />
                     <span className="absolute top-3 left-3 rounded-full bg-white/90 backdrop-blur-sm px-2.5 py-1 text-[11px] font-semibold text-navy-800">
                       {b.category}
                     </span>

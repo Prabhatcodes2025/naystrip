@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import BrandLogo from "../components/branding/BrandLogo";
 import Seo from "../components/shared/Seo";
+import { LoadError, PageLoader } from "../components/shared/Loading";
 import {
   downloadProtectedDocument,
   getToken,
@@ -74,15 +75,7 @@ export default function CustomerDashboard() {
     sessionStorage.removeItem(sessionKey("customer"));
     navigate("/account/login");
   };
-  if (!data)
-    return (
-      <main className="grid min-h-screen place-items-center bg-[#fffaf2]">
-        <div className="text-center">
-          <BrandLogo className="mx-auto h-28" />
-          <p className="mt-4">{error || "Loading your journeys…"}</p>
-        </div>
-      </main>
-    );
+  if (!data) return error ? <LoadError message={error} onRetry={() => { setError(""); load(); }} loginTo="/account/login" /> : <PageLoader full label="Loading your journeys…" />;
   const upcoming = data.bookings.filter(
     (item) => item.travel_date && new Date(item.travel_date) >= new Date(),
   );

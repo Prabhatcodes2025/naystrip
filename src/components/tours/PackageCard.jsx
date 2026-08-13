@@ -1,5 +1,6 @@
 import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
+import SmartImage from "../shared/SmartImage";
 
 export default function PackageCard({ tour, commercial, priority = false }) {
   const online = Boolean(commercial?.booking_state?.online);
@@ -7,7 +8,7 @@ export default function PackageCard({ tour, commercial, priority = false }) {
   return (
     <article className="group overflow-hidden rounded-[1.4rem] border border-slate-200 bg-white shadow-[0_16px_50px_rgba(19,52,45,.08)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_65px_rgba(19,52,45,.14)]">
       <Link to={`/tours/${tour.slug}`} className="relative block aspect-[4/3] overflow-hidden bg-slate-100">
-        <img src={tour.image} alt={`${tour.title} tour`} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" loading={priority ? "eager" : "lazy"} />
+        <SmartImage src={commercial?.hero_image || tour.image} context={`${tour.title} ${tour.destinations.join(" ")}`} alt={`${tour.title} tour`} className="object-cover transition duration-700 group-hover:scale-105" loading={priority ? "eager" : "lazy"} />
         <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[.12em] text-[#173c34]">{tour.duration}</span>
       </Link>
       <div className="p-5 sm:p-6">

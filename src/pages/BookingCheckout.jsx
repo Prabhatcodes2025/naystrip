@@ -8,6 +8,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import Seo from "../components/shared/Seo";
+import { PageLoader } from "../components/shared/Loading";
 import { getToken, openCashfree, portalFetch } from "../utils/portal";
 const emptyTraveller = (type = "adult") => ({
   type,
@@ -30,6 +31,7 @@ export default function BookingCheckout() {
   const [error, setError] = useState("");
   const [pricing, setPricing] = useState(null);
   const [booking, setBooking] = useState(null);
+  const [paymentStatus, setPaymentStatus] = useState("");
   const [form, setForm] = useState({
     departureId: "",
     travelDate: "",
@@ -173,7 +175,7 @@ export default function BookingCheckout() {
     setBusy(true);
     setError("");
     try {
-      const result = await openCashfree(booking.reference, "advance");
+      const result = await openCashfree(booking.reference, "advance", setPaymentStatus);
       navigate(`/booking/confirmation/${booking.reference}`, {
         state: { payment: result },
       });
@@ -181,15 +183,11 @@ export default function BookingCheckout() {
       setError(err.message);
     } finally {
       setBusy(false);
+      setPaymentStatus("");
     }
   };
   const total = useMemo(() => pricing?.pricing?.total || 0, [pricing]);
-  if (loading)
-    return (
-      <main className="container-lg py-28">
-        <p>Loading live booking options…</p>
-      </main>
-    );
+  if (loading) return <PageLoader label="Loading live booking options…" />;
   if (!options || (error && !options))
     return (
       <main className="container-lg py-28">
@@ -775,7 +773,7 @@ export default function BookingCheckout() {
                     className="btn-primary mt-7"
                   >
                     <CreditCard size={17} />
-                    {busy ? "Opening payment…" : "Pay secure advance"}
+                    {busy ? paymentStatus || "Preparing secure payment…" : "Pay secure advance"}
                   </button>
                   <Link to="/account/dashboard" className="btn-secondary mt-3">
                     Pay later from dashboard

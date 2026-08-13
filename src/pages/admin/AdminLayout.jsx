@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Map, Users, MessageSquare, Newspaper, Star, Settings, FileText, CalendarDays, BellRing,
@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { isAdminLoggedIn, adminLogout } from "../../utils/storage";
 import BrandLogo from "../../components/branding/BrandLogo";
+import { PageLoader } from "../../components/shared/Loading";
 
 const navItems = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
@@ -23,9 +24,15 @@ const navItems = [
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [session, setSession] = useState({ checking: true, admin: null });
   const navigate = useNavigate();
-
-  if (!isAdminLoggedIn()) return <Navigate to="/admin/login" replace />;
+  useEffect(() => {
+    const token=sessionStorage.getItem("naystrip_admin_session");
+    if(!token){setSession({checking:false,admin:null});return;}
+    fetch("/api/auth/admin",{headers:{Authorization:`Bearer ${token}`}}).then(async(response)=>{const data=await response.json();if(!response.ok)throw new Error(data.error);setSession({checking:false,admin:data.admin});}).catch(()=>{adminLogout();setSession({checking:false,admin:null});});
+  },[]);
+  if (session.checking) return <PageLoader full label="Checking secure admin session…" />;
+  if (!isAdminLoggedIn() || !session.admin) return <Navigate to="/admin/login" replace />;
 
   const handleLogout = () => {
     adminLogout();
@@ -94,8 +101,8 @@ export default function AdminLayout() {
             <div className="flex items-center gap-2.5">
               <span className="flex h-9 w-9 items-center justify-center rounded-full bg-navy-900 text-xs font-bold text-white">A</span>
               <div className="hidden sm:block">
-                <p className="text-xs font-semibold text-navy-800">Admin User</p>
-                <p className="text-[11px] text-navy-400">Authenticated staff</p>
+                <p className="text-xs font-semibold text-navy-800">{session.admin.displayName || "Admin User"}</p>
+                <p className="text-[11px] text-navy-400">{session.admin.role}</p>
               </div>
             </div>
           </div>

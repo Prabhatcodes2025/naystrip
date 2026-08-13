@@ -1,5 +1,6 @@
 import { Star } from "lucide-react";
 import Reveal from "./Reveal";
+import SmartImage from "./SmartImage";
 
 export function SectionHeading({ eyebrow, title, subtitle, center = false, light = false }) {
   return (
@@ -59,10 +60,12 @@ export function PriceTag({ original, price, size = "base" }) {
 export function PageBanner({ eyebrow, title, subtitle, image }) {
   return (
     <section className="relative h-[42vh] min-h-[320px] sm:h-[48vh] flex items-end overflow-hidden">
-      <img
+      <SmartImage
         src={image}
+        context={title}
         alt={title}
-        className="absolute inset-0 h-full w-full object-cover"
+        wrapperClassName="absolute inset-0"
+        className="object-cover"
         loading="eager"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-navy-950/90 via-navy-950/50 to-navy-950/20" />

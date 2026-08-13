@@ -4,6 +4,7 @@ import { treks, expeditions } from "../data/treksExpeditions";
 import { PageBanner } from "../components/shared/Bits";
 import Reveal from "../components/shared/Reveal";
 import Seo from "../components/shared/Seo";
+import SmartImage from "../components/shared/SmartImage";
 
 function TrekGrid({ items }) {
   return (
@@ -12,7 +13,7 @@ function TrekGrid({ items }) {
         <Reveal key={t.slug} delay={(i % 4) * 0.07}>
           <Link to={`/treks/${t.slug}`} className="card-surface overflow-hidden group hover:shadow-lift hover:-translate-y-1 transition-all block">
             <div className="relative aspect-[4/3] overflow-hidden">
-              <img src={t.image} alt={t.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+              <SmartImage src={t.image} context={`${t.name} ${t.category}`} alt={t.name} loading="lazy" className="object-cover transition-transform duration-700 group-hover:scale-110" />
               <span className="absolute top-3 left-3 rounded-full bg-navy-950/70 backdrop-blur-sm px-2.5 py-1 text-[11px] font-semibold text-gold-300">
                 {t.category}
               </span>

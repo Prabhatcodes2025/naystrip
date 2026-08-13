@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, Building2, CalendarDays, Car, Check, ChevronDown
 import { Link, useNavigate } from "react-router-dom";
 import Seo from "../components/shared/Seo";
 import PackageCard from "../components/tours/PackageCard";
+import SmartImage from "../components/shared/SmartImage";
 import { blogs, testimonials } from "../data/content";
 import { destinations } from "../data/destinations";
 import { tours } from "../data/tours";
@@ -51,7 +52,7 @@ export default function Home() {
   return <>
     <Seo title="NaysTrip & Treks | Tailor-made Tours, Treks & Holidays" description="Plan Maharashtra tours, treks, expeditions, corporate travel and tailor-made holidays with a Navi Mumbai-based travel team." />
     <section className="relative min-h-[760px] overflow-hidden bg-[#102f29] text-white">
-      {heroSlides.map((item, index) => <img key={item.tour.slug} src={item.tour.image} alt={index === slide ? `${item.kicker} travel experience` : ""} className={`absolute inset-0 h-full w-full object-cover transition duration-1000 ${index === slide ? "scale-100 opacity-70" : "scale-105 opacity-0"}`} fetchPriority={index === 0 ? "high" : "auto"} loading={index === 0 ? "eager" : "lazy"}/>) }
+      {heroSlides.map((item, index) => <SmartImage key={item.tour.slug} src={item.tour.image} context={item.kicker} alt={index === slide ? `${item.kicker} travel experience` : ""} wrapperClassName={`absolute inset-0 transition duration-1000 ${index === slide ? "scale-100 opacity-70" : "scale-105 opacity-0"}`} className="object-cover" fetchPriority={index === 0 ? "high" : "auto"} loading={index === 0 ? "eager" : "lazy"}/>) }
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,31,26,.96)_0%,rgba(8,31,26,.76)_50%,rgba(8,31,26,.22)_100%)]" />
       <div className="container-lg relative flex min-h-[760px] items-center pb-28 pt-24">
         <div className="max-w-4xl">

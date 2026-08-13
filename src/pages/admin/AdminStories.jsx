@@ -3,6 +3,8 @@ import { Plus, Pencil, Trash2, X } from "lucide-react";
 import { testimonials as staticStories } from "../../data/content";
 import { getAdminStories, saveAdminStory, deleteAdminStory } from "../../utils/storage";
 import { StarRating } from "../../components/shared/Bits";
+import MediaUploader from "../../components/admin/MediaUploader";
+import SmartImage from "../../components/shared/SmartImage";
 
 const emptyStory = {
   name: "", destination: "", rating: 5, testimonial: "",
@@ -49,7 +51,7 @@ export default function AdminStories() {
         {allStories.map((s) => (
           <div key={s.id} className="rounded-2xl bg-white border border-navy-100 shadow-soft p-5">
             <div className="flex items-center gap-3">
-              <img src={s.image} alt="" className="h-11 w-11 rounded-full object-cover" />
+              <SmartImage src={s.image} context="traveller portrait" alt="" wrapperClassName="h-11 w-11 rounded-full" className="object-cover" />
               <div>
                 <h4 className="text-sm font-semibold text-navy-800">{s.name}</h4>
                 <p className="text-xs text-navy-400">{s.destination}</p>
@@ -87,7 +89,7 @@ export default function AdminStories() {
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 <div><label className="label-field">Rating (1–5)</label><input type="number" min="1" max="5" step="0.1" value={form.rating} onChange={(e) => setForm({ ...form, rating: e.target.value })} className="input-field" /></div>
-                <div><label className="label-field">Photo / Thumbnail URL</label><input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} className="input-field" /></div>
+                <MediaUploader label="Traveller photo" value={form.image} onChange={(image) => setForm({ ...form, image })} scope={`stories/${editing || "draft"}`} context="traveller portrait" />
               </div>
               <div><label className="label-field">Testimonial</label><textarea rows={4} value={form.testimonial} onChange={(e) => setForm({ ...form, testimonial: e.target.value })} className="input-field resize-none" /></div>
               <label className="flex items-center gap-2 text-sm text-navy-600"><input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} className="accent-terracotta-500" /> Published</label>

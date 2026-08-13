@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Copy, Plus, Search, Trash2, X } from "lucide-react";
+import MediaUploader from "../../components/admin/MediaUploader";
+import { TableSkeleton } from "../../components/shared/Loading";
 const empty = {
   title: "",
   slug: "",
@@ -207,7 +209,7 @@ export default function AdminTours() {
           placeholder="Search packages"
         />
       </label><label><span className="sr-only">Filter by booking readiness</span><select value={readiness} onChange={(event) => setReadiness(event.target.value)} className="input-field min-w-56"><option value="all">All readiness states</option><option value="price_missing">PRICE MISSING</option><option value="enquiry_only">ENQUIRY ONLY</option><option value="online_ready">ONLINE BOOKING READY</option></select></label></div>
-      <div className="mt-5 overflow-x-auto rounded-2xl border bg-white">
+      {busy && !packages.length ? <div className="mt-5"><TableSkeleton /></div> : <div className="mt-5 overflow-x-auto rounded-2xl border bg-white">
         <table className="w-full min-w-[850px] text-sm">
           <thead>
             <tr className="border-b text-left">
@@ -266,7 +268,7 @@ export default function AdminTours() {
             ))}
           </tbody>
         </table>
-      </div>
+      </div>}
       {open && (
         <div className="fixed inset-0 z-50 grid place-items-center p-4">
           <button
@@ -292,7 +294,6 @@ export default function AdminTours() {
                   ["Route", "route"],
                   ["Start point", "startPoint"],
                   ["End point", "endPoint"],
-                  ["Hero image URL", "heroImage"],
                 ].map(([label, key]) => (
                   <label key={key}>
                     <span className="label-field">{label}</span>
@@ -391,6 +392,11 @@ export default function AdminTours() {
                   </select>
                 </label>
               </div>
+              <div className="grid gap-6 lg:grid-cols-2">
+                <MediaUploader label="Hero / cover image" value={form.heroImage} onChange={(heroImage) => setForm({ ...form, heroImage })} scope={`packages/${form.id || form.slug || "draft"}/hero`} context={`${form.title} ${form.destinations.join(" ")}`} />
+                <div><label className="label-field">Image alt text</label><input value={form.seo?.hero_alt || ""} onChange={(event) => setForm({ ...form, seo: { ...form.seo, hero_alt: event.target.value } })} className="input-field" placeholder="Describe the destination shown"/><details className="mt-3 text-xs text-slate-500"><summary className="cursor-pointer font-bold">Use an existing image URL</summary><input value={form.heroImage} onChange={(event) => setForm({ ...form, heroImage: event.target.value })} className="input-field mt-2" placeholder="https://…"/></details></div>
+              </div>
+              <MediaUploader multiple label="Package gallery" value={form.gallery} onChange={(gallery) => setForm({ ...form, gallery })} scope={`packages/${form.id || form.slug || "draft"}/gallery`} context={`${form.title} ${form.destinations.join(" ")}`} />
               <label>
                 <span className="label-field">Overview</span>
                 <textarea

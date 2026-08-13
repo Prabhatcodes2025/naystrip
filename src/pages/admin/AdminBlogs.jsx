@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Plus, Pencil, Trash2, X, Search } from "lucide-react";
 import { blogs as staticBlogs } from "../../data/content";
 import { getAdminBlogs, saveAdminBlog, deleteAdminBlog } from "../../utils/storage";
+import MediaUploader from "../../components/admin/MediaUploader";
+import SmartImage from "../../components/shared/SmartImage";
 
 const emptyBlog = {
   title: "", category: "Travel Guides", description: "", content: "",
@@ -53,7 +55,7 @@ export default function AdminBlogs() {
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {allBlogs.map((b) => (
           <div key={b.id} className="rounded-2xl bg-white border border-navy-100 shadow-soft overflow-hidden">
-            <img src={b.image} alt="" className="aspect-[16/9] w-full object-cover" />
+            <SmartImage src={b.image} context={`blog ${b.category}`} alt="" wrapperClassName="aspect-[16/9]" className="object-cover" />
             <div className="p-4">
               <span className="text-[11px] font-semibold text-terracotta-600">{b.category}</span>
               <h4 className="text-sm font-semibold text-navy-800 mt-1 line-clamp-2">{b.title}</h4>
@@ -90,7 +92,7 @@ export default function AdminBlogs() {
                     <option>Travel Guides</option><option>Destinations</option><option>Trekking</option><option>Travel Tips</option>
                   </select>
                 </div>
-                <div><label className="label-field">Image URL</label><input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} className="input-field" /></div>
+                <MediaUploader label="Cover image" value={form.image} onChange={(image) => setForm({ ...form, image })} scope={`blogs/${editing || "draft"}`} context={`blog ${form.category}`} />
               </div>
               <div><label className="label-field">Short Description</label><textarea rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value, excerpt: e.target.value })} className="input-field resize-none" /></div>
               <div><label className="label-field">Full Content</label><textarea rows={6} value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} className="input-field resize-none" /></div>

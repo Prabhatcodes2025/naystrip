@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import Seo from "../components/shared/Seo";
+import SmartImage from "../components/shared/SmartImage";
 import { cancellationSlabs, getTourBySlug } from "../data/tours";
 import { saveContactLead } from "../utils/storage";
 
@@ -100,10 +101,12 @@ export default function TourDetails() {
         description={tour.overview}
       />
       <section className="relative min-h-[580px] bg-[#173c34] text-white">
-        <img
+        <SmartImage
           src={tour.image}
+          context={`${tour.title} ${tour.destinations.join(" ")}`}
           alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-55"
+          wrapperClassName="absolute inset-0 opacity-55"
+          className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#102f29] via-[#102f29]/55 to-black/15" />
         <div className="container-lg relative flex min-h-[580px] items-end pb-14 pt-28">

@@ -45,6 +45,7 @@ export default function AdminSettings() {
             <div><label className="label-field">Phone Number</label><input value={form.phone} onChange={(e) => update("phone", e.target.value)} className="input-field" /></div>
             <div><label className="label-field">Support Phone</label><input value={form.supportPhone} onChange={(e) => update("supportPhone", e.target.value)} className="input-field" /></div>
             <div><label className="label-field">Email</label><input value={form.email} onChange={(e) => update("email", e.target.value)} className="input-field" /></div>
+            <div><label className="label-field">Cancellation Email</label><input type="email" value={form.cancellationEmail} onChange={(e) => update("cancellationEmail", e.target.value)} className="input-field" /></div>
             <div><label className="label-field">WhatsApp Number</label><input value={form.whatsapp} onChange={(e) => update("whatsapp", e.target.value)} className="input-field" /></div>
           </div>
           <div><label className="label-field">Office Address</label><textarea rows={2} value={form.address} onChange={(e) => update("address", e.target.value)} className="input-field resize-none" /></div>

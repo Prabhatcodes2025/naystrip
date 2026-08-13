@@ -1,7 +1,8 @@
 import { Suspense, lazy } from "react";
 import { Routes, Route } from "react-router-dom";
 import PublicLayout from "./components/layout/PublicLayout";
-import BrandLogo from "./components/branding/BrandLogo";
+import { GlobalPreloader, PageLoader } from "./components/shared/Loading";
+import RouteErrorBoundary from "./components/shared/RouteErrorBoundary";
 import AdminErrorBoundary from "./components/admin/AdminErrorBoundary";
 
 const Home = lazy(() => import("./pages/Home"));
@@ -46,17 +47,9 @@ const AdminBookings = lazy(() => import("./pages/admin/AdminBookings"));
 const AdminDepartures = lazy(() => import("./pages/admin/AdminDepartures"));
 const AdminNotifications = lazy(() => import("./pages/admin/AdminNotifications"));
 
-function PageLoader() {
-  return (
-    <div className="flex min-h-[60vh] items-center justify-center">
-      <BrandLogo variant="symbol" eager className="h-20 w-20 animate-pulse" />
-    </div>
-  );
-}
-
 export default function App() {
   return (
-    <Suspense fallback={<PageLoader />}>
+    <RouteErrorBoundary><GlobalPreloader/><Suspense fallback={<PageLoader />}>
     <Routes>
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Home />} />
@@ -122,6 +115,6 @@ export default function App() {
         <Route path="settings" element={<AdminSettings />} />
       </Route>
     </Routes>
-    </Suspense>
+    </Suspense></RouteErrorBoundary>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import BrandLogo from "../components/branding/BrandLogo";
+import { LoadError, PageLoader } from "../components/shared/Loading";
 import { getToken, portalFetch, sessionKey } from "../utils/portal";
 export default function B2BDashboard() {
   const navigate = useNavigate();
@@ -59,15 +60,7 @@ export default function B2BDashboard() {
       setError(err.message);
     }
   };
-  if (!data)
-    return (
-      <main className="grid min-h-screen place-items-center bg-[#fffaf2]">
-        <div className="text-center">
-          <BrandLogo className="mx-auto h-28" />
-          <p className="mt-4">{error || "Loading partner workspace…"}</p>
-        </div>
-      </main>
-    );
+  if (!data) return error ? <LoadError message={error} onRetry={() => { setError(""); load().catch((err) => setError(err.message)); }} loginTo="/b2b/login" /> : <PageLoader full label="Loading partner workspace…" />;
   return (
     <main className="min-h-screen bg-[#f5f3ed]">
       <header className="border-b bg-white">

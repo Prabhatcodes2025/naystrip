@@ -76,9 +76,9 @@ export const destinations = [
     name: "Manali",
     region: "Domestic",
     tagline: "Himachal's favourite mountain escape",
-    image: "https://images.unsplash.com/photo-1626016909965-b5b5b5b5b5b5?auto=format&fit=crop&w=1400&q=80",
+    image: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1400&q=80",
     gallery: [
-      "https://images.unsplash.com/photo-1626016909965-b5b5b5b5b5b5?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
       "https://images.unsplash.com/photo-1626197031507-c17099753214?auto=format&fit=crop&w=1200&q=80",
       "https://images.unsplash.com/photo-1533130061792-64b345e4a833?auto=format&fit=crop&w=1200&q=80",
     ],
@@ -151,7 +151,7 @@ export const destinations = [
     image: "https://images.unsplash.com/photo-1544634076-a90160ddf22e?auto=format&fit=crop&w=1400&q=80",
     gallery: [
       "https://images.unsplash.com/photo-1544634076-a90160ddf22e?auto=format&fit=crop&w=1200&q=80",
-      "https://images.unsplash.com/photo-1626016909965-b5b5b5b5b5b5?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
       "https://images.unsplash.com/photo-1602427906023-4b1d6b0f6c9a?auto=format&fit=crop&w=1200&q=80",
     ],
     startingPrice: 16999,

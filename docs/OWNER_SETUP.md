@@ -100,3 +100,31 @@ Purpose: CAPTCHA protection for public enquiry forms without blocking authentica
 - Pay an advance and then the balance against the same booking; confirm two payment rows, one booking, and no duplicate voucher emails.
 - Download voucher, itinerary, invoice and receipt; inspect pagination and print output.
 - Review failed/skipped notifications, cancellation/refund safeguards, webhook events and booking activity history in Admin.
+
+## Portal configuration
+
+### Admin and Super Admin
+
+1. Create the staff user in Supabase Authentication with email/password.
+2. Ensure a matching active row exists in `admin_users` using the Auth user ID.
+3. Assign `role_id` to a row in `roles`. `Super Admin` receives the broadest legitimate Admin access; financial actions remain restricted by server authorization.
+4. Set `admin_users.status` to `active`. Expired, missing or inactive mappings are rejected and the Admin UI clears the invalid session.
+
+### Customers
+
+Customer registration at `/account/register` creates a Supabase Auth user with `portal=customer`; the database trigger creates the related `customers` profile. Customers can access only bookings and protected documents owned by their Auth user ID.
+
+### B2B partners
+
+Partner applications begin at `/b2b/register`. The trigger creates a `b2b_agents` profile with `verification_status=pending`. Review the business details, then set the profile to `approved` before `/b2b/login` grants dashboard access. Pending or rejected profiles cannot use protected agent APIs.
+
+## Public media configuration
+
+1. Run `supabase/migrations/004_public_media.sql` after the earlier migrations. It creates the public `site-media` bucket; keep `booking-documents` private.
+2. Admin package, blog and traveller-story forms accept JPG, PNG and WebP files up to 5 MB. Uploads pass through `/api/admin/media`, which checks an active Admin session, MIME type, file signature and size before using the server-only service-role key.
+3. Managed files use organized paths such as `packages/{id}/hero`, `packages/{id}/gallery`, `blogs/{id}` and `stories/{id}` with randomized filenames.
+4. Existing remote image URLs remain compatible. Upload, preview, replace or remove an image in Admin, then save the record to publish the changed URL.
+
+## Environment variable names
+
+`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `ID_ENCRYPTION_KEY`, `CASHFREE_CLIENT_ID`, `CASHFREE_CLIENT_SECRET`, `CASHFREE_ENV`, `PUBLIC_SITE_URL`, `RESEND_API_KEY`, `RESEND_FROM`, `BOOKINGS_NOTIFICATION_EMAIL`, `LEADS_NOTIFICATION_EMAIL`, `SUPPORT_EMAIL`, `WHATSAPP_PROVIDER`, `WHATSAPP_API_URL`, `WHATSAPP_API_TOKEN`, `WHATSAPP_LEADS_TO`, `CRON_SECRET`, `TURNSTILE_SECRET_KEY`, `VITE_TURNSTILE_SITE_KEY`.

@@ -5,6 +5,7 @@ import { getTrekBySlug } from "../data/treksExpeditions";
 import { PageBanner, PriceTag } from "../components/shared/Bits";
 import Reveal from "../components/shared/Reveal";
 import Seo from "../components/shared/Seo";
+import SmartImage from "../components/shared/SmartImage";
 import { saveContactLead } from "../utils/storage";
 
 const stats = (t) => [
@@ -122,7 +123,7 @@ export default function TrekDetail() {
                 <h3 className="font-display text-lg font-semibold text-navy-900 mb-4">Gallery</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {trek.gallery.map((img, i) => (
-                    <img key={i} src={img} alt={`${trek.name} view ${i + 1}`} loading="lazy" className="aspect-square w-full object-cover rounded-xl" />
+                    <SmartImage key={i} src={img} context={`${trek.name} trek`} alt={`${trek.name} view ${i + 1}`} loading="lazy" wrapperClassName="aspect-square rounded-xl" className="object-cover" />
                   ))}
                 </div>
               </div>
