@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useCallback, useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import PublicLayout from "./components/layout/PublicLayout";
 import { GlobalPreloader, PageLoader } from "./components/shared/Loading";
@@ -47,9 +47,16 @@ const AdminBookings = lazy(() => import("./pages/admin/AdminBookings"));
 const AdminDepartures = lazy(() => import("./pages/admin/AdminDepartures"));
 const AdminNotifications = lazy(() => import("./pages/admin/AdminNotifications"));
 
+function BootComplete({ onReady }) {
+  useEffect(() => onReady(), [onReady]);
+  return null;
+}
+
 export default function App() {
+  const [booting, setBooting] = useState(true);
+  const completeBoot = useCallback(() => setBooting(false), []);
   return (
-    <RouteErrorBoundary><GlobalPreloader/><Suspense fallback={<PageLoader />}>
+    <RouteErrorBoundary><Suspense fallback={booting ? <GlobalPreloader /> : <PageLoader />}><BootComplete onReady={completeBoot} />
     <Routes>
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Home />} />

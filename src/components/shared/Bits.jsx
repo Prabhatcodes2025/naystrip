@@ -59,7 +59,7 @@ export function PriceTag({ original, price, size = "base" }) {
 
 export function PageBanner({ eyebrow, title, subtitle, image }) {
   return (
-    <section className="relative h-[42vh] min-h-[320px] sm:h-[48vh] flex items-end overflow-hidden">
+    <section className="page-hero relative flex items-end overflow-hidden bg-navy-950">
       <SmartImage
         src={image}
         context={title}
@@ -69,9 +69,9 @@ export function PageBanner({ eyebrow, title, subtitle, image }) {
         loading="eager"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-navy-950/90 via-navy-950/50 to-navy-950/20" />
-      <div className="container-lg relative z-10 pb-10 sm:pb-14">
+      <div className="container-lg relative z-10 pb-9 sm:pb-12">
         {eyebrow && <span className="eyebrow text-gold-300 mb-2 block">{eyebrow}</span>}
-        <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-semibold text-white text-shadow-sm">
+        <h1 className="page-hero__title font-display font-semibold text-white text-shadow-sm">
           {title}
         </h1>
         {subtitle && <p className="text-white/80 mt-3 max-w-2xl text-sm sm:text-base">{subtitle}</p>}

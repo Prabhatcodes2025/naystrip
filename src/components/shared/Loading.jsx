@@ -1,24 +1,14 @@
-import { useEffect, useState } from "react";
 import BrandLogo from "../branding/BrandLogo";
 import { Link } from "react-router-dom";
 
 export function PageLoader({ label = "Loading your next journey…", full = false }) {
-  return <div role="status" aria-live="polite" className={`route-loader ${full ? "min-h-screen" : "min-h-[60vh]"}`}>
-    <div className="text-center"><BrandLogo variant="symbol" eager animated className="mx-auto h-24 w-24"/><p className="mt-5 text-sm font-bold text-[#173c34]">{label}</p><span className="route-progress mt-4"/></div>
+  return <div role="status" aria-live="polite" className={`route-loader ${full ? "min-h-screen" : "min-h-[42vh]"}`}>
+    <div className="text-center"><span className="route-spinner mx-auto"/><p className="mt-4 text-sm font-semibold text-[#173c34]">{label}</p></div>
   </div>;
 }
 
 export function GlobalPreloader() {
-  const [visible,setVisible]=useState(() => document.readyState !== "complete");
-  const [leaving,setLeaving]=useState(false);
-  useEffect(() => {
-    if(!visible)return undefined;
-    const ready=()=>{setLeaving(true);window.setTimeout(()=>setVisible(false),220);};
-    if(document.readyState==="complete")ready();else window.addEventListener("load",ready,{once:true});
-    return()=>window.removeEventListener("load",ready);
-  },[visible]);
-  if(!visible)return null;
-  return <div className={`global-preloader ${leaving ? "is-leaving" : ""}`}><PageLoader full label="Preparing your journey…" /></div>;
+  return <div className="global-preloader" role="status" aria-live="polite"><div className="global-preloader__content"><BrandLogo variant="symbol" eager animated className="mx-auto h-24 w-24"/><p className="mt-5 text-sm font-bold text-[#173c34]">Preparing your journey…</p><span className="route-progress mt-4"/></div></div>;
 }
 
 export function CardSkeleton({ count = 6 }) {

@@ -82,7 +82,7 @@ export default {
         },
       },
       maxWidth: {
-        "8xl": "1440px",
+        "8xl": "1320px",
       },
     },
   },

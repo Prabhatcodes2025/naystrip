@@ -100,7 +100,7 @@ export default function TourDetails() {
         title={`${tour.title} | ${tour.duration} | NaysTrip & Treks`}
         description={tour.overview}
       />
-      <section className="relative min-h-[580px] bg-[#173c34] text-white">
+      <section className="package-hero relative bg-[#173c34] text-white">
         <SmartImage
           src={tour.image}
           context={`${tour.title} ${tour.destinations.join(" ")}`}
@@ -109,7 +109,7 @@ export default function TourDetails() {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#102f29] via-[#102f29]/55 to-black/15" />
-        <div className="container-lg relative flex min-h-[580px] items-end pb-14 pt-28">
+        <div className="package-hero__content container-lg relative flex items-end pb-10 pt-20 sm:pb-12">
           <div className="max-w-4xl">
             <Link
               to="/tours"
@@ -120,7 +120,7 @@ export default function TourDetails() {
             <p className="mt-8 text-xs font-bold uppercase tracking-[.18em] text-orange-300">
               {tour.duration} · Customisable
             </p>
-            <h1 className="mt-3 font-display text-5xl leading-[1.02] sm:text-7xl">
+            <h1 className="package-hero__title mt-3 font-display">
               {tour.title}
             </h1>
             <p className="mt-5 flex items-start gap-2 text-sm text-white/75">
