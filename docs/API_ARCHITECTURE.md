@@ -1,9 +1,10 @@
 # Vercel Hobby API architecture
 
-The public API contract remains unchanged. All `/api/*` requests now enter through the single Vercel Function `api/[...route].js`, which delegates to handlers in `server/`. Files under `server/` are imported implementation modules, not independently deployed functions.
+The public API contract remains unchanged. An API-first rewrite sends all `/api/*` requests to the single Vercel Function `api/index.js`, which delegates to handlers in `server/`. This explicit rewrite prevents the SPA fallback from serving `index.html` for API requests. Files under `server/` are imported implementation modules, not independently deployed functions.
 
 | Existing URL | Methods | Handler | Primary caller |
 |---|---|---|---|
+| `/api/config` | GET | `server/config.js` | Environment-aware public Turnstile state |
 | `/api/leads` | POST | `server/leads.js` | Contact, custom-trip and package-customisation forms |
 | `/api/departures` | GET | `server/departures.js` | Public fixed departures |
 | `/api/auth/admin` | POST | `server/auth/admin.js` | Admin login |
@@ -44,4 +45,4 @@ The catch-all entry disables automatic body parsing. `server/router.js` parses J
 ## Function count
 
 - Before consolidation: 46 JavaScript files under `/api` (32 endpoint handlers plus 14 helper/document modules).
-- After consolidation: 1 function entry, `api/[...route].js`.
+- After consolidation: 1 function entry, `api/index.js`.

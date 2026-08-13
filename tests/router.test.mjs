@@ -5,19 +5,19 @@ import {join} from "node:path";
 import test from "node:test";
 import dispatch,{routeFromRequest,routes} from "../server/router.js";
 
-const expected=["admin/bookings","admin/departures","admin/leads","admin/notifications","admin/packages","admin/quotation-actions","admin/quotations","auth/admin","auth/portal","auth/recover","auth/register","auth/update-password","b2b/create-booking","b2b/dashboard","bookings/create","bookings/options","bookings/preview","bookings/verify","cron/reminders","departures","documents/booking","documents/itinerary","documents/quotation","leads","payments/create-order","payments/verify","payments/webhook","portal/cancel","portal/dashboard","portal/profile","quotations/view","settings"];
+const expected=["admin/bookings","admin/departures","admin/leads","admin/notifications","admin/packages","admin/quotation-actions","admin/quotations","auth/admin","auth/portal","auth/recover","auth/register","auth/update-password","b2b/create-booking","b2b/dashboard","bookings/create","bookings/options","bookings/preview","bookings/verify","config","cron/reminders","departures","documents/booking","documents/itinerary","documents/quotation","leads","payments/create-order","payments/verify","payments/webhook","portal/cancel","portal/dashboard","portal/profile","quotations/view","settings"];
 
 function response(){return {statusCode:200,headers:{},body:null,status(code){this.statusCode=code;return this},setHeader(key,value){this.headers[key]=value;return this},json(value){this.body=value;return this},end(value){this.body=value;return this},send(value){this.body=value;return this}}}
 function request({path,method="GET",body,headers={}}){const req=Readable.from(body===undefined?[]:[Buffer.from(body)]);req.method=method;req.url=`/api/${path}`;req.query={route:path.split("/")};req.headers=headers;return req}
 function filesBelow(directory){return readdirSync(directory).flatMap(name=>{const path=join(directory,name);return statSync(path).isDirectory()?filesBelow(path):[path]})}
 
-test("router preserves all 32 legacy endpoint paths",()=>{
+test("router preserves every legacy endpoint plus public environment config",()=>{
   assert.deepEqual([...routes.keys()].sort(),expected.sort());
   for(const handler of routes.values())assert.equal(typeof handler,"function");
 });
 
 test("all preserved endpoint groups dispatch to a real handler",async()=>{
-  const checks={"admin/bookings":"GET","admin/departures":"GET","admin/leads":"GET","admin/notifications":"GET","admin/packages":"GET","admin/quotation-actions":"POST","admin/quotations":"GET","auth/admin":"POST","auth/portal":"POST","auth/recover":"POST","auth/register":"POST","auth/update-password":"POST","b2b/create-booking":"POST","b2b/dashboard":"GET","bookings/create":"POST","bookings/options":"GET","bookings/preview":"POST","bookings/verify":"GET","cron/reminders":"GET",departures:"GET","documents/booking":"GET","documents/itinerary":"GET","documents/quotation":"GET",leads:"POST","payments/create-order":"POST","payments/verify":"POST","payments/webhook":"POST","portal/cancel":"POST","portal/dashboard":"GET","portal/profile":"PATCH","quotations/view":"GET",settings:"POST"};
+  const checks={"admin/bookings":"GET","admin/departures":"GET","admin/leads":"GET","admin/notifications":"GET","admin/packages":"GET","admin/quotation-actions":"POST","admin/quotations":"GET","auth/admin":"POST","auth/portal":"POST","auth/recover":"POST","auth/register":"POST","auth/update-password":"POST","b2b/create-booking":"POST","b2b/dashboard":"GET","bookings/create":"POST","bookings/options":"GET","bookings/preview":"POST","bookings/verify":"GET",config:"GET","cron/reminders":"GET",departures:"GET","documents/booking":"GET","documents/itinerary":"GET","documents/quotation":"GET",leads:"POST","payments/create-order":"POST","payments/verify":"POST","payments/webhook":"POST","portal/cancel":"POST","portal/dashboard":"GET","portal/profile":"PATCH","quotations/view":"GET",settings:"POST"};
   const saved={SUPABASE_URL:process.env.SUPABASE_URL,SUPABASE_ANON_KEY:process.env.SUPABASE_ANON_KEY,SUPABASE_SERVICE_ROLE_KEY:process.env.SUPABASE_SERVICE_ROLE_KEY,RAZORPAY_WEBHOOK_SECRET:process.env.RAZORPAY_WEBHOOK_SECRET};
   delete process.env.SUPABASE_URL;delete process.env.SUPABASE_ANON_KEY;delete process.env.SUPABASE_SERVICE_ROLE_KEY;delete process.env.RAZORPAY_WEBHOOK_SECRET;
   try{for(const [path,method] of Object.entries(checks)){const res=response();await dispatch(request({path,method,body:["GET","HEAD"].includes(method)?undefined:"{}",headers:{"content-type":"application/json"}}),res);assert.notEqual(res.body?.error,"API route not found",`${method} /api/${path} did not dispatch`)}}finally{for(const [key,value] of Object.entries(saved)){if(value===undefined)delete process.env[key];else process.env[key]=value}}
@@ -32,7 +32,14 @@ test("every frontend API URL resolves through the consolidated router",()=>{
 
 test("route resolution supports Vercel params and direct legacy URLs",()=>{
   assert.equal(routeFromRequest({query:{route:["admin","bookings"]},url:"/ignored"}),"admin/bookings");
+  assert.equal(routeFromRequest({query:{route:"bookings/options"},url:"/ignored"}),"bookings/options");
   assert.equal(routeFromRequest({query:{},url:"/api/bookings/verify?reference=NTB-1"}),"bookings/verify");
+});
+
+test("Vercel routes API requests before the SPA fallback",()=>{
+  const configuration=JSON.parse(readFileSync(join(process.cwd(),"vercel.json"),"utf8"));
+  assert.deepEqual(configuration.rewrites?.[0],{source:"/api/:route*",destination:"/api/index?route=:route*"});
+  assert.deepEqual(configuration.rewrites?.[1],{source:"/(.*)",destination:"/index.html"});
 });
 
 test("router returns JSON 404 for unknown endpoints",async()=>{

@@ -1,30 +1,460 @@
 import { useEffect, useState } from "react";
-import { ArrowLeft, Check, ChevronDown, CircleAlert, Clock, Download, FileText, MapPin, MessageCircle, Printer, Share2, ShieldCheck, SlidersHorizontal, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  ChevronDown,
+  CircleAlert,
+  Clock,
+  Download,
+  FileText,
+  MapPin,
+  MessageCircle,
+  Printer,
+  Share2,
+  ShieldCheck,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import Seo from "../components/shared/Seo";
 import { cancellationSlabs, getTourBySlug } from "../data/tours";
 import { saveContactLead } from "../utils/storage";
 
-export default function TourDetails(){
-  const {slug}=useParams(); const tour=getTourBySlug(slug); const [open,setOpen]=useState(1); const [allOpen,setAllOpen]=useState(false); const [customising,setCustomising]=useState(false); const [bookingEligible,setBookingEligible]=useState(false); const [form,setForm]=useState({name:"",phone:"",email:"",message:""}); const [state,setState]=useState({status:"idle",message:""});
-  useEffect(()=>{fetch(`/api/bookings/options?slug=${encodeURIComponent(slug)}`).then(response=>response.ok?response.json():null).then(data=>setBookingEligible(Boolean(data?.package?.booking_enabled&&!data.package.custom_enquiry_only&&data.package.price_from!=null))).catch(()=>setBookingEligible(false))},[slug]);
-  if(!tour)return <main className="container-lg py-28"><h1 className="section-title">Package not found</h1><Link to="/tours" className="btn-primary mt-6">Browse packages</Link></main>;
-  const submit=async(e)=>{e.preventDefault();setState({status:"loading",message:""});try{const entry=await saveContactLead({...form,destination:tour.title,source:`Tour: ${tour.title}`});setState({status:"success",message:`Reference ${entry.id}`});}catch(err){setState({status:"error",message:err.message||"We could not send this request. Please call or WhatsApp us."});}};
-  const wa=`https://wa.me/917710991126?text=${encodeURIComponent(`Hi NaysTrip, I would like a quote for ${tour.title} (${tour.duration}).`)}`;
-  const share=async()=>{const data={title:tour.title,text:`${tour.title} — ${tour.duration}`,url:window.location.href};if(navigator.share)await navigator.share(data);else{await navigator.clipboard.writeText(window.location.href);setState({status:"idle",message:"Link copied"});}};
-  return <><Seo title={`${tour.title} | ${tour.duration} | NaysTrip & Treks`} description={tour.overview}/>
-    <section className="relative min-h-[580px] bg-[#173c34] text-white"><img src={tour.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-55"/><div className="absolute inset-0 bg-gradient-to-t from-[#102f29] via-[#102f29]/55 to-black/15"/><div className="container-lg relative flex min-h-[580px] items-end pb-14 pt-28"><div className="max-w-4xl"><Link to="/tours" className="inline-flex items-center gap-2 text-sm font-bold text-white/75"><ArrowLeft size={16}/> All Maharashtra packages</Link><p className="mt-8 text-xs font-bold uppercase tracking-[.18em] text-orange-300">{tour.duration} · Customisable</p><h1 className="mt-3 font-display text-5xl leading-[1.02] sm:text-7xl">{tour.title}</h1><p className="mt-5 flex items-start gap-2 text-sm text-white/75"><MapPin size={17} className="mt-0.5 shrink-0"/>{tour.destinations.join(" · ")}</p></div></div></section>
-    <section className="border-b border-slate-200 bg-[#fffaf2]"><div className="container-lg grid divide-y divide-slate-200 sm:grid-cols-3 sm:divide-x sm:divide-y-0"><div className="p-6 sm:px-8"><Clock size={20} className="text-orange-600"/><p className="mt-2 text-xs font-bold uppercase tracking-wider text-slate-500">Duration</p><p className="mt-1 font-display text-xl text-[#173c34]">{tour.duration}</p></div><div className="p-6 sm:px-8"><FileText size={20} className="text-orange-600"/><p className="mt-2 text-xs font-bold uppercase tracking-wider text-slate-500">Quote</p><p className="mt-1 font-display text-xl text-[#173c34]">Price on request</p></div><div className="p-6 sm:px-8"><ShieldCheck size={20} className="text-orange-600"/><p className="mt-2 text-xs font-bold uppercase tracking-wider text-slate-500">Source</p><p className="mt-1 font-display text-xl text-[#173c34]">NaysTrip supplied route</p></div></div></section>
-    <main className="py-16 sm:py-24"><div className="container-lg grid gap-14 lg:grid-cols-[1fr_360px]">
-      <div className="min-w-0"><p className="eyebrow">Day by day</p><h2 className="section-title mt-3">The itinerary</h2><p className="mt-5 max-w-3xl leading-7 text-slate-600">{tour.overview}</p>
-      <div className="mt-7 flex flex-wrap gap-2 print:hidden">{bookingEligible&&<Link to={`/checkout/${tour.slug}`} className="btn-primary">Book now</Link>}<button onClick={()=>setAllOpen(!allOpen)} className="btn-secondary">{allOpen?"Collapse all":"Expand all"}</button><button onClick={()=>window.print()} className="btn-secondary"><Printer size={16}/> Print</button><a href={`/api/documents/itinerary?slug=${encodeURIComponent(tour.slug)}`} className="btn-secondary"><Download size={16}/> Download PDF</a><button onClick={share} className="btn-secondary"><Share2 size={16}/> Share</button><button onClick={()=>setCustomising(true)} className="btn-primary"><SlidersHorizontal size={16}/> Customise package</button></div>
-      <div className="relative mt-10 border-l-2 border-orange-200 pl-7">{tour.itinerary.map(item=>{const expanded=allOpen||open===item.day;return <article key={item.day} className="relative border-b border-slate-200"><span className="absolute -left-[38px] top-6 grid h-5 w-5 place-items-center rounded-full border-4 border-[#fffaf2] bg-orange-500"/><button onClick={()=>setOpen(open===item.day?0:item.day)} aria-expanded={expanded} className="flex w-full items-center gap-5 py-6 text-left"><span className="font-display text-3xl text-orange-600">{String(item.day).padStart(2,"0")}</span><span className="flex-1 font-display text-2xl text-[#173c34]">{item.title}</span><ChevronDown className={`transition ${expanded?"rotate-180":""}`}/></button>{expanded&&<div className="pb-7 pl-[66px]"><p className="leading-7 text-slate-600">{item.details}</p>{item.meals&&<p className="mt-3 text-sm"><strong>Meals:</strong> {item.meals}</p>}{item.stay&&<p className="mt-1 text-sm"><strong>Stay:</strong> {item.stay}</p>}</div>}</article>})}</div>
-      {tour.notes.length>0&&<div className="mt-10 border-l-4 border-orange-500 bg-orange-50 p-6"><h3 className="font-bold text-[#173c34]">Route notes</h3>{tour.notes.map(n=><p key={n} className="mt-2 text-sm leading-6 text-slate-600">{n}</p>)}</div>}
-      <div className="mt-16 grid gap-9 sm:grid-cols-2"><section><h2 className="font-display text-3xl text-[#173c34]">Included</h2><ul className="mt-5 space-y-3">{tour.inclusions.map(v=><li key={v} className="flex gap-3 text-sm leading-6 text-slate-600"><Check className="mt-1 shrink-0 text-emerald-700" size={16}/>{v}</li>)}</ul></section><section><h2 className="font-display text-3xl text-[#173c34]">Not included</h2><ul className="mt-5 space-y-3">{tour.exclusions.map(v=><li key={v} className="flex gap-3 text-sm leading-6 text-slate-600"><X className="mt-1 shrink-0 text-rose-600" size={16}/>{v}</li>)}</ul></section></div>
-      <section className="mt-16"><h2 className="font-display text-3xl text-[#173c34]">Cancellation schedule</h2><p className="mt-3 text-sm text-slate-600">Fee as a percentage of the package cost, based on days before departure.</p><div className="mt-6 overflow-x-auto"><table className="w-full min-w-[520px] border-collapse text-left text-sm"><thead><tr className="bg-[#173c34] text-white"><th className="p-4">From days</th><th className="p-4">To days</th><th className="p-4">Cancellation fee</th></tr></thead><tbody>{cancellationSlabs.map(s=><tr key={s.from} className="border-b border-slate-200"><td className="p-4">{s.from}</td><td className="p-4">{s.to}</td><td className="p-4 font-bold">{s.fee}%</td></tr>)}</tbody></table></div><p className="mt-4 text-xs leading-5 text-slate-500">Cancellation requests must be sent from the registered email address to cancellation@naystrip.com. Refunds are processed in INR within 15 working days after final confirmation. No interest is payable.</p></section>
-      </div>
-      <aside className="lg:sticky lg:top-28 lg:self-start"><div className="bg-[#173c34] p-7 text-white"><p className="text-xs font-bold uppercase tracking-[.17em] text-orange-300">Get an exact quote</p><h2 className="mt-3 font-display text-3xl">Dates, group and stays.</h2><p className="mt-3 text-sm leading-6 text-white/65">Tell us your basics. We will confirm availability, vehicle and hotel options before any payment.</p>{state.status==="success"?<div className="mt-6 bg-white/10 p-5"><Check className="text-orange-300"/><p className="mt-3 font-bold">Request received</p><p className="mt-1 text-sm text-white/70">{state.message}</p></div>:<form onSubmit={submit} className="mt-6 space-y-3"><input required aria-label="Full name" placeholder="Full name" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} className="w-full border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/50 focus:border-orange-400 focus:outline-none"/><input required aria-label="Phone number" placeholder="Phone number" value={form.phone} onChange={e=>setForm({...form,phone:e.target.value})} className="w-full border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/50 focus:border-orange-400 focus:outline-none"/><input type="email" aria-label="Email" placeholder="Email" value={form.email} onChange={e=>setForm({...form,email:e.target.value})} className="w-full border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/50 focus:border-orange-400 focus:outline-none"/><textarea aria-label="Requirements" placeholder="Dates, travellers, hotel preference" rows="3" value={form.message} onChange={e=>setForm({...form,message:e.target.value})} className="w-full border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/50 focus:border-orange-400 focus:outline-none"/>{state.status==="error"&&<p className="flex gap-2 text-xs text-orange-200"><CircleAlert size={15}/>{state.message}</p>}<button disabled={state.status==="loading"} className="w-full bg-orange-500 px-5 py-3.5 text-sm font-extrabold hover:bg-orange-600 disabled:opacity-60">{state.status==="loading"?"Sending…":"Request quote"}</button></form>}<a href={wa} target="_blank" rel="noopener noreferrer" className="mt-3 flex w-full items-center justify-center gap-2 border border-white/30 px-5 py-3.5 text-sm font-bold"><MessageCircle size={17}/> WhatsApp instead</a></div></aside>
-    </div></main>
-    {customising&&<div className="fixed inset-0 z-[70] grid place-items-center p-4 print:hidden"><button aria-label="Close customisation" onClick={()=>setCustomising(false)} className="absolute inset-0 bg-[#102f29]/75"/><section role="dialog" aria-modal="true" aria-labelledby="customise-title" className="relative z-10 max-h-[90vh] w-full max-w-xl overflow-y-auto bg-white p-6 sm:p-9"><button onClick={()=>setCustomising(false)} className="absolute right-5 top-5" aria-label="Close"><X/></button><p className="eyebrow">Tailor this route</p><h2 id="customise-title" className="mt-2 pr-10 font-display text-3xl text-[#173c34]">Customise {tour.title}</h2><p className="mt-3 text-sm leading-6 text-slate-600">Use the planner with this itinerary preselected. You can change dates, duration, group, rooms, transport and activities before submitting.</p><Link to={`/custom-trip?package=${encodeURIComponent(tour.slug)}`} className="btn-primary mt-6">Start customising <SlidersHorizontal size={16}/></Link></section></div>}
-  </>;
+export default function TourDetails() {
+  const { slug } = useParams();
+  const tour = getTourBySlug(slug);
+  const [open, setOpen] = useState(1);
+  const [allOpen, setAllOpen] = useState(false);
+  const [customising, setCustomising] = useState(false);
+  const [bookingInfo, setBookingInfo] = useState(null);
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    message: "",
+  });
+  const [state, setState] = useState({ status: "idle", message: "" });
+  useEffect(() => {
+    fetch(`/api/bookings/options?slug=${encodeURIComponent(slug)}`, {
+      headers: { Accept: "application/json" },
+    })
+      .then(async (response) => {
+        const data = await response.json().catch(() => null);
+        if (!response.ok || !data?.package)
+          throw new Error(
+            data?.error || "Booking availability could not be loaded",
+          );
+        return data.package;
+      })
+      .then(setBookingInfo)
+      .catch((error) => {
+        console.warn("booking_availability_unavailable", error.message);
+        setBookingInfo(null);
+      });
+  }, [slug]);
+  if (!tour)
+    return (
+      <main className="container-lg py-28">
+        <h1 className="section-title">Package not found</h1>
+        <Link to="/tours" className="btn-primary mt-6">
+          Browse packages
+        </Link>
+      </main>
+    );
+  const submit = async (e) => {
+    e.preventDefault();
+    setState({ status: "loading", message: "" });
+    try {
+      const entry = await saveContactLead({
+        ...form,
+        destination: tour.title,
+        source: `Tour: ${tour.title}`,
+      });
+      setState({ status: "success", message: `Reference ${entry.id}` });
+    } catch (err) {
+      setState({
+        status: "error",
+        message:
+          err.message ||
+          "We could not send this request. Please call or WhatsApp us.",
+      });
+    }
+  };
+  const wa = `https://wa.me/917710991126?text=${encodeURIComponent(`Hi NaysTrip, I would like a quote for ${tour.title} (${tour.duration}).`)}`;
+  const share = async () => {
+    const data = {
+      title: tour.title,
+      text: `${tour.title} — ${tour.duration}`,
+      url: window.location.href,
+    };
+    if (navigator.share) await navigator.share(data);
+    else {
+      await navigator.clipboard.writeText(window.location.href);
+      setState({ status: "idle", message: "Link copied" });
+    }
+  };
+  return (
+    <>
+      <Seo
+        title={`${tour.title} | ${tour.duration} | NaysTrip & Treks`}
+        description={tour.overview}
+      />
+      <section className="relative min-h-[580px] bg-[#173c34] text-white">
+        <img
+          src={tour.image}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover opacity-55"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#102f29] via-[#102f29]/55 to-black/15" />
+        <div className="container-lg relative flex min-h-[580px] items-end pb-14 pt-28">
+          <div className="max-w-4xl">
+            <Link
+              to="/tours"
+              className="inline-flex items-center gap-2 text-sm font-bold text-white/75"
+            >
+              <ArrowLeft size={16} /> All Maharashtra packages
+            </Link>
+            <p className="mt-8 text-xs font-bold uppercase tracking-[.18em] text-orange-300">
+              {tour.duration} · Customisable
+            </p>
+            <h1 className="mt-3 font-display text-5xl leading-[1.02] sm:text-7xl">
+              {tour.title}
+            </h1>
+            <p className="mt-5 flex items-start gap-2 text-sm text-white/75">
+              <MapPin size={17} className="mt-0.5 shrink-0" />
+              {tour.destinations.join(" · ")}
+            </p>
+          </div>
+        </div>
+      </section>
+      <section className="border-b border-slate-200 bg-[#fffaf2]">
+        <div className="container-lg grid divide-y divide-slate-200 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+          <div className="p-6 sm:px-8">
+            <Clock size={20} className="text-orange-600" />
+            <p className="mt-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+              Duration
+            </p>
+            <p className="mt-1 font-display text-xl text-[#173c34]">
+              {tour.duration}
+            </p>
+          </div>
+          <div className="p-6 sm:px-8">
+            <FileText size={20} className="text-orange-600" />
+            <p className="mt-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+              Quote
+            </p>
+            <p className="mt-1 font-display text-xl text-[#173c34]">
+              {bookingInfo?.booking_state?.online &&
+              bookingInfo.price_from != null
+                ? `From INR ${Number(bookingInfo.price_from).toLocaleString("en-IN")}`
+                : "Price on request"}
+            </p>
+          </div>
+          <div className="p-6 sm:px-8">
+            <ShieldCheck size={20} className="text-orange-600" />
+            <p className="mt-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+              Booking
+            </p>
+            <p className="mt-1 font-display text-xl text-[#173c34]">
+              {bookingInfo?.booking_state?.online
+                ? "Online booking available"
+                : "Custom quote first"}
+            </p>
+          </div>
+        </div>
+      </section>
+      <main className="py-16 sm:py-24">
+        <div className="container-lg grid gap-14 lg:grid-cols-[1fr_360px]">
+          <div className="min-w-0">
+            <p className="eyebrow">Day by day</p>
+            <h2 className="section-title mt-3">The itinerary</h2>
+            <p className="mt-5 max-w-3xl leading-7 text-slate-600">
+              {tour.overview}
+            </p>
+            <div className="mt-7 flex flex-wrap gap-2 print:hidden">
+              {bookingInfo?.booking_state?.online && (
+                <Link to={`/checkout/${tour.slug}`} className="btn-primary">
+                  Book now
+                </Link>
+              )}
+              <button
+                onClick={() => setAllOpen(!allOpen)}
+                className="btn-secondary"
+              >
+                {allOpen ? "Collapse all" : "Expand all"}
+              </button>
+              <button onClick={() => window.print()} className="btn-secondary">
+                <Printer size={16} /> Print
+              </button>
+              <a
+                href={`/api/documents/itinerary?slug=${encodeURIComponent(tour.slug)}`}
+                className="btn-secondary"
+              >
+                <Download size={16} /> Download PDF
+              </a>
+              <button onClick={share} className="btn-secondary">
+                <Share2 size={16} /> Share
+              </button>
+              <button
+                onClick={() => setCustomising(true)}
+                className="btn-primary"
+              >
+                <SlidersHorizontal size={16} /> Customise package
+              </button>
+            </div>
+            <div className="relative mt-10 border-l-2 border-orange-200 pl-7">
+              {tour.itinerary.map((item) => {
+                const expanded = allOpen || open === item.day;
+                return (
+                  <article
+                    key={item.day}
+                    className="relative border-b border-slate-200"
+                  >
+                    <span className="absolute -left-[38px] top-6 grid h-5 w-5 place-items-center rounded-full border-4 border-[#fffaf2] bg-orange-500" />
+                    <button
+                      onClick={() => setOpen(open === item.day ? 0 : item.day)}
+                      aria-expanded={expanded}
+                      className="flex w-full items-center gap-5 py-6 text-left"
+                    >
+                      <span className="font-display text-3xl text-orange-600">
+                        {String(item.day).padStart(2, "0")}
+                      </span>
+                      <span className="flex-1 font-display text-2xl text-[#173c34]">
+                        {item.title}
+                      </span>
+                      <ChevronDown
+                        className={`transition ${expanded ? "rotate-180" : ""}`}
+                      />
+                    </button>
+                    {expanded && (
+                      <div className="pb-7 pl-[66px]">
+                        <p className="leading-7 text-slate-600">
+                          {item.details}
+                        </p>
+                        {item.meals && (
+                          <p className="mt-3 text-sm">
+                            <strong>Meals:</strong> {item.meals}
+                          </p>
+                        )}
+                        {item.stay && (
+                          <p className="mt-1 text-sm">
+                            <strong>Stay:</strong> {item.stay}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </article>
+                );
+              })}
+            </div>
+            {tour.notes.length > 0 && (
+              <div className="mt-10 border-l-4 border-orange-500 bg-orange-50 p-6">
+                <h3 className="font-bold text-[#173c34]">Route notes</h3>
+                {tour.notes.map((n) => (
+                  <p key={n} className="mt-2 text-sm leading-6 text-slate-600">
+                    {n}
+                  </p>
+                ))}
+              </div>
+            )}
+            <div className="mt-16 grid gap-9 sm:grid-cols-2">
+              <section>
+                <h2 className="font-display text-3xl text-[#173c34]">
+                  Included
+                </h2>
+                <ul className="mt-5 space-y-3">
+                  {tour.inclusions.map((v) => (
+                    <li
+                      key={v}
+                      className="flex gap-3 text-sm leading-6 text-slate-600"
+                    >
+                      <Check
+                        className="mt-1 shrink-0 text-emerald-700"
+                        size={16}
+                      />
+                      {v}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+              <section>
+                <h2 className="font-display text-3xl text-[#173c34]">
+                  Not included
+                </h2>
+                <ul className="mt-5 space-y-3">
+                  {tour.exclusions.map((v) => (
+                    <li
+                      key={v}
+                      className="flex gap-3 text-sm leading-6 text-slate-600"
+                    >
+                      <X className="mt-1 shrink-0 text-rose-600" size={16} />
+                      {v}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            </div>
+            <section className="mt-16">
+              <h2 className="font-display text-3xl text-[#173c34]">
+                Cancellation schedule
+              </h2>
+              <p className="mt-3 text-sm text-slate-600">
+                Fee as a percentage of the package cost, based on days before
+                departure.
+              </p>
+              <div className="mt-6 overflow-x-auto">
+                <table className="w-full min-w-[520px] border-collapse text-left text-sm">
+                  <thead>
+                    <tr className="bg-[#173c34] text-white">
+                      <th className="p-4">From days</th>
+                      <th className="p-4">To days</th>
+                      <th className="p-4">Cancellation fee</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {cancellationSlabs.map((s) => (
+                      <tr key={s.from} className="border-b border-slate-200">
+                        <td className="p-4">{s.from}</td>
+                        <td className="p-4">{s.to}</td>
+                        <td className="p-4 font-bold">{s.fee}%</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="mt-4 text-xs leading-5 text-slate-500">
+                Cancellation requests must be sent from the registered email
+                address to cancellation@naystrip.com. Refunds are processed in
+                INR within 15 working days after final confirmation. No interest
+                is payable.
+              </p>
+            </section>
+          </div>
+          <aside className="lg:sticky lg:top-28 lg:self-start">
+            <div className="bg-[#173c34] p-7 text-white">
+              <p className="text-xs font-bold uppercase tracking-[.17em] text-orange-300">
+                Get an exact quote
+              </p>
+              <h2 className="mt-3 font-display text-3xl">
+                Dates, group and stays.
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-white/65">
+                Tell us your basics. We will confirm availability, vehicle and
+                hotel options before any payment.
+              </p>
+              {state.status === "success" ? (
+                <div className="mt-6 bg-white/10 p-5">
+                  <Check className="text-orange-300" />
+                  <p className="mt-3 font-bold">Request received</p>
+                  <p className="mt-1 text-sm text-white/70">{state.message}</p>
+                </div>
+              ) : (
+                <form onSubmit={submit} className="mt-6 space-y-3">
+                  <input
+                    required
+                    aria-label="Full name"
+                    placeholder="Full name"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    className="w-full border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/50 focus:border-orange-400 focus:outline-none"
+                  />
+                  <input
+                    required
+                    aria-label="Phone number"
+                    placeholder="Phone number"
+                    value={form.phone}
+                    onChange={(e) =>
+                      setForm({ ...form, phone: e.target.value })
+                    }
+                    className="w-full border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/50 focus:border-orange-400 focus:outline-none"
+                  />
+                  <input
+                    type="email"
+                    aria-label="Email"
+                    placeholder="Email"
+                    value={form.email}
+                    onChange={(e) =>
+                      setForm({ ...form, email: e.target.value })
+                    }
+                    className="w-full border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/50 focus:border-orange-400 focus:outline-none"
+                  />
+                  <textarea
+                    aria-label="Requirements"
+                    placeholder="Dates, travellers, hotel preference"
+                    rows="3"
+                    value={form.message}
+                    onChange={(e) =>
+                      setForm({ ...form, message: e.target.value })
+                    }
+                    className="w-full border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/50 focus:border-orange-400 focus:outline-none"
+                  />
+                  {state.status === "error" && (
+                    <p className="flex gap-2 text-xs text-orange-200">
+                      <CircleAlert size={15} />
+                      {state.message}
+                    </p>
+                  )}
+                  <button
+                    disabled={state.status === "loading"}
+                    className="w-full bg-orange-500 px-5 py-3.5 text-sm font-extrabold hover:bg-orange-600 disabled:opacity-60"
+                  >
+                    {state.status === "loading" ? "Sending…" : "Request quote"}
+                  </button>
+                </form>
+              )}
+              <a
+                href={wa}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 flex w-full items-center justify-center gap-2 border border-white/30 px-5 py-3.5 text-sm font-bold"
+              >
+                <MessageCircle size={17} /> WhatsApp instead
+              </a>
+            </div>
+          </aside>
+        </div>
+      </main>
+      {customising && (
+        <div className="fixed inset-0 z-[70] grid place-items-center p-4 print:hidden">
+          <button
+            aria-label="Close customisation"
+            onClick={() => setCustomising(false)}
+            className="absolute inset-0 bg-[#102f29]/75"
+          />
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="customise-title"
+            className="relative z-10 max-h-[90vh] w-full max-w-xl overflow-y-auto bg-white p-6 sm:p-9"
+          >
+            <button
+              onClick={() => setCustomising(false)}
+              className="absolute right-5 top-5"
+              aria-label="Close"
+            >
+              <X />
+            </button>
+            <p className="eyebrow">Tailor this route</p>
+            <h2
+              id="customise-title"
+              className="mt-2 pr-10 font-display text-3xl text-[#173c34]"
+            >
+              Customise {tour.title}
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-slate-600">
+              Use the planner with this itinerary preselected. You can change
+              dates, duration, group, rooms, transport and activities before
+              submitting.
+            </p>
+            <Link
+              to={`/custom-trip?package=${encodeURIComponent(tour.slug)}`}
+              className="btn-primary mt-6"
+            >
+              Start customising <SlidersHorizontal size={16} />
+            </Link>
+          </section>
+        </div>
+      )}
+    </>
+  );
 }

@@ -32,9 +32,23 @@ async function postLead(kind, payload) {
   }
 }
 let turnstileLoader;
-function turnstileToken() {
-  const sitekey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
-  if (!sitekey) return Promise.resolve(null);
+let turnstileConfiguration;
+async function configuredTurnstile() {
+  if (!turnstileConfiguration)
+    turnstileConfiguration = fetch("/api/config", {
+      headers: { Accept: "application/json" },
+    }).then(async (response) => {
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok)
+        throw new Error("Anti-bot configuration is unavailable");
+      return data.turnstile || { enabled: false, siteKey: null };
+    });
+  return turnstileConfiguration;
+}
+async function turnstileToken() {
+  const configuration = await configuredTurnstile();
+  if (!configuration.enabled || !configuration.siteKey) return null;
+  const sitekey = configuration.siteKey;
   if (!turnstileLoader)
     turnstileLoader = new Promise((resolve, reject) => {
       if (window.turnstile) return resolve();

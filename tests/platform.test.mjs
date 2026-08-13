@@ -17,7 +17,7 @@ test("every server and Vercel entry module parses",()=>{
 });
 
 test("Vercel Hobby deployment has exactly one function entry",()=>{
-  assert.deepEqual(filesBelow(join(process.cwd(),"api")).filter(file=>file.endsWith(".js")).map(file=>file.replaceAll("\\","/").split("/api/")[1]),["[...route].js"]);
+  assert.deepEqual(filesBelow(join(process.cwd(),"api")).filter(file=>file.endsWith(".js")).map(file=>file.replaceAll("\\","/").split("/api/")[1]),["index.js"]);
 });
 
 test("booking references and traveller validation enforce expected shape",()=>{

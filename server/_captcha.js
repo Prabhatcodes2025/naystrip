@@ -1,13 +1,27 @@
+export function captchaConfiguration() {
+  const secret = String(process.env.TURNSTILE_SECRET_KEY || "").trim();
+  const siteKey = String(process.env.VITE_TURNSTILE_SITE_KEY || "").trim();
+  return {
+    enabled: Boolean(secret && siteKey),
+    secret,
+    siteKey,
+    partial: Boolean(secret || siteKey) && !(secret && siteKey),
+  };
+}
+
 export async function verifyCaptcha(token, remoteIp) {
-  if (!process.env.TURNSTILE_SECRET_KEY)
-    return { success: true, skipped: true };
+  const configuration = captchaConfiguration();
+  if (!configuration.enabled) {
+    if (configuration.partial) console.warn("turnstile_partial_configuration");
+    return { success: true, skipped: true, reason: "not_configured" };
+  }
   if (!token)
     return {
       success: false,
       error: "Complete the anti-bot check and try again",
     };
   const body = new URLSearchParams({
-    secret: process.env.TURNSTILE_SECRET_KEY,
+    secret: configuration.secret,
     response: String(token),
   });
   if (remoteIp) body.set("remoteip", String(remoteIp).split(",")[0].trim());

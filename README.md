@@ -39,17 +39,17 @@ The seed upserts categories and packages by stable slugs, replaces itinerary/ite
 
 Copy `.env.example` to the relevant local/Vercel environment and provide:
 
-- `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
-- `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`
+- Required platform: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `PUBLIC_SITE_URL`, `ID_ENCRYPTION_KEY`, `CRON_SECRET`
+- Required for online payments: `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`
 - `RESEND_API_KEY`, `RESEND_FROM`, `BOOKINGS_NOTIFICATION_EMAIL`, `LEADS_NOTIFICATION_EMAIL`, `SUPPORT_EMAIL` when email delivery is enabled
 - `WHATSAPP_API_URL`, `WHATSAPP_API_TOKEN` when WhatsApp notifications are enabled
-- `TURNSTILE_SECRET_KEY`, `VITE_TURNSTILE_SITE_KEY` for production bot protection
+- `TURNSTILE_SECRET_KEY`, `VITE_TURNSTILE_SITE_KEY` together for production bot protection; omit both to keep enquiry forms available without CAPTCHA
 
 Never expose service-role, gateway-secret or notification tokens through a `VITE_` variable.
 
 ## Deployment
 
-Vercel serves the Vite output from `dist`. A single Hobby-compatible catch-all function at `api/[...route].js` dispatches the unchanged API URLs to implementation modules under `server/`. Configure all secrets in the Vercel project, apply the database migration, seed content, create approved admin accounts in Supabase Auth, and register `/api/payments/webhook` in Razorpay before accepting payments. The full route map is in [docs/API_ARCHITECTURE.md](docs/API_ARCHITECTURE.md).
+Vercel serves the Vite output from `dist`. An API-first rewrite sends every unchanged `/api/*` URL to the single Hobby-compatible function at `api/index.js`, which delegates to implementation modules under `server/`. Configure all secrets in the Vercel project, apply the database migration, seed content, create approved admin accounts in Supabase Auth, and register `/api/payments/webhook` in Razorpay before accepting payments. The full route map is in [docs/API_ARCHITECTURE.md](docs/API_ARCHITECTURE.md).
 
 The exact dashboard paths, webhook events, DNS work and acceptance tests are in [docs/OWNER_SETUP.md](docs/OWNER_SETUP.md).
 

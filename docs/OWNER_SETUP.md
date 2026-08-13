@@ -21,7 +21,7 @@ Purpose: production database, authentication, row-level authorization and privat
    - `SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
 7. Generate a long random value (at least 32 bytes) for `ID_ENCRYPTION_KEY`. Store it in a password manager and Vercel. Losing or rotating it without a data migration makes stored traveller IDs unreadable.
-8. Run `corepack pnpm seed` once with the production Supabase variables available. This upserts the 16 supplied Maharashtra packages and preserves their stable slugs. Review package prices and switch on `booking_enabled` only when rates are commercially approved.
+8. Run `corepack pnpm seed` once with the production Supabase variables available. This upserts the 16 supplied Maharashtra packages, preserves their stable slugs, and explicitly leaves them in enquiry-only mode. In Admin, approve a real price and choose **Flexible date** or create a priced departure and choose **Fixed departures** before enabling online booking.
 9. Test by registering a customer and confirming that only that customer can read their own booking/document rows.
 
 ## 2. Razorpay
@@ -71,7 +71,7 @@ Purpose: serverless APIs, scheduled reminders and production delivery.
 
 1. In **Vercel Project > Settings > Environment Variables**, add every variable listed in `.env.example` to the correct Preview and Production environments.
 2. Set `PUBLIC_SITE_URL=https://YOUR_DOMAIN`.
-3. Generate separate long random secrets for `CRON_SECRET` and `DOCUMENT_SIGNING_SECRET`.
+3. Generate a long random secret for `CRON_SECRET`.
 4. Redeploy after variables are saved. Never commit `.env` files or expose service-role/payment secrets as `VITE_` variables.
 5. Confirm **Settings > Cron Jobs** shows `/api/cron/reminders` at `0 4 * * *`. Vercel automatically sends the configured cron authorization; manually calling it requires `Authorization: Bearer YOUR_CRON_SECRET`.
 6. In **Settings > Domains**, add the production domain and apply the A/CNAME records Vercel displays. Update Supabase redirects, Razorpay webhook URL, Resend links and `PUBLIC_SITE_URL` after the domain is final.
