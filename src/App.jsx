@@ -7,6 +7,7 @@ import AdminErrorBoundary from "./components/admin/AdminErrorBoundary";
 
 const Home = lazy(() => import("./pages/Home"));
 const ToursListing = lazy(() => import("./pages/ToursListing"));
+const TourCategoryPage = lazy(() => import("./pages/TourCategoryPage"));
 const TourDetails = lazy(() => import("./pages/TourDetails"));
 const DestinationsListing = lazy(() => import("./pages/DestinationsListing"));
 const DestinationDetail = lazy(() => import("./pages/DestinationDetail"));
@@ -61,7 +62,10 @@ export default function App() {
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/tours" element={<ToursListing />} />
+        <Route path="/tours/domestic" element={<TourCategoryPage kind="domestic" />} />
+        <Route path="/tours/international" element={<TourCategoryPage kind="international" />} />
         <Route path="/tours/:slug" element={<TourDetails />} />
+        <Route path="/trips/:slug" element={<TourDetails shareable />} />
         <Route path="/destinations" element={<DestinationsListing />} />
         <Route path="/destinations/:slug" element={<DestinationDetail />} />
         <Route path="/holidays" element={<Holidays />} />

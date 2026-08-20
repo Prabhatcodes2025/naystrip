@@ -130,6 +130,7 @@ textarea:focus-visible {
 }
 
 .smart-image { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; background: #e9eeeb; }
+.smart-image.absolute { position: absolute; }
 .smart-image::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 25%, rgba(255,255,255,.55) 45%, transparent 65%); transform: translateX(-100%); animation: mediaShimmer 1.35s infinite; }
 .smart-image.is-loaded::after { display: none; }
 .smart-image > img { width: 100%; height: 100%; }
@@ -159,12 +160,12 @@ textarea:focus-visible {
 .package-hero__title { max-width: 58rem; font-size: clamp(2.25rem, 4.5vw, 4rem); line-height: 1.04; }
 
 @media (max-width: 767px) {
-  .page-hero { height: clamp(280px, 78vw, 330px); }
+  .page-hero { height: clamp(260px, 70vw, 320px); }
   .page-hero__title { font-size: clamp(2rem, 9vw, 2.65rem); }
   .home-hero { height: clamp(570px, calc(100svh - 82px), 620px); }
   .home-hero__content { align-items: flex-start; padding-top: 3.25rem; padding-bottom: 11.5rem; }
   .home-hero__title { font-size: clamp(2.15rem, 10vw, 2.75rem); line-height: 1.02; }
-  .package-hero { height: clamp(350px, 102vw, 410px); }
+  .package-hero { height: clamp(320px, 88vw, 390px); }
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {

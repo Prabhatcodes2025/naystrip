@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Copy, Plus, Search, Trash2, X } from "lucide-react";
+import { Copy, Download, ExternalLink, MessageCircle, Plus, Search, Trash2, X } from "lucide-react";
 import MediaUploader from "../../components/admin/MediaUploader";
 import { TableSkeleton } from "../../components/shared/Loading";
 const empty = {
@@ -57,6 +57,16 @@ const split = (value) =>
     .split("\n")
     .map((item) => item.trim())
     .filter(Boolean);
+const slugify=(value)=>String(value||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const LEH_ADVISORY=`High-altitude preparation
+• Keep the first day light and allow time to acclimatise before exertion.
+• Stay well hydrated; cold weather can make dehydration less noticeable.
+• Avoid alcohol and smoking while acclimatising.
+• Dress in layers: thermals, fleece and an insulated outer layer.
+• Carry sun protection, prescribed personal medicines, cash and essential supplies.
+
+Connectivity
+Postpaid mobile connections are generally more reliable in Ladakh. Coverage is strongest around Leh and major towns and may be unavailable in remote areas. Inform family before travel and carry a power bank.`;
 export default function AdminTours() {
   const [packages, setPackages] = useState([]);
   const [form, setForm] = useState(empty);
@@ -65,6 +75,8 @@ export default function AdminTours() {
   const [readiness, setReadiness] = useState("all");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [slugTouched,setSlugTouched]=useState(false);
+  const [notice,setNotice]=useState("");
   const load = async () => {
     setBusy(true);
     try {
@@ -79,6 +91,7 @@ export default function AdminTours() {
     load();
   }, []);
   const edit = (item) => {
+    setSlugTouched(true);
     setForm({
       id: item.id,
       title: item.title,
@@ -167,6 +180,9 @@ export default function AdminTours() {
     });
     await load();
   };
+  const publicUrl=(item)=>`${window.location.origin}/trips/${item.slug}`;
+  const shareMessage=(item)=>{const departure=(item.departures||[]).filter((entry)=>entry.status!=="cancelled").sort((a,b)=>String(a.start_date).localeCompare(String(b.start_date)))[0];const date=departure?.start_date?new Date(`${departure.start_date}T00:00:00`).toLocaleDateString("en-IN",{day:"numeric",month:"short"}).toUpperCase():"DATES ON REQUEST";const highlights=(item.highlights||[]).slice(0,5).map((value)=>`✨ ${value}`).join("\n");return `🌍 ${item.title.toUpperCase()}\n\n📅 ${date}\n⏱️ ${item.days} DAYS / ${item.nights} NIGHTS\n${highlights?`${highlights}\n`:""}${item.price_from!=null?`💰 FROM ₹${Number(item.price_from).toLocaleString("en-IN")}\n`:"💬 PRICE ON REQUEST\n"}\n⚡ Limited availability\n\n🔗 ${publicUrl(item)}\n\n📞 Bookings & Queries\n+91 8097132424`;};
+  const copyText=async(value,label)=>{await navigator.clipboard.writeText(value);setNotice(`${label} copied`);window.setTimeout(()=>setNotice(""),2200)};
   const readinessCode = (item) => {
     if (item.price_from == null) return "price_missing";
     if (!item.booking_enabled || item.custom_enquiry_only || item.policies?.booking_mode === "enquiry_only") return "enquiry_only";
@@ -191,6 +207,7 @@ export default function AdminTours() {
         <button
           onClick={() => {
             setForm(empty);
+            setSlugTouched(false);
             setOpen(true);
           }}
           className="btn-primary"
@@ -200,6 +217,7 @@ export default function AdminTours() {
         </button>
       </div>
       {error && <p className="mt-4 bg-rose-50 p-3 text-sm">{error}</p>}
+      {notice && <p role="status" className="mt-4 rounded-xl bg-emerald-50 p-3 text-sm font-bold text-emerald-700">{notice}</p>}
       <div className="mt-5 flex flex-wrap gap-3"><label className="relative block max-w-sm flex-1">
         <Search size={15} className="absolute left-3 top-3.5" />
         <input
@@ -241,7 +259,7 @@ export default function AdminTours() {
                 <td className="p-4"><span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-extrabold tracking-wide ${readinessCode(item) === "online_ready" ? "bg-emerald-50 text-emerald-700" : readinessCode(item) === "price_missing" ? "bg-amber-50 text-amber-800" : "bg-slate-100 text-slate-600"}`}>{readinessCode(item) === "online_ready" ? "ONLINE BOOKING READY" : readinessCode(item) === "price_missing" ? "PRICE MISSING" : "ENQUIRY ONLY"}</span></td>
                 <td className="p-4">{item.status}</td>
                 <td className="p-4">
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() => edit(item)}
                       className="btn-secondary"
@@ -255,6 +273,10 @@ export default function AdminTours() {
                     >
                       <Copy size={15} />
                     </button>
+                    <button onClick={()=>copyText(publicUrl(item),"Trip URL")} title="Copy public trip URL" className="grid h-10 w-10 place-items-center bg-emerald-50 text-emerald-700"><ExternalLink size={15}/></button>
+                    <button onClick={()=>copyText(shareMessage(item),"Share message")} title="Generate and copy share message" className="grid h-10 w-10 place-items-center bg-sky-50 text-sky-700"><MessageCircle size={15}/></button>
+                    <a href={`https://wa.me/?text=${encodeURIComponent(shareMessage(item))}`} target="_blank" rel="noopener noreferrer" title="Open WhatsApp" className="grid h-10 w-10 place-items-center bg-green-50 text-green-700"><MessageCircle size={15}/></a>
+                    <a href={`/api/documents/itinerary?slug=${encodeURIComponent(item.slug)}`} title="Download itinerary PDF" className="grid h-10 w-10 place-items-center bg-orange-50 text-orange-700"><Download size={15}/></a>
                     <button
                       onClick={() => archive(item.id)}
                       title="Archive"
@@ -300,9 +322,7 @@ export default function AdminTours() {
                     <input
                       required={["title", "slug"].includes(key)}
                       value={form[key]}
-                      onChange={(e) =>
-                        setForm({ ...form, [key]: e.target.value })
-                      }
+                      onChange={(e) => {const value=e.target.value;if(key==="slug")setSlugTouched(true);setForm({ ...form, [key]: value, ...(key==="title"&&!slugTouched?{slug:slugify(value)}:{}) });}}
                       className="input-field"
                     />
                   </label>
@@ -408,6 +428,8 @@ export default function AdminTours() {
                   className="input-field"
                 />
               </label>
+              <div className="grid gap-4 lg:grid-cols-2"><label><span className="label-field">Short marketing description</span><textarea rows="3" value={form.shortDescription} onChange={(e)=>setForm({...form,shortDescription:e.target.value})} className="input-field" maxLength="500"/></label><label><span className="label-field">Highlights, one per line</span><textarea rows="3" value={form.highlights.join("\n")} onChange={(e)=>setForm({...form,highlights:split(e.target.value)})} className="input-field"/></label></div>
+              <section className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5"><div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end"><div><h3 className="font-bold text-[#173c34]">Travel advisory / important information</h3><p className="mt-1 text-xs text-slate-500">Attach only when relevant. This appears on the trip page and in its PDF.</p></div><select aria-label="Advisory preset" value="" onChange={(e)=>{if(e.target.value==="leh")setForm({...form,policies:{...form.policies,travel_advisory:LEH_ADVISORY}})}} className="input-field max-w-xs"><option value="">Choose a preset…</option><option value="leh">Leh / Ladakh high altitude</option></select></div><textarea rows="8" value={form.policies?.travel_advisory||""} onChange={(e)=>setForm({...form,policies:{...form.policies,travel_advisory:e.target.value}})} className="input-field mt-4" placeholder="Destination-specific advice, packing, connectivity and preparation guidance"/></section>
               <div className="flex flex-wrap gap-6">
                 <label>
                   <span className="label-field">Booking mode</span>

@@ -6,6 +6,7 @@ import { blogs } from "../data/content";
 import { PageBanner, SectionHeading } from "../components/shared/Bits";
 import Reveal from "../components/shared/Reveal";
 import Seo from "../components/shared/Seo";
+import { imageFallbackFor } from "../data/imageFallbacks";
 
 export default function DestinationDetail() {
   const { slug } = useParams();
@@ -18,7 +19,7 @@ export default function DestinationDetail() {
   return (
     <>
       <Seo title={`${destination.name} Travel Guide | NaysTrip & Treks`} description={destination.overview} />
-      <PageBanner eyebrow={destination.region} title={destination.name} subtitle={destination.tagline} image={destination.image} />
+      <PageBanner eyebrow={destination.region} title={destination.name} subtitle={destination.tagline} image={imageFallbackFor(destination.name)} />
 
       <section className="py-12 sm:py-16">
         <div className="container-lg grid lg:grid-cols-3 gap-10">

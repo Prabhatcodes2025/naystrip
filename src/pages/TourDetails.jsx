@@ -18,12 +18,23 @@ import {
 import { Link, useParams } from "react-router-dom";
 import Seo from "../components/shared/Seo";
 import SmartImage from "../components/shared/SmartImage";
+import { PageLoader } from "../components/shared/Loading";
 import { cancellationSlabs, getTourBySlug } from "../data/tours";
 import { saveContactLead } from "../utils/storage";
 
-export default function TourDetails() {
+const fromPackage=(pkg)=>({
+  slug:pkg.slug,title:pkg.title,destination:pkg.destination_names?.[0]||"",destinations:pkg.destination_names||[],type:pkg.package_type,
+  duration:`${pkg.days} Days / ${pkg.nights} Nights`,days:pkg.days,nights:pkg.nights,image:pkg.hero_image,gallery:pkg.gallery||[],overview:pkg.overview||pkg.short_description||"",
+  itinerary:(pkg.itinerary||[]).sort((a,b)=>a.day_number-b.day_number).map((day)=>({day:day.day_number,title:day.title,details:day.description,meals:day.meals,stay:day.stay})),
+  inclusions:(pkg.items||[]).filter((item)=>item.item_type==="inclusion").map((item)=>item.body),
+  exclusions:(pkg.items||[]).filter((item)=>item.item_type==="exclusion").map((item)=>item.body),
+  notes:(pkg.items||[]).filter((item)=>item.item_type==="note").map((item)=>item.body),travelAdvisory:pkg.policies?.travel_advisory||"",commercial:pkg,
+});
+
+export default function TourDetails({ shareable = false }) {
   const { slug } = useParams();
-  const tour = getTourBySlug(slug);
+  const [tour,setTour]=useState(()=>getTourBySlug(slug));
+  const [catalogueLoading,setCatalogueLoading]=useState(!getTourBySlug(slug));
   const [open, setOpen] = useState(1);
   const [allOpen, setAllOpen] = useState(false);
   const [customising, setCustomising] = useState(false);
@@ -35,6 +46,13 @@ export default function TourDetails() {
     message: "",
   });
   const [state, setState] = useState({ status: "idle", message: "" });
+  useEffect(()=>{
+    const supplied=getTourBySlug(slug);
+    if(supplied){setTour(supplied);setCatalogueLoading(false);return undefined}
+    let active=true;setCatalogueLoading(true);
+    fetch(`/api/packages?slug=${encodeURIComponent(slug)}`,{headers:{Accept:"application/json"}}).then((response)=>response.ok?response.json():Promise.reject(new Error("Package not found"))).then((data)=>{if(active)setTour(fromPackage(data.package))}).catch(()=>{if(active)setTour(null)}).finally(()=>{if(active)setCatalogueLoading(false)});
+    return()=>{active=false};
+  },[slug]);
   useEffect(() => {
     fetch(`/api/bookings/options?slug=${encodeURIComponent(slug)}`, {
       headers: { Accept: "application/json" },
@@ -53,6 +71,7 @@ export default function TourDetails() {
         setBookingInfo(null);
       });
   }, [slug]);
+  if(catalogueLoading)return <PageLoader label="Loading trip details…"/>;
   if (!tour)
     return (
       <main className="container-lg py-28">
@@ -115,7 +134,7 @@ export default function TourDetails() {
               to="/tours"
               className="inline-flex items-center gap-2 text-sm font-bold text-white/75"
             >
-              <ArrowLeft size={16} /> All Maharashtra packages
+              <ArrowLeft size={16} /> {shareable ? "All tour packages" : "All Maharashtra packages"}
             </Link>
             <p className="mt-8 text-xs font-bold uppercase tracking-[.18em] text-orange-300">
               {tour.duration} · Customisable
@@ -260,6 +279,8 @@ export default function TourDetails() {
                 ))}
               </div>
             )}
+            {tour.travelAdvisory && <section className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-6 sm:p-8"><h3 className="font-display text-2xl text-[#173c34]">Important travel information</h3><div className="mt-4 whitespace-pre-line text-sm leading-7 text-slate-700">{tour.travelAdvisory}</div></section>}
+            {tour.gallery?.length > 0 && <section className="mt-14"><h2 className="font-display text-3xl text-[#173c34]">Trip gallery</h2><div className="mt-5 grid gap-4 sm:grid-cols-3">{tour.gallery.slice(0,3).map((image,index)=><SmartImage key={image} src={image} context={`${tour.title} gallery`} alt={`${tour.title} gallery ${index+1}`} wrapperClassName="aspect-[4/3] rounded-2xl" className="object-cover"/>)}</div></section>}
             <div className="mt-16 grid gap-9 sm:grid-cols-2">
               <section>
                 <h2 className="font-display text-3xl text-[#173c34]">

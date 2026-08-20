@@ -6,6 +6,7 @@ import { PageBanner } from "../components/shared/Bits";
 import Reveal from "../components/shared/Reveal";
 import Seo from "../components/shared/Seo";
 import SmartImage from "../components/shared/SmartImage";
+import { imageFallbackFor } from "../data/imageFallbacks";
 
 export default function DestinationsListing() {
   const [search, setSearch] = useState("");
@@ -63,7 +64,7 @@ export default function DestinationsListing() {
               <Reveal key={d.slug} delay={(i % 3) * 0.07}>
                 <Link to={`/destinations/${d.slug}`} className="group block card-surface overflow-hidden hover:shadow-lift hover:-translate-y-1 transition-all">
                   <div className="relative aspect-[4/3] overflow-hidden">
-                    <SmartImage src={d.image} context={d.name} alt={`${d.name} — ${d.tagline}`} loading="lazy" className="object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <SmartImage src={imageFallbackFor(d.name)} context={d.name} alt={`${d.name} — ${d.tagline}`} loading="lazy" className="object-cover transition-transform duration-700 group-hover:scale-110" />
                     <div className="absolute inset-0 bg-gradient-to-t from-navy-950/70 to-transparent" />
                     <span className="absolute top-3 left-3 rounded-full bg-white/90 backdrop-blur-sm px-2.5 py-1 text-[11px] font-semibold text-navy-800">
                       {d.region}

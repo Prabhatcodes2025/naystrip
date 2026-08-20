@@ -1,15 +1,27 @@
+import { rgb } from "pdf-lib";
 import { getTourBySlug } from "../../src/data/tours.js";
-import { colours,createBrandedPdf,sendPdf,wrap } from "./_pdf.js";
+import { supabaseRequest } from "../_shared.js";
+import { colours,createBrandedPdf,embedPdfImage,sendPdf,wrap } from "./_pdf.js";
+
+const fromPackage=(pkg)=>({slug:pkg.slug,title:pkg.title,duration:`${pkg.days} Days / ${pkg.nights} Nights`,days:pkg.days,nights:pkg.nights,destinations:pkg.destination_names||[],image:pkg.hero_image,gallery:pkg.gallery||[],overview:pkg.overview||pkg.short_description||"",price:pkg.price_from,itinerary:(pkg.itinerary||[]).sort((a,b)=>a.day_number-b.day_number).map((day)=>({day:day.day_number,title:day.title,details:day.description,meals:day.meals,stay:day.stay})),inclusions:(pkg.items||[]).filter((item)=>item.item_type==="inclusion").map((item)=>item.body),exclusions:(pkg.items||[]).filter((item)=>item.item_type==="exclusion").map((item)=>item.body),notes:(pkg.items||[]).filter((item)=>item.item_type==="note").map((item)=>item.body),policies:pkg.policies||{}});
+
+async function resolveTour(slug){let record=null;try{const response=await supabaseRequest(`packages?slug=eq.${encodeURIComponent(slug)}&status=eq.published&deleted_at=is.null&select=*,itinerary:package_itinerary_days(*),items:package_items(*)&limit=1`);if(response.ok)[record]=await response.json()}catch{}return record?fromPackage(record):getTourBySlug(slug)}
 
 export default async function handler(req,res){
  if(req.method!=="GET")return res.status(405).json({error:"Method not allowed"});
- const slug=String(req.query?.slug||"").replace(/[^a-z0-9-]/gi,"").slice(0,100);const tour=getTourBySlug(slug);if(!tour)return res.status(404).json({error:"Package not found"});
- const {pdf,regular,bold,addPage}=await createBrandedPdf(tour.title,`${tour.duration}  •  ${tour.destinations.join(" • ")}`);let {page,y}=addPage();
- const ensure=(needed=80)=>{if(y<needed){({page,y}=addPage())}};
- const paragraph=(text,{size=9,font=regular,colour=colours.grey,indent=0,leading=14}={})=>{for(const line of wrap(font,text,size,500-indent)){ensure(70);page.drawText(line,{x:42+indent,y,size,font,color:colour});y-=leading}y-=5};
- paragraph(tour.overview,{size:10});
- for(const item of tour.itinerary){ensure(120);page.drawText(`DAY ${String(item.day).padStart(2,"0")}  ${item.title}`,{x:42,y,size:13,font:bold,color:colours.orange});y-=21;paragraph(item.details,{indent:12});if(item.meals)paragraph(`Meals: ${item.meals}`,{font:bold,indent:12});if(item.stay)paragraph(`Stay: ${item.stay}`,{font:bold,indent:12});y-=7}
- ensure(130);page.drawText("INCLUSIONS",{x:42,y,size:13,font:bold,color:colours.forest});y-=21;for(const item of tour.inclusions)paragraph(`• ${item}`,{indent:8});
- ensure(130);page.drawText("EXCLUSIONS",{x:42,y,size:13,font:bold,color:colours.forest});y-=21;for(const item of tour.exclusions)paragraph(`• ${item}`,{indent:8});
- const bytes=await pdf.save();return sendPdf(res,bytes,`naystrip-${slug}-itinerary.pdf`);
+ const slug=String(req.query?.slug||"").replace(/[^a-z0-9-]/gi,"").slice(0,100);const tour=await resolveTour(slug);if(!tour)return res.status(404).json({error:"Package not found"});
+ const {pdf,regular,bold,addContentPage,addCoverPage}=await createBrandedPdf(tour.title,`${tour.duration}  -  ${tour.destinations.join("  -  ")}`);const hero=await embedPdfImage(pdf,tour.image)||await embedPdfImage(pdf,"/public/og.png");let {page,y}=addCoverPage({hero,summary:[["Starting from",tour.price!=null?`INR ${Number(tour.price).toLocaleString("en-IN")}`:"Price on request"],["Duration",tour.duration],["Places covered",tour.destinations.join(", ")]],meta:[["Generated",new Date().toLocaleDateString("en-IN")],...(req.query?.reference?[["Reference",String(req.query.reference).slice(0,60)]]:[]) ]});
+ const newPage=(heading="")=>{({page,y}=addContentPage(heading))};const ensure=(needed=90,heading="")=>{if(y<needed)newPage(heading)};
+ const paragraph=(text,{size=9,font=regular,colour=colours.grey,indent=0,leading=13,after=6}={})=>{for(const line of wrap(font,text,size,500-indent)){ensure(70);page.drawText(line,{x:42+indent,y,size,font,color:colour});y-=leading}y-=after};
+ const heading=(text)=>{ensure(110,text);page.drawText(text.toUpperCase(),{x:42,y,size:12,font:bold,color:colours.forest});page.drawLine({start:{x:42,y:y-7},end:{x:553,y:y-7},thickness:1.5,color:colours.orange});y-=27};
+ heading("Package overview");paragraph(tour.overview,{size:10,leading:15});
+ heading("Day-wise itinerary");for(const item of tour.itinerary||[]){ensure(120,"Day-wise itinerary");page.drawRectangle({x:42,y:y-8,width:52,height:27,color:colours.orange});page.drawText(`DAY ${String(item.day).padStart(2,"0")}`,{x:51,y,size:8,font:bold,color:colours.white});page.drawText(item.title,{x:106,y,size:12,font:bold,color:colours.forest,maxWidth:445});y-=30;paragraph(item.details,{indent:12});if(item.meals)paragraph(`Meals: ${item.meals}`,{font:bold,indent:12,after:2});if(item.stay)paragraph(`Stay: ${item.stay}`,{font:bold,indent:12});y-=5}
+ if(tour.inclusions?.length){heading("Inclusions");for(const item of tour.inclusions)paragraph(`+  ${item}`,{indent:4,after:3})}
+ if(tour.exclusions?.length){heading("Exclusions");for(const item of tour.exclusions)paragraph(`-  ${item}`,{indent:4,after:3})}
+ if(tour.notes?.length){heading("Important notes");for(const item of tour.notes)paragraph(item,{indent:4})}
+ if(tour.policies?.travel_advisory){heading("Important travel information");for(const block of String(tour.policies.travel_advisory).split(/\n+/).filter(Boolean))paragraph(block,{indent:4})}
+ const policySections=[["Booking policy",tour.policies?.booking_policy],["Cancellation policy",tour.policies?.cancellation_policy],["Payment information",tour.policies?.payment_information]].filter(([,value])=>value);for(const [label,value] of policySections){heading(label);paragraph(value)}
+ const gallery=[];for(const source of (tour.gallery||[]).slice(0,2)){const image=await embedPdfImage(pdf,source);if(image)gallery.push(image)}if(gallery.length){heading("Journey preview");ensure(220,"Journey preview");let x=42;for(const image of gallery){const fitted=image.scaleToFit(245,155);page.drawRectangle({x,y:y-155,width:245,height:155,color:rgb(.91,.91,.88)});page.drawImage(image,{x:x+(245-fitted.width)/2,y:y-155+(155-fitted.height)/2,width:fitted.width,height:fitted.height});x+=266}y-=175}
+ ensure(145,"Book with NaysTrip");page.drawRectangle({x:42,y:y-92,width:511,height:92,color:colours.forest});page.drawText("READY TO PLAN THIS JOURNEY?",{x:62,y:y-28,size:12,font:bold,color:colours.white});page.drawText("hello@naystrip.com  |  +91 8097132424  |  www.naystrek.com",{x:62,y:y-51,size:8.5,font:regular,color:rgb(.83,.89,.86)});page.drawText("Request a quote or book online when live availability is shown.",{x:62,y:y-70,size:8,font:regular,color:rgb(1,.72,.3)});
+ pdf.getPages().forEach((item,index)=>item.drawText(`Page ${index+1} of ${pdf.getPageCount()}`,{x:275,y:30,size:7,font:regular,color:colours.grey}));const bytes=await pdf.save();const safe=tour.title.replace(/[^a-z0-9]+/gi,"-").replace(/^-|-$/g,"");return sendPdf(res,bytes,`NaysTrip-${safe}-${tour.days}D${tour.nights}N.pdf`);
 }

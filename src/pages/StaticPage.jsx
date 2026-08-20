@@ -1,6 +1,7 @@
 import { PageBanner } from "../components/shared/Bits";
 import Seo from "../components/shared/Seo";
 import { Link } from "react-router-dom";
+import { Compass, Headphones, Map, ShieldCheck } from "lucide-react";
 import { getSiteSettings } from "../data/siteConfig";
 import { policyPages } from "../data/policies";
 
@@ -76,7 +77,7 @@ export default function StaticPage({ slug }) {
         title={content.title}
         image="https://images.unsplash.com/photo-1500835556837-99ac94a94552?auto=format&fit=crop&w=1600&q=80"
       />
-      <section className="py-14 sm:py-20">
+      {slug === "about" ? <AboutContent body={content.body} /> : <section className="py-14 sm:py-20">
         <div className="container-lg max-w-3xl">
           {content.sections ? (
             <article>
@@ -105,7 +106,20 @@ export default function StaticPage({ slug }) {
             </div>
           )}
         </div>
-      </section>
+      </section>}
     </>
   );
+}
+
+function AboutContent({ body }) {
+  const cards = [
+    [Compass, "Who we are", body[0]],
+    [Map, "What we do", "Tour packages, tailor-made holidays, treks, educational travel and corporate journeys—from leisure to adventure."],
+    [ShieldCheck, "How we plan trips", "We review routes with experienced travellers and verified local partners, then make inclusions, pricing and next steps easy to understand."],
+    [Headphones, "Why NaysTrip", "Practical on-ground knowledge, transparent communication and genuine support before, during and after your journey."],
+  ];
+  return <>
+    <section className="py-14 sm:py-20"><div className="container-lg"><div className="grid gap-8 lg:grid-cols-[.75fr_1.25fr] lg:items-end"><div><p className="eyebrow">Travel planned by people</p><h2 className="section-title mt-3">Clear routes. Human support. Better journeys.</h2></div><p className="max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">{body[1]}</p></div><div className="mt-10 grid gap-5 sm:grid-cols-2">{cards.map(([Icon,title,copy])=><article key={title} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_12px_36px_rgba(19,52,45,.06)] sm:p-8"><span className="grid h-12 w-12 place-items-center rounded-full bg-orange-50 text-orange-600"><Icon size={22}/></span><h3 className="mt-6 font-display text-2xl text-[#173c34]">{title}</h3><p className="mt-3 text-sm leading-7 text-slate-600">{copy}</p></article>)}</div></div></section>
+    <section className="bg-[#fff3df] py-14 sm:py-20"><div className="container-lg flex flex-col justify-between gap-6 md:flex-row md:items-center"><div><p className="eyebrow">Start with an idea</p><h2 className="mt-3 max-w-3xl font-display text-3xl text-[#173c34] sm:text-5xl">Tell us where you want to go. We will shape the route.</h2></div><Link to="/custom-trip" className="btn-primary shrink-0">Plan my trip</Link></div></section>
+  </>;
 }
