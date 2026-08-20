@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Lock, Mail, ShieldCheck } from "lucide-react";
 import BrandLogo from "../../components/branding/BrandLogo";
 import Seo from "../../components/shared/Seo";
@@ -26,7 +26,7 @@ export default function AdminLogin() {
     <main className="relative grid min-h-screen place-items-center overflow-hidden bg-[#102f29] px-4">
       <img src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1800&q=60" alt="" className="absolute inset-0 h-full w-full object-cover opacity-15" />
       <div className="relative w-full max-w-md">
-        <div className="mb-7 flex flex-col items-center text-center text-white"><BrandLogo eager animated className="h-32 w-auto" /><p className="mt-2 text-sm text-white/50">Operations dashboard</p></div>
+        <div className="mb-7 flex flex-col items-center text-center text-white"><Link to="/" aria-label="NaysTrip home"><BrandLogo eager animated className="h-32 w-auto" /></Link><p className="mt-2 text-sm text-white/50">Operations dashboard</p></div>
         <div className="bg-white p-8"><h1 className="font-display text-3xl text-[#173c34]">Secure sign in</h1><p className="mt-2 text-sm text-slate-500">Use the account assigned by your administrator.</p>
           <form onSubmit={submit} className="mt-7 space-y-4">
             <label className="block"><span className="label-field"><Mail size={14} className="mr-1 inline" />Email</span><input type="email" autoComplete="username" required value={email} onChange={(event) => setEmail(event.target.value)} className="input-field" placeholder="name@naystrip.com" /></label>

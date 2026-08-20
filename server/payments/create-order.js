@@ -20,7 +20,7 @@ export default async function handler(req,res){
   if(existing?.gateway_order_id&&existing.raw_status?.payment_session_id)return json(res,200,{order_id:existing.gateway_order_id,payment_session_id:existing.raw_status.payment_session_id,amount:existing.amount,currency:existing.currency,booking_reference:booking.reference,purpose,mode:configuration.environment,reused:true});
 
   const orderId=`${booking.reference}-${purpose}-${crypto.randomUUID().slice(0,8)}`.slice(0,45);
-  const siteUrl=String(process.env.PUBLIC_SITE_URL||"https://www.naystrek.com").replace(/\/$/,"");
+  const siteUrl=String(process.env.PUBLIC_SITE_URL||"https://www.naystrip.com").replace(/\/$/,"");
   const phone=String(booking.billing?.phone||session.profile?.phone||"").replace(/\D/g,"").slice(-15);
   if(phone.length<10)return json(res,422,{error:"A valid customer phone is required for online payment"});
   const gateway=await cashfreeRequest("/orders",{method:"POST",headers:{"x-idempotency-key":crypto.randomUUID(),"x-request-id":crypto.randomUUID()},body:JSON.stringify({

@@ -7,6 +7,7 @@ import Reveal from "../components/shared/Reveal";
 import Seo from "../components/shared/Seo";
 import SmartImage from "../components/shared/SmartImage";
 import { saveContactLead } from "../utils/storage";
+import { whatsappHref } from "../data/siteConfig";
 
 const stats = (t) => [
   { icon: Gauge, label: "Difficulty", value: t.difficulty },
@@ -167,7 +168,7 @@ export default function TrekDetail() {
                   </form>
                 )}
                 <a
-                  href={`https://wa.me/917710991126?text=${encodeURIComponent(`Hi NaysTrip! I'm interested in the ${trek.name} ${trek.category}.`)}`}
+                  href={whatsappHref(`Hi NaysTrip! I'm interested in the ${trek.name} ${trek.category}.`)}
                   target="_blank" rel="noopener noreferrer"
                   className="w-full inline-flex items-center justify-center gap-2 rounded-full border-2 border-forest-600 py-3.5 mt-3 text-sm font-semibold text-forest-700 hover:bg-forest-600 hover:text-white transition-colors"
                 >

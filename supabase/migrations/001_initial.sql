@@ -49,4 +49,4 @@ create policy "customers read own payments" on public.payments for select using(
 create policy "agents read own profile" on public.b2b_agents for select using(user_id=auth.uid());
 
 insert into public.roles(name) values ('Super Admin'),('Content Manager'),('Sales'),('Operations'),('Accounts'),('B2B Manager'),('Support') on conflict(name) do nothing;
-insert into public.website_settings(id,data) values(true,'{"brandName":"NaysTrip & Treks","phone":"+91 8097132424","whatsapp":"+91 7710991126","email":"hello@naystrip.com","cancellationEmail":"cancellation@naystrip.com","address":"EL146, Mahape, Navi Mumbai, Maharashtra, India"}'::jsonb) on conflict(id) do update set data=excluded.data,updated_at=now();
+insert into public.website_settings(id,data) values(true,'{"brandName":"NaysTrip & Treks","phone":"+91 8097132424","whatsapp":"+91 8097132424","email":"hello@naystrip.com","cancellationEmail":"cancellation@naystrip.com","address":"EL146, Mahape, Navi Mumbai, Maharashtra, India"}'::jsonb) on conflict(id) do update set data=excluded.data,updated_at=now();

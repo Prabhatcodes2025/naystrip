@@ -10,6 +10,7 @@ import {
 import Seo from "../components/shared/Seo";
 import { PageLoader } from "../components/shared/Loading";
 import { getToken, openCashfree, portalFetch } from "../utils/portal";
+import { clearCheckoutDraft, readCheckoutDraft, saveCheckoutDraft } from "../utils/checkoutDraft";
 const emptyTraveller = (type = "adult") => ({
   type,
   fullName: "",
@@ -24,15 +25,16 @@ const emptyTraveller = (type = "adult") => ({
 export default function BookingCheckout() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const draft = useMemo(() => readCheckoutDraft(slug), [slug]);
   const [options, setOptions] = useState(null);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(() => draft?.step || 1);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [pricing, setPricing] = useState(null);
+  const [pricing, setPricing] = useState(() => draft?.pricing || null);
   const [booking, setBooking] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState("");
-  const [form, setForm] = useState({
+  const [form, setForm] = useState(() => draft?.form || ({
     departureId: "",
     travelDate: "",
     departureCity: "Mumbai",
@@ -57,7 +59,10 @@ export default function BookingCheckout() {
       companyName: "",
     },
     customerNotes: "",
-  });
+  }));
+  useEffect(() => {
+    if (!booking) saveCheckoutDraft(slug, { form, pricing, step });
+  }, [booking, form, pricing, slug, step]);
   useEffect(() => {
     fetch(`/api/bookings/options?slug=${encodeURIComponent(slug)}`)
       .then(async (response) => {
@@ -68,8 +73,8 @@ export default function BookingCheckout() {
         if (first)
           setForm((current) => ({
             ...current,
-            departureId: first.id,
-            travelDate: first.start_date,
+            departureId: current.departureId || first.id,
+            travelDate: current.travelDate || first.start_date,
           }));
       })
       .catch((err) => setError(err.message))
@@ -145,6 +150,7 @@ export default function BookingCheckout() {
   const validateTravellers = () => form.travellers.every((item) => item.fullName && !travellerDobError(item) && item.nationality && item.idType && item.idNumber);
   const submit = async () => {
     if (!getToken("customer")) {
+      saveCheckoutDraft(slug, { form, pricing, step });
       navigate(
         `/account/login?returnTo=${encodeURIComponent(`/checkout/${slug}`)}`,
       );
@@ -164,8 +170,14 @@ export default function BookingCheckout() {
         }),
       });
       setBooking(result.booking);
+      clearCheckoutDraft(slug);
       setStep(5);
     } catch (err) {
+      if (err.status === 401) {
+        saveCheckoutDraft(slug, { form, pricing, step });
+        navigate(`/account/login?returnTo=${encodeURIComponent(`/checkout/${slug}`)}`);
+        return;
+      }
       setError(err.message);
     } finally {
       setBusy(false);

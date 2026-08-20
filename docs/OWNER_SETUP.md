@@ -69,11 +69,11 @@ Purpose: optional operational notifications. No WhatsApp success is fabricated w
 Purpose: serverless APIs, scheduled reminders and production delivery.
 
 1. In **Vercel Project > Settings > Environment Variables**, add every variable listed in `.env.example` to the correct Preview and Production environments.
-2. Set `PUBLIC_SITE_URL=https://YOUR_DOMAIN`.
+2. For the domain migration, set `PUBLIC_SITE_URL=https://www.naystrip.com` in Production and Preview only when those environments can resolve that hostname. Keep the current production value until the DNS cutover is ready.
 3. Generate a long random secret for `CRON_SECRET`.
 4. Redeploy after variables are saved. Never commit `.env` files or expose service-role/payment secrets as `VITE_` variables.
 5. Confirm **Settings > Cron Jobs** shows `/api/cron/reminders` at `0 4 * * *`. Vercel automatically sends the configured cron authorization; manually calling it requires `Authorization: Bearer YOUR_CRON_SECRET`.
-6. In **Settings > Domains**, add the production domain and apply the A/CNAME records Vercel displays. Update Supabase redirects, Cashfree webhook URL, Resend links and `PUBLIC_SITE_URL` after the domain is final.
+6. In **Settings > Domains**, add `naystrip.com` and `www.naystrip.com`, apply the A/CNAME records Vercel displays, and choose `www.naystrip.com` as primary. Keep `naystrek.com` attached and redirect it to the new primary after launch. In Supabase Authentication add `https://www.naystrip.com/account/reset-password` and `https://www.naystrip.com/b2b/reset-password`; in Cashfree set the production webhook to `https://www.naystrip.com/api/payments/webhook`; update approved Resend links/templates. Then switch `PUBLIC_SITE_URL`, redeploy, and verify HTTPS/canonical links before enabling the old-domain redirect.
 7. Run the acceptance checks: enquiry, customer recovery, checkout/payment/webhook, protected document download, admin actions, approved-agent login, quotation share, and cron endpoint.
 
 ## 6. Business and legal details
@@ -116,11 +116,11 @@ Customer registration at `/account/register` creates a Supabase Auth user with `
 
 ### B2B partners
 
-Partner applications begin at `/b2b/register`. The trigger creates a `b2b_agents` profile with `verification_status=pending`. Review the business details, then set the profile to `approved` before `/b2b/login` grants dashboard access. Pending or rejected profiles cannot use protected agent APIs.
+Partner applications begin at `/b2b/register`. The trigger creates a `b2b_agents` profile with `verification_status=pending`. A Super Admin or B2B Manager reviews and approves or rejects it at `/admin/agents`; the action is written to `audit_logs`. Only approved partners can sign in to protected agent APIs.
 
 ## Public media configuration
 
-1. Run `supabase/migrations/004_public_media.sql` after the earlier migrations. It creates the public `site-media` bucket; keep `booking-documents` private.
+1. Run `supabase/migrations/004_public_media.sql` and `005_primary_contact.sql` after the earlier migrations. They create the public `site-media` bucket and standardize WhatsApp to `+91 8097132424`; keep `booking-documents` private.
 2. Admin package, blog and traveller-story forms accept JPG, PNG and WebP files up to 5 MB. Uploads pass through `/api/admin/media`, which checks an active Admin session, MIME type, file signature and size before using the server-only service-role key.
 3. Managed files use organized paths such as `packages/{id}/hero`, `packages/{id}/gallery`, `blogs/{id}` and `stories/{id}` with randomized filenames.
 4. Existing remote image URLs remain compatible. Upload, preview, replace or remove an image in Admin, then save the record to publish the changed URL.

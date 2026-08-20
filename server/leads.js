@@ -138,7 +138,7 @@ export default async function handler(req, res) {
     if (err.message === "SERVICE_NOT_CONFIGURED")
       return json(res, 503, {
         error:
-          "Online enquiries are being configured. Please call +91 8097132424 or WhatsApp +91 7710991126.",
+          "Online enquiries are being configured. Please call or WhatsApp +91 8097132424.",
       });
     console.error("lead_handler_failed", err);
     return json(res, 500, { error: "Please call or WhatsApp us to continue." });

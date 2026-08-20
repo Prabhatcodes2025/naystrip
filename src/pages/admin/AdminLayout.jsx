@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Link, Navigate, NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Map, Users, MessageSquare, Newspaper, Star, Settings, FileText, CalendarDays, BellRing,
   Menu, X, Search, Bell, LogOut,
@@ -17,6 +17,7 @@ const navItems = [
   { to: "/admin/contact-leads", label: "Contact Leads", icon: MessageSquare },
   { to: "/admin/quotations", label: "Quotations", icon: FileText },
   { to: "/admin/notifications", label: "Notifications", icon: BellRing },
+  { to: "/admin/agents", label: "B2B Partner Approvals", icon: Users },
   { to: "/admin/blogs", label: "Blog Management", icon: Newspaper },
   { to: "/admin/stories", label: "Happy Travellers", icon: Star },
   { to: "/admin/settings", label: "Website Settings", icon: Settings },
@@ -33,6 +34,7 @@ export default function AdminLayout() {
   },[]);
   if (session.checking) return <PageLoader full label="Checking secure admin session…" />;
   if (!isAdminLoggedIn() || !session.admin) return <Navigate to="/admin/login" replace />;
+  const visibleNavItems = navItems.filter((item) => item.to !== "/admin/agents" || ["Super Admin", "B2B Manager"].includes(session.admin.role));
 
   const handleLogout = () => {
     adminLogout();
@@ -42,11 +44,11 @@ export default function AdminLayout() {
   const SidebarContent = (
     <>
       <div className="px-5 py-5">
-        <BrandLogo className="h-20 w-auto" />
+        <Link to="/" aria-label="NaysTrip home"><BrandLogo className="h-20 w-auto" /></Link>
         <span className="mt-1 block text-xs font-semibold uppercase tracking-[.16em] text-white/50">Admin console</span>
       </div>
       <nav className="flex-1 px-3 space-y-1">
-        {navItems.map((item) => (
+        {visibleNavItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}

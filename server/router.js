@@ -1,4 +1,5 @@
 import adminBookings from "./admin/bookings.js";
+import adminAgents from "./admin/agents.js";
 import adminDepartures from "./admin/departures.js";
 import adminLeads from "./admin/leads.js";
 import adminNotifications from "./admin/notifications.js";
@@ -35,6 +36,7 @@ import quotationView from "./quotations/view.js";
 import settings from "./settings.js";
 
 export const routes = new Map([
+  ["admin/agents", adminAgents],
   ["admin/bookings", adminBookings],
   ["admin/departures", adminDepartures],
   ["admin/leads", adminLeads],

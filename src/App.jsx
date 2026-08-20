@@ -47,6 +47,7 @@ const AdminQuotations = lazy(() => import("./pages/admin/AdminQuotations"));
 const AdminBookings = lazy(() => import("./pages/admin/AdminBookings"));
 const AdminDepartures = lazy(() => import("./pages/admin/AdminDepartures"));
 const AdminNotifications = lazy(() => import("./pages/admin/AdminNotifications"));
+const AdminAgents = lazy(() => import("./pages/admin/AdminAgents"));
 
 function BootComplete({ onReady }) {
   useEffect(() => onReady(), [onReady]);
@@ -71,6 +72,7 @@ export default function App() {
         <Route path="/holidays" element={<Holidays />} />
         <Route path="/fixed-departures" element={<FixedDepartures />} />
         <Route path="/treks" element={<Treks />} />
+        <Route path="/treks-expeditions" element={<Treks />} />
         <Route path="/treks/:slug" element={<TrekDetail />} />
         <Route path="/expeditions" element={<Expeditions />} />
         <Route path="/expeditions/:slug" element={<TrekDetail />} />
@@ -121,6 +123,7 @@ export default function App() {
         <Route path="contact-leads" element={<AdminContactLeads />} />
         <Route path="quotations" element={<AdminQuotations />} />
         <Route path="notifications" element={<AdminNotifications />} />
+        <Route path="agents" element={<AdminAgents />} />
         <Route path="blogs" element={<AdminBlogs />} />
         <Route path="stories" element={<AdminStories />} />
         <Route path="settings" element={<AdminSettings />} />

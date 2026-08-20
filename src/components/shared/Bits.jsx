@@ -19,8 +19,10 @@ export function SectionHeading({ eyebrow, title, subtitle, center = false, light
 }
 
 export function StarRating({ rating, size = 14, showValue = true }) {
-  const full = Math.floor(rating);
-  const hasHalf = rating - full >= 0.5;
+  const numeric = Number(rating);
+  const safeRating = Number.isFinite(numeric) ? Math.min(5, Math.max(0, numeric)) : 0;
+  const full = Math.floor(safeRating);
+  const hasHalf = safeRating - full >= 0.5;
   return (
     <span className="inline-flex items-center gap-1">
       <span className="flex items-center gap-0.5">
@@ -38,20 +40,23 @@ export function StarRating({ rating, size = 14, showValue = true }) {
           />
         ))}
       </span>
-      {showValue && <span className="text-xs font-semibold text-navy-600">{rating.toFixed(1)}</span>}
+      {showValue && Number.isFinite(numeric) && <span className="text-xs font-semibold text-navy-600">{safeRating.toFixed(1)}</span>}
     </span>
   );
 }
 
 export function PriceTag({ original, price, size = "base" }) {
   const cls = size === "lg" ? "text-2xl sm:text-3xl" : "text-lg";
+  const numericPrice = Number(price);
+  const hasPrice = price !== null && price !== undefined && Number.isFinite(numericPrice) && numericPrice > 0;
+  const numericOriginal = Number(original);
   return (
     <div className="flex items-baseline gap-2">
       <span className={`font-display font-bold text-navy-900 ${cls}`}>
-        ₹{price.toLocaleString("en-IN")}
+        {hasPrice ? `₹${numericPrice.toLocaleString("en-IN")}` : "Price on request"}
       </span>
-      {original && original > price && (
-        <span className="text-sm text-navy-400 line-through">₹{original.toLocaleString("en-IN")}</span>
+      {hasPrice && Number.isFinite(numericOriginal) && numericOriginal > numericPrice && (
+        <span className="text-sm text-navy-400 line-through">₹{numericOriginal.toLocaleString("en-IN")}</span>
       )}
     </div>
   );

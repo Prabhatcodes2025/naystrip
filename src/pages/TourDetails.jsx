@@ -21,6 +21,7 @@ import SmartImage from "../components/shared/SmartImage";
 import { PageLoader } from "../components/shared/Loading";
 import { cancellationSlabs, getTourBySlug } from "../data/tours";
 import { saveContactLead } from "../utils/storage";
+import { whatsappHref } from "../data/siteConfig";
 
 const fromPackage=(pkg)=>({
   slug:pkg.slug,title:pkg.title,destination:pkg.destination_names?.[0]||"",destinations:pkg.destination_names||[],type:pkg.package_type,
@@ -100,7 +101,7 @@ export default function TourDetails({ shareable = false }) {
       });
     }
   };
-  const wa = `https://wa.me/917710991126?text=${encodeURIComponent(`Hi NaysTrip, I would like a quote for ${tour.title} (${tour.duration}).`)}`;
+  const wa = whatsappHref(`Hi NaysTrip, I would like a quote for ${tour.title} (${tour.duration}).`);
   const share = async () => {
     const data = {
       title: tour.title,

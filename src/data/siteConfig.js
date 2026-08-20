@@ -4,7 +4,7 @@ export const defaultSiteSettings = {
   tagline: "Leisure to Adventure",
   phone: "+91 8097132424",
   supportPhone: "+91 8097132424",
-  whatsapp: "+91 7710991126",
+  whatsapp: "+91 8097132424",
   email: "hello@naystrip.com",
   trekEmail: "naystrek@gmail.com",
   cancellationEmail: "cancellation@naystrip.com",
@@ -22,6 +22,11 @@ export const defaultSiteSettings = {
 
 export function getSiteSettings() {
   return defaultSiteSettings;
+}
+
+export function whatsappHref(message = "") {
+  const number = getSiteSettings().whatsapp.replace(/\D/g, "");
+  return `https://wa.me/${number}${message ? `?text=${encodeURIComponent(message)}` : ""}`;
 }
 
 export async function saveSiteSettings(settings) {

@@ -11,6 +11,7 @@ import {
 import BrandLogo from "../components/branding/BrandLogo";
 import Seo from "../components/shared/Seo";
 import { LoadError, PageLoader } from "../components/shared/Loading";
+import { whatsappHref } from "../data/siteConfig";
 import {
   downloadProtectedDocument,
   getToken,
@@ -130,7 +131,7 @@ export default function CustomerDashboard() {
               <p className="text-sm text-slate-500">Balance due</p>
             </div>
             <a
-              href="https://wa.me/917710991126"
+              href={whatsappHref()}
               className="bg-[#173c34] p-5 text-white"
             >
               <Headphones className="text-orange-300" />

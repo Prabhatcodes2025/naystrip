@@ -13,6 +13,11 @@ export default function PortalAccess() {
   const [form, setForm] = useState({ email: "", password: "", name: "", businessName: "", phone: "" });
   const [state, setState] = useState({ loading: false, error: "", ok: "" });
   const Icon = agent ? Building2 : UserRound;
+  const requestedReturn = params.get("returnTo") || "";
+  const returnTo = requestedReturn.startsWith("/") && !requestedReturn.startsWith("//")
+    ? requestedReturn
+    : (agent ? "/b2b/dashboard" : "/account/dashboard");
+  const preserveReturn = requestedReturn ? `?returnTo=${encodeURIComponent(returnTo)}` : "";
 
   const update = (key) => (event) => setForm({ ...form, [key]: event.target.value });
   const submit = async (event) => {
@@ -27,7 +32,7 @@ export default function PortalAccess() {
       if (!response.ok) throw new Error(data.error || "Unable to continue");
       if (data.access_token) sessionStorage.setItem(`naystrip_${agent ? "agent" : "customer"}_session`, data.access_token);
       setState({ loading: false, error: "", ok: register ? "Check your email to confirm the account." : "Signed in securely." });
-      if (!register) navigate(params.get("returnTo") || (agent ? "/b2b/dashboard" : "/account/dashboard"));
+      if (!register) navigate(returnTo, { replace: true });
     } catch (error) { setState({ loading: false, error: error.message, ok: "" }); }
   };
 
@@ -35,13 +40,13 @@ export default function PortalAccess() {
     <Seo title={`${agent ? "B2B Partner" : "Customer"} ${register ? "Registration" : "Login"} | NaysTrip & Treks`} />
     <main className="grid min-h-[75vh] bg-[#fffaf2] lg:grid-cols-2">
       <section className="hidden bg-[#173c34] p-16 text-white lg:flex lg:flex-col lg:justify-end">
-        <BrandLogo animated className="mb-auto h-32 w-auto self-start" />
+        <Link to="/" aria-label="NaysTrip home" className="mb-auto self-start"><BrandLogo animated className="h-32 w-auto" /></Link>
         <Icon size={32} className="text-orange-300" />
         <h1 className="mt-6 max-w-lg font-display text-6xl">{agent ? "A working desk for travel partners." : "Your journeys, documents and payments in one place."}</h1>
         <p className="mt-5 max-w-md leading-7 text-white/65">{agent ? "Approved partners can access private rates, bookings, ledgers and marketing material." : "Access booking status, payment records and documents tied to your verified account."}</p>
       </section>
       <section className="grid place-items-center p-6 sm:p-12"><div className="w-full max-w-md">
-        <BrandLogo animated className="mb-8 h-24 w-auto lg:hidden" />
+        <Link to="/" aria-label="NaysTrip home" className="mb-8 inline-flex lg:hidden"><BrandLogo animated className="h-24 w-auto" /></Link>
         <p className="eyebrow">{agent ? "Partner portal" : "Customer portal"}</p>
         <h2 className="mt-3 font-display text-4xl text-[#173c34]">{register ? "Create your account" : "Welcome back"}</h2>
         <form onSubmit={submit} className="mt-8 space-y-4">
@@ -57,7 +62,7 @@ export default function PortalAccess() {
           <button disabled={state.loading} className="btn-primary w-full">{state.loading ? "Please wait…" : register ? "Create account" : "Sign in"}<ArrowRight size={16} /></button>
         </form>
         {!register && <Link className="mt-4 block text-sm font-bold text-orange-600" to={agent ? "/b2b/forgot-password" : "/account/forgot-password"}>Forgot password?</Link>}
-        <p className="mt-6 text-sm text-slate-500">{register ? "Already registered? " : "New here? "}<Link className="font-bold text-orange-600" to={agent ? (register ? "/b2b/login" : "/b2b/register") : (register ? "/account/login" : "/account/register")}>{register ? "Sign in" : "Create an account"}</Link></p>
+        <p className="mt-6 text-sm text-slate-500">{register ? "Already registered? " : "New here? "}<Link className="font-bold text-orange-600" to={`${agent ? (register ? "/b2b/login" : "/b2b/register") : (register ? "/account/login" : "/account/register")}${preserveReturn}`}>{register ? "Sign in" : "Create an account"}</Link></p>
         {agent && register && <p className="mt-4 text-xs leading-5 text-slate-500">Partner access is granted only after NaysTrip verifies your business details and documents.</p>}
       </div></section>
     </main>
