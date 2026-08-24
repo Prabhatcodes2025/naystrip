@@ -24,6 +24,8 @@ export function getSiteSettings() {
   return defaultSiteSettings;
 }
 
+export async function loadSiteSettings(){const response=await fetch("/api/settings",{headers:{Accept:"application/json"}});const data=await response.json();if(!response.ok)throw new Error(data.error||"Settings unavailable");return {...defaultSiteSettings,...data.settings,social:{...defaultSiteSettings.social,...(data.settings?.social||{})}}}
+
 export function whatsappHref(message = "") {
   const number = getSiteSettings().whatsapp.replace(/\D/g, "");
   return `https://wa.me/${number}${message ? `?text=${encodeURIComponent(message)}` : ""}`;

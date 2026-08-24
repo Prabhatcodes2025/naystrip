@@ -10,7 +10,7 @@ const pageContent = {
     title: "About Us",
     body: [
       "NaysTrip & Treks is a Mumbai and Navi Mumbai-based travel and adventure company specialising in group travel, tailor-made itineraries, mountain trekking, educational travel and corporate journeys.",
-      "We combine real, on-ground expertise with transparent pricing and genuine 24/7 support — whether you're booking a weekend escape or a two-week international holiday.",
+      "We combine practical, on-ground expertise with transparent pricing and dedicated support — whether you're booking a weekend escape or a longer international holiday.",
       "Every itinerary we create is reviewed by someone who has either travelled the route themselves or worked closely with verified local partners, so you always know exactly what to expect.",
     ],
   },
@@ -45,10 +45,14 @@ const pageContent = {
   faqs: {
     title: "Help & FAQs",
     body: [
-      "How do I book a trip? — Browse our packages or use the Custom Trip planner, then submit an inquiry. Our team will confirm details and share a payment link.",
-      "Can I customise a package? — Yes, nearly every itinerary can be adjusted for dates, hotel category, and add-on experiences.",
-      "What is your cancellation policy? — Cancellation terms vary by package and are shared clearly at the time of booking confirmation.",
-      "Do you assist with visas? — Yes, for applicable international packages our team guides you through the visa process.",
+      "How do I book a trip? — Browse a package or use the Custom Trip planner. After details and availability are confirmed, you receive a written quotation or secure checkout option.",
+      "Can I customise a package? — Yes. Dates, pace, stay category, transport and optional services can be adjusted before confirmation.",
+      "How much advance is required? — The exact advance is shown in your quotation or checkout before payment; it can vary by package and supplier terms.",
+      "How are payments confirmed? — A payment is confirmed only after server-side gateway verification. Your account then shows the booking and available documents.",
+      "What is your cancellation and refund process? — Use the registered account or email with your booking reference. Applicable charges follow the published policy and any stricter supplier terms disclosed before booking.",
+      "Which traveller documents are needed? — Requirements depend on the destination and service. The final itinerary or booking communication lists the documents needed for your trip.",
+      "Where can I get support? — Use the Contact page, call +91 8097132424, or use the WhatsApp control. Keep your enquiry or booking reference ready.",
+      "How do B2B partner accounts work? — Register with valid business details and PAN. Private partner access remains unavailable until an authorised admin approves the application.",
     ],
   },
   sitemap: {

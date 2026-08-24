@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Calendar, ArrowRight } from "lucide-react";
 import { blogs } from "../data/content";
-import { getAdminBlogs } from "../utils/storage";
+import { getPublicBlogs } from "../utils/storage";
 import { PageBanner } from "../components/shared/Bits";
 import Reveal from "../components/shared/Reveal";
 import Seo from "../components/shared/Seo";
@@ -11,11 +11,12 @@ import SmartImage from "../components/shared/SmartImage";
 export default function Blog() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
+  const [published,setPublished]=useState([]);
+  useEffect(()=>{getPublicBlogs().then(setPublished).catch(()=>setPublished([]))},[]);
 
   const allBlogs = useMemo(() => {
-    const published = getAdminBlogs().filter((b) => b.published !== false);
     return [...published, ...blogs];
-  }, []);
+  }, [published]);
 
   const categories = ["All", ...Array.from(new Set(allBlogs.map((b) => b.category)))];
 

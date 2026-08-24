@@ -21,12 +21,14 @@ const categoryChart = [
 
 export default function AdminDashboard() {
   const [leadState,setLeadState]=useState({custom:[],contact:[],loading:true,error:""});
+  const [contentState,setContentState]=useState({blogs:[],stories:[]});
   useEffect(()=>{let active=true;Promise.all([getCustomLeads(),getContactLeads()]).then(([custom,contact])=>{if(active)setLeadState({custom:Array.isArray(custom)?custom:[],contact:Array.isArray(contact)?contact:[],loading:false,error:""})}).catch((error)=>{if(active)setLeadState({custom:[],contact:[],loading:false,error:error.message||"Dashboard data could not be loaded"})});return()=>{active=false}},[]);
+  useEffect(()=>{let active=true;Promise.all([getAdminBlogs(),getAdminStories()]).then(([blogs,stories])=>{if(active)setContentState({blogs,stories})}).catch(()=>{});return()=>{active=false}},[]);
   const customLeads = leadState.custom;
   const contactLeads = leadState.contact;
-  const adminBlogs = getAdminBlogs();
+  const adminBlogs = contentState.blogs;
   const adminTours = getAdminTours();
-  const adminStories = getAdminStories();
+  const adminStories = contentState.stories;
 
   const stats = useMemo(() => {
     const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;

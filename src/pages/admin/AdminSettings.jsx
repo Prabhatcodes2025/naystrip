@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle2, Save } from "lucide-react";
-import { defaultSiteSettings, getSiteSettings, saveSiteSettings } from "../../data/siteConfig";
+import { defaultSiteSettings, getSiteSettings, loadSiteSettings, saveSiteSettings } from "../../data/siteConfig";
 import BrandLogo from "../../components/branding/BrandLogo";
 
 export default function AdminSettings() {
   const [form, setForm] = useState(getSiteSettings());
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  useEffect(()=>{loadSiteSettings().then(setForm).catch(()=>{})},[]);
 
   const update = (field, value) => setForm((f) => ({ ...f, [field]: value }));
   const updateSocial = (field, value) => setForm((f) => ({ ...f, social: { ...f.social, [field]: value } }));

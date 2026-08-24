@@ -22,17 +22,21 @@ export default async function handler(req, res) {
     website,
     captchaToken,
   } = req.body || {};
-  if (website !== "naystrip.com" || !["contact", "custom_trip"].includes(kind))
+  if (
+    website !== "naystrip.com" ||
+    !["contact", "custom_trip", "package_quote", "quick_quote"].includes(kind)
+  )
     return json(res, 400, { error: "Invalid request" });
   const captcha = await verifyCaptcha(
     captchaToken,
     req.headers["x-forwarded-for"],
   );
   if (!captcha.success) return json(res, 403, { error: captcha.error });
-  const name = clean(
+  const suppliedName = clean(
     payload.name || `${payload.firstName || ""} ${payload.lastName || ""}`,
     120,
   );
+  const name = suppliedName || (kind === "quick_quote" ? "Quick quote request" : "");
   const phoneNumber = clean(payload.phone, 24);
   const emailAddress = clean(payload.email, 160);
   if (

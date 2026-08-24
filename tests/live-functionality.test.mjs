@@ -58,10 +58,10 @@ test("booking CTA state requires real owner-controlled configuration",()=>{
   assert.equal(calculateBookingState({...base,price_from:null,policies:{booking_mode:"fixed_departure"}},[{status:"open",available_seats:5,price_override:14000}]).online,true);
 });
 
-test("catch-all router dispatches contact, custom-trip and package-customisation enquiries",async()=>{
+test("catch-all router dispatches separate contact, custom-trip, package and quick quote enquiries",async()=>{
   configureSupabase();process.env.NODE_ENV="production";delete process.env.TURNSTILE_SECRET_KEY;delete process.env.VITE_TURNSTILE_SITE_KEY;
   globalThis.fetch=async(url)=>String(url).includes("/inquiries")?jsonResponse([{id:"CTC-20260813-ROUTED1"}],201):jsonResponse([]);
-  for(const [kind,payload] of [["contact",{name:"Contact",phone:"9876543210"}],["custom_trip",{name:"Planner",phone:"9876543211"}],["contact",{name:"Package",phone:"9876543212",source:"Tour: Pune Nashik Shirdi Aurangabad"}]]){const res=response();await dispatch(leadRequest("leads",payload,kind),res);assert.equal(res.statusCode,201);assert.equal(jsonBody(res).id,"CTC-20260813-ROUTED1")}
+  for(const [kind,payload] of [["contact",{name:"Contact",phone:"9876543210"}],["custom_trip",{name:"Planner",phone:"9876543211"}],["package_quote",{name:"Package",phone:"9876543212",packageSlug:"pune-nashik-shirdi-aurangabad-4-days",packageDuration:"4 Days / 3 Nights"}],["quick_quote",{phone:"9876543213",destination:"Goa",travelDate:"2026-12-10",guests:"2"}]]){const res=response();await dispatch(leadRequest("leads",payload,kind),res);assert.equal(res.statusCode,201);assert.equal(jsonBody(res).id,"CTC-20260813-ROUTED1")}
 });
 
 test("production origin allowlist includes the live domain and configured canonical origin",()=>{

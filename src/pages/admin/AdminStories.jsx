@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, X } from "lucide-react";
 import { testimonials as staticStories } from "../../data/content";
 import { getAdminStories, saveAdminStory, deleteAdminStory } from "../../utils/storage";
@@ -13,22 +13,22 @@ const emptyStory = {
 };
 
 export default function AdminStories() {
-  const [adminStories, setAdminStories] = useState(getAdminStories());
+  const [adminStories, setAdminStories] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(emptyStory);
+  const [error,setError]=useState("");
 
-  const refresh = () => setAdminStories(getAdminStories());
+  const refresh = async () => {try{setAdminStories(await getAdminStories());setError("")}catch(err){setError(err.message)}};
+  useEffect(()=>{refresh()},[]);
   const openAdd = () => { setForm(emptyStory); setEditing(null); setModalOpen(true); };
   const openEdit = (s) => { setForm(s); setEditing(s.id); setModalOpen(true); };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    saveAdminStory(editing ? { ...form, id: editing } : form);
-    refresh();
-    setModalOpen(false);
+    try{await saveAdminStory(editing ? { ...form, id: editing } : form);await refresh();setModalOpen(false)}catch(err){setError(err.message)}
   };
-  const handleDelete = (id) => { if (confirm("Delete this story?")) { deleteAdminStory(id); refresh(); } };
+  const handleDelete = async (id) => { if (confirm("Delete this story?")) { try{await deleteAdminStory(id);await refresh()}catch(err){setError(err.message)} } };
 
   const allStories = [
     ...adminStories.map((s) => ({ ...s, isAdmin: true })),
@@ -46,6 +46,7 @@ export default function AdminStories() {
           <Plus size={14} /> Add Story
         </button>
       </div>
+      {error&&<p role="alert" className="mb-5 rounded-xl bg-rose-50 p-3 text-sm text-rose-700">{error}</p>}
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {allStories.map((s) => (

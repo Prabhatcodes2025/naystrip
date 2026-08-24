@@ -1,4 +1,6 @@
 import adminBookings from "./admin/bookings.js";
+import adminContent from "./admin/content.js";
+import adminCustomers from "./admin/customers.js";
 import adminAgents from "./admin/agents.js";
 import adminDepartures from "./admin/departures.js";
 import adminLeads from "./admin/leads.js";
@@ -19,11 +21,13 @@ import bookingOptions from "./bookings/options.js";
 import bookingPreview from "./bookings/preview.js";
 import bookingVerify from "./bookings/verify.js";
 import cronReminders from "./cron/reminders.js";
+import content from "./content.js";
 import publicConfig from "./config.js";
 import departures from "./departures.js";
 import documentBooking from "./documents/booking.js";
 import documentItinerary from "./documents/itinerary.js";
 import documentQuotation from "./documents/quotation.js";
+import documentServiceVoucher from "./documents/service-voucher.js";
 import leads from "./leads.js";
 import paymentCreateOrder from "./payments/create-order.js";
 import paymentVerify from "./payments/verify.js";
@@ -38,6 +42,8 @@ import settings from "./settings.js";
 export const routes = new Map([
   ["admin/agents", adminAgents],
   ["admin/bookings", adminBookings],
+  ["admin/content", adminContent],
+  ["admin/customers", adminCustomers],
   ["admin/departures", adminDepartures],
   ["admin/leads", adminLeads],
   ["admin/notifications", adminNotifications],
@@ -59,10 +65,12 @@ export const routes = new Map([
   ["bookings/verify", bookingVerify],
   ["cron/reminders", cronReminders],
   ["config", publicConfig],
+  ["content", content],
   ["departures", departures],
   ["documents/booking", documentBooking],
   ["documents/itinerary", documentItinerary],
   ["documents/quotation", documentQuotation],
+  ["documents/service-voucher", documentServiceVoucher],
   ["leads", leads],
   ["payments/create-order", paymentCreateOrder],
   ["payments/verify", paymentVerify],

@@ -94,7 +94,7 @@ export default function AdminQuotations() {
         method: "POST",
         body: JSON.stringify(form),
       });
-      setMessage(`Created ${quotation.reference}`);
+      setMessage(`Draft ${quotation.reference} created successfully. It now appears in the quotation list below, where you can download its PDF or copy the secure share link.`);
       setForm(empty);
       await load();
     } catch (error) {

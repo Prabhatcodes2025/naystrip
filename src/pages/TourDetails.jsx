@@ -20,7 +20,7 @@ import Seo from "../components/shared/Seo";
 import SmartImage from "../components/shared/SmartImage";
 import { PageLoader } from "../components/shared/Loading";
 import { cancellationSlabs, getTourBySlug } from "../data/tours";
-import { saveContactLead } from "../utils/storage";
+import { savePackageLead } from "../utils/storage";
 import { whatsappHref } from "../data/siteConfig";
 
 const fromPackage=(pkg)=>({
@@ -49,6 +49,7 @@ export default function TourDetails({ shareable = false }) {
   const [state, setState] = useState({ status: "idle", message: "" });
   useEffect(()=>{
     const supplied=getTourBySlug(slug);
+    setTour(supplied || null);setOpen(1);setAllOpen(false);setCustomising(false);setState({status:"idle",message:""});setForm({name:"",phone:"",email:"",message:""});
     if(supplied){setTour(supplied);setCatalogueLoading(false);return undefined}
     let active=true;setCatalogueLoading(true);
     fetch(`/api/packages?slug=${encodeURIComponent(slug)}`,{headers:{Accept:"application/json"}}).then((response)=>response.ok?response.json():Promise.reject(new Error("Package not found"))).then((data)=>{if(active)setTour(fromPackage(data.package))}).catch(()=>{if(active)setTour(null)}).finally(()=>{if(active)setCatalogueLoading(false)});
@@ -72,7 +73,7 @@ export default function TourDetails({ shareable = false }) {
         setBookingInfo(null);
       });
   }, [slug]);
-  if(catalogueLoading)return <PageLoader label="Loading trip details…"/>;
+  if(catalogueLoading || tour?.slug !== slug)return <PageLoader label="Loading trip details…"/>;
   if (!tour)
     return (
       <main className="container-lg py-28">
@@ -86,12 +87,16 @@ export default function TourDetails({ shareable = false }) {
     e.preventDefault();
     setState({ status: "loading", message: "" });
     try {
-      const entry = await saveContactLead({
+      const entry = await savePackageLead({
         ...form,
         destination: tour.title,
-        source: `Tour: ${tour.title}`,
+        packageTitle: tour.title,
+        packageSlug: tour.slug,
+        packageDuration: tour.duration,
+        packageDestinations: tour.destinations,
+        source: `Package quote: ${tour.title}`,
       });
-      setState({ status: "success", message: `Reference ${entry.id}` });
+      setState({ status: "success", message: `Reference ID: ${entry.id}` });
     } catch (err) {
       setState({
         status: "error",
@@ -102,18 +107,10 @@ export default function TourDetails({ shareable = false }) {
     }
   };
   const wa = whatsappHref(`Hi NaysTrip, I would like a quote for ${tour.title} (${tour.duration}).`);
-  const share = async () => {
-    const data = {
-      title: tour.title,
-      text: `${tour.title} — ${tour.duration}`,
-      url: window.location.href,
-    };
-    if (navigator.share) await navigator.share(data);
-    else {
-      await navigator.clipboard.writeText(window.location.href);
-      setState({ status: "idle", message: "Link copied" });
-    }
-  };
+  const itineraryPath=`/api/documents/itinerary?slug=${encodeURIComponent(tour.slug)}`;
+  const itineraryUrl=`${window.location.origin}${itineraryPath}`;
+  const copyItinerary=async()=>{await navigator.clipboard.writeText(itineraryUrl);setState({status:"idle",message:"PDF link copied"})};
+  const itineraryWhatsApp=whatsappHref(`Here is the NaysTrip itinerary PDF for ${tour.title} (${tour.duration}): ${itineraryUrl}`);
   return (
     <>
       <Seo
@@ -210,14 +207,15 @@ export default function TourDetails({ shareable = false }) {
                 <Printer size={16} /> Print
               </button>
               <a
-                href={`/api/documents/itinerary?slug=${encodeURIComponent(tour.slug)}`}
+                href={itineraryPath}
                 className="btn-secondary"
               >
                 <Download size={16} /> Download PDF
               </a>
-              <button onClick={share} className="btn-secondary">
-                <Share2 size={16} /> Share
+              <button onClick={copyItinerary} className="btn-secondary">
+                <Share2 size={16} /> Copy PDF link
               </button>
+              <a href={itineraryWhatsApp} target="_blank" rel="noopener noreferrer" className="btn-secondary"><MessageCircle size={16}/> Share PDF on WhatsApp</a>
               <button
                 onClick={() => setCustomising(true)}
                 className="btn-primary"

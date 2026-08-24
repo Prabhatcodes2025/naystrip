@@ -21,7 +21,7 @@ const serviceOptions = [
 ];
 
 const initialState = {
-  from: "", to: "", departureDate: "", flexibleDates: false, nights: "3", adults: "2", minors: "0", rooms: "1",
+  from: "", to: "", departureDate: "", flexibleDates: false, nights: "3", adults: "2", minors: "0", childAges: [], rooms: "1",
   tripType: "Adventure", budget: "50000-100000", hotelCategory: "3-star", mealPlan: "Breakfast", transportPreference: "Private car",
   firstName: "", lastName: "", phone: "", email: "", details: "", packageSlug: "", consent: false, whatsappConsent: true,
   services: {},
@@ -34,10 +34,12 @@ export default function CustomTrip() {
   const [errors, setErrors] = useState({});
   const [result, setResult] = useState(null);
 
-  useEffect(()=>{const slug=params.get("package");const tour=slug&&getTourBySlug(slug);if(tour)setData((current)=>({...current,to:current.to||tour.destinations.join(", "),nights:String(Math.max(1,tour.itinerary.length-1)),packageSlug:slug,details:current.details||`Please customise the ${tour.title} itinerary.`}))},[params]);
+  useEffect(()=>{const slug=params.get("package");const service=params.get("service");const tour=slug&&getTourBySlug(slug);setData((current)=>{if(tour){const changed=current.packageSlug!==slug;return {...current,to:changed?tour.destinations.join(", "):current.to||tour.destinations.join(", "),nights:changed?String(Math.max(1,tour.itinerary.length-1)):current.nights,packageSlug:slug,details:changed?`Please customise the ${tour.title} itinerary.`:current.details||`Please customise the ${tour.title} itinerary.`}}if(serviceOptions.some((item)=>item.key===service))return {...current,services:{...current.services,[service]:true},details:current.details||`I need help with ${serviceOptions.find((item)=>item.key===service).label}.`};return current})},[params]);
   useEffect(()=>{sessionStorage.setItem("naystrip_trip_draft",JSON.stringify(data))},[data]);
 
   const update = (field, value) => setData((d) => ({ ...d, [field]: value }));
+  const updateChildren=(value)=>setData((current)=>{const count=Math.max(0,Math.min(10,Number(value)||0));return {...current,minors:String(count),childAges:Array.from({length:count},(_,index)=>current.childAges?.[index]??"")}});
+  const updateChildAge=(index,value)=>setData((current)=>({...current,childAges:current.childAges.map((age,itemIndex)=>itemIndex===index?value:age)}));
   const toggleService = (key) => setData((d) => ({ ...d, services: { ...d.services, [key]: !d.services[key] } }));
 
   const validateStep = (s) => {
@@ -54,6 +56,7 @@ export default function CustomTrip() {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) e.email = "Enter a valid email";
       if (!data.consent) e.consent = "Please accept to continue";
     }
+    if(s===2&&Number(data.minors)>0&&data.childAges.some((age)=>age===""||Number(age)<0||Number(age)>17))e.childAges="Enter an age from 0 to 17 for every child";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -77,10 +80,10 @@ export default function CustomTrip() {
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-forest-50 text-forest-600 mb-6">
               <CheckCircle2 size={40} />
             </div>
-            <h1 className="font-display text-3xl font-semibold text-navy-900">Your Trip Request is In!</h1>
-            <p className="text-navy-500 mt-3">Our travel experts will reach out with a customised itinerary within 24 hours.</p>
+            <h1 className="font-display text-3xl font-semibold text-navy-900">Request received</h1>
+            <p className="text-navy-500 mt-3">Your detailed trip request has been saved for our travel team.</p>
             <div className="mt-6 inline-block rounded-xl bg-navy-50 px-6 py-4">
-              <p className="text-xs text-navy-400">Your Inquiry Number</p>
+              <p className="text-xs text-navy-400">Reference ID</p>
               <p className="font-display text-xl font-bold text-navy-900">{result}</p>
             </div>
             <div className="mt-8">
@@ -171,8 +174,8 @@ export default function CustomTrip() {
                     <input type="number" min="1" value={data.adults} onChange={(e) => update("adults", e.target.value)} className="input-field" />
                   </div>
                   <div>
-                    <label className="label-field"><Baby size={14} className="inline mr-1.5 -mt-0.5" />Minors</label>
-                    <input type="number" min="0" value={data.minors} onChange={(e) => update("minors", e.target.value)} className="input-field" />
+                    <label className="label-field"><Baby size={14} className="inline mr-1.5 -mt-0.5" />Children</label>
+                    <input type="number" min="0" max="10" value={data.minors} onChange={(e) => updateChildren(e.target.value)} className="input-field" />
                   </div>
                   <div>
                     <label className="label-field"><Compass size={14} className="inline mr-1.5 -mt-0.5" />Trip Type</label>
@@ -182,6 +185,7 @@ export default function CustomTrip() {
                   </div>
                   <div><label className="label-field">Rooms</label><input type="number" min="1" max="20" value={data.rooms} onChange={(e)=>update("rooms",e.target.value)} className="input-field"/></div>
                 </div>
+                {Number(data.minors)>0&&<div><p className="label-field">Age of each child</p><div className="grid gap-3 sm:grid-cols-3">{data.childAges.map((age,index)=><label key={index}><span className="text-xs text-navy-500">Child {index+1}</span><input required type="number" min="0" max="17" value={age} onChange={(e)=>updateChildAge(index,e.target.value)} className="input-field mt-1"/></label>)}</div>{errors.childAges&&<p className="mt-2 text-xs text-terracotta-500">{errors.childAges}</p>}</div>}
                 <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <label className="label-field"><Wallet size={14} className="inline mr-1.5 -mt-0.5" />Budget (per person)</label>

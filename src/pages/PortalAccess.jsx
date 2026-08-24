@@ -10,7 +10,7 @@ export default function PortalAccess() {
   const [params] = useSearchParams();
   const agent = pathname.startsWith("/b2b");
   const register = pathname.endsWith("/register");
-  const [form, setForm] = useState({ email: "", password: "", name: "", businessName: "", phone: "" });
+  const [form, setForm] = useState({ email: "", password: "", name: "", businessName: "", pan: "", phone: "" });
   const [state, setState] = useState({ loading: false, error: "", ok: "" });
   const Icon = agent ? Building2 : UserRound;
   const requestedReturn = params.get("returnTo") || "";
@@ -52,7 +52,7 @@ export default function PortalAccess() {
         <form onSubmit={submit} className="mt-8 space-y-4">
           {register && <>
             <label className="block"><span className="label-field">{agent ? "Contact person" : "Full name"}</span><input required value={form.name} onChange={update("name")} className="input-field" /></label>
-            {agent && <label className="block"><span className="label-field">Business name</span><input required value={form.businessName} onChange={update("businessName")} className="input-field" /></label>}
+            {agent && <><label className="block"><span className="label-field">Business name</span><input required value={form.businessName} onChange={update("businessName")} className="input-field" /></label><label className="block"><span className="label-field">PAN</span><input required maxLength="10" pattern="[A-Za-z]{5}[0-9]{4}[A-Za-z]" title="Use the format AAAAA9999A" value={form.pan} onChange={(event)=>setForm({...form,pan:event.target.value.toUpperCase()})} className="input-field uppercase" placeholder="AAAAA9999A" /></label></>}
             <label className="block"><span className="label-field">Phone</span><input required inputMode="tel" value={form.phone} onChange={update("phone")} className="input-field" /></label>
           </>}
           <label className="block"><span className="label-field">Email</span><input type="email" required value={form.email} onChange={update("email")} className="input-field" /></label>

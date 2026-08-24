@@ -3,7 +3,8 @@ function inquiryId(prefix) {
   return `${prefix}-${new Date().toISOString().slice(0, 10).replaceAll("-", "")}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
 }
 async function postLead(kind, payload) {
-  const localId = inquiryId(kind === "custom_trip" ? "TRIP" : "CTC");
+  const prefixes = { custom_trip: "TRIP", package_quote: "PKG", quick_quote: "QTE", contact: "CTC" };
+  const localId = inquiryId(prefixes[kind] || "LEAD");
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), API_TIMEOUT);
   try {
@@ -88,6 +89,8 @@ async function turnstileToken() {
 }
 export const saveCustomLead = (lead) => postLead("custom_trip", lead);
 export const saveContactLead = (lead) => postLead("contact", lead);
+export const savePackageLead = (lead) => postLead("package_quote", lead);
+export const saveQuickLead = (lead) => postLead("quick_quote", lead);
 
 const AUTH_KEY = "naystrip_admin_session";
 export function isAdminLoggedIn() {
@@ -133,6 +136,10 @@ export const getContactLeads = async () => {
   const data = await adminRequest("/api/admin/leads?kind=contact");
   return data.leads;
 };
+export const getPackageLeads = async () => {
+  const data = await adminRequest("/api/admin/leads?kind=package_quote");
+  return data.leads;
+};
 export const updateCustomLeadStatus = (
   id,
   status,
@@ -148,18 +155,16 @@ export const deleteCustomLead = (id) =>
 export const updateContactLeadStatus = updateCustomLeadStatus;
 export const deleteContactLead = deleteCustomLead;
 export const getAdminTours = () => [];
-export const getAdminBlogs = () => [];
-export const getAdminStories = () => [];
+export const getAdminBlogs = async () => (await adminRequest("/api/admin/content?resource=blogs")).items;
+export const getAdminStories = async () => (await adminRequest("/api/admin/content?resource=stories")).items;
 export const saveAdminTour = () => {
   throw new Error("Connect the admin data service");
 };
 export const deleteAdminTour = () => {};
-export const saveAdminBlog = () => {
-  throw new Error("Connect the admin data service");
-};
-export const deleteAdminBlog = () => {};
-export const saveAdminStory = () => {
-  throw new Error("Connect the admin data service");
-};
-export const deleteAdminStory = () => {};
+export const saveAdminBlog = (item) => adminRequest("/api/admin/content?resource=blogs",{method:item.id?"PATCH":"POST",body:JSON.stringify({resource:"blogs",item})});
+export const deleteAdminBlog = (id) => adminRequest(`/api/admin/content?resource=blogs&id=${encodeURIComponent(id)}`,{method:"DELETE"});
+export const saveAdminStory = (item) => adminRequest("/api/admin/content?resource=stories",{method:item.id?"PATCH":"POST",body:JSON.stringify({resource:"stories",item})});
+export const deleteAdminStory = (id) => adminRequest(`/api/admin/content?resource=stories&id=${encodeURIComponent(id)}`,{method:"DELETE"});
+export const getPublicBlogs = async () => {const response=await fetch("/api/content?resource=blogs");const data=await response.json();if(!response.ok)throw new Error(data.error);return data.blogs||[]};
+export const getPublicStories = async () => {const response=await fetch("/api/content?resource=stories");const data=await response.json();if(!response.ok)throw new Error(data.error);return data.stories||[]};
 export const KEYS = {};

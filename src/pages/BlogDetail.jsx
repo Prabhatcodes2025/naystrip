@@ -3,18 +3,23 @@ import { Calendar, Facebook, Twitter, Linkedin, Link2 } from "lucide-react";
 import { blogs, getBlogBySlug } from "../data/content";
 import { getDestinationBySlug } from "../data/destinations";
 import { tours } from "../data/tours";
-import { getAdminBlogs } from "../utils/storage";
+import { getPublicBlogs } from "../utils/storage";
 import { PageBanner, SectionHeading } from "../components/shared/Bits";
 import Reveal from "../components/shared/Reveal";
 import Seo from "../components/shared/Seo";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { PageLoader } from "../components/shared/Loading";
 
 export default function BlogDetail() {
   const { slug } = useParams();
   const [copied, setCopied] = useState(false);
-  const adminBlog = getAdminBlogs().find((b) => b.id === slug);
+  const [publicBlogs,setPublicBlogs]=useState([]);
+  const [loading,setLoading]=useState(true);
+  useEffect(()=>{getPublicBlogs().then(setPublicBlogs).catch(()=>setPublicBlogs([])).finally(()=>setLoading(false))},[]);
+  const adminBlog = publicBlogs.find((b) => b.slug === slug || b.id === slug);
   const blog = adminBlog || getBlogBySlug(slug);
 
+  if (loading&&!blog) return <PageLoader label="Loading article…"/>;
   if (!blog) return <Navigate to="/blog" replace />;
 
   const destination = blog.relatedDestination ? getDestinationBySlug(blog.relatedDestination) : null;

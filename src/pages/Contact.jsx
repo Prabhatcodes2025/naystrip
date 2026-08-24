@@ -34,7 +34,7 @@ export default function Contact() {
       <PageBanner
         eyebrow="We'd Love to Hear From You"
         title="Contact Us"
-        subtitle="Questions, custom requests or just starting to plan — our team responds within 24 hours."
+        subtitle="Questions, custom requests or just starting to plan — send the team the details you have."
         image="https://images.unsplash.com/photo-1521295121783-8a321d551ad2?auto=format&fit=crop&w=1600&q=80"
       />
 
@@ -79,8 +79,8 @@ export default function Contact() {
               {result ? (
                 <div className="text-center py-10">
                   <CheckCircle2 size={40} className="mx-auto text-forest-600 mb-4" />
-                  <h3 className="font-display text-2xl font-semibold text-navy-900">Message Sent!</h3>
-                  <p className="text-navy-500 mt-2">We'll get back to you within 24 hours.</p>
+                  <h3 className="font-display text-2xl font-semibold text-navy-900">Request received</h3>
+                  <p className="text-navy-500 mt-2">Your contact enquiry has been saved for our team.</p>
                   <div className="mt-5 inline-block rounded-xl bg-navy-50 px-6 py-3">
                     <p className="text-xs text-navy-400">Reference ID</p>
                     <p className="font-display font-bold text-navy-900">{result}</p>

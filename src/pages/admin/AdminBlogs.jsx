@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, X, Search } from "lucide-react";
 import { blogs as staticBlogs } from "../../data/content";
 import { getAdminBlogs, saveAdminBlog, deleteAdminBlog } from "../../utils/storage";
@@ -6,29 +6,29 @@ import MediaUploader from "../../components/admin/MediaUploader";
 import SmartImage from "../../components/shared/SmartImage";
 
 const emptyBlog = {
-  title: "", category: "Travel Guides", description: "", content: "",
+  title: "", slug: "", category: "Travel Guides", description: "", content: "", seoTitle:"", seoDescription:"",
   image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80",
   published: true,
 };
 
 export default function AdminBlogs() {
-  const [adminBlogs, setAdminBlogs] = useState(getAdminBlogs());
+  const [adminBlogs, setAdminBlogs] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(emptyBlog);
   const [search, setSearch] = useState("");
+  const [error,setError]=useState("");
 
-  const refresh = () => setAdminBlogs(getAdminBlogs());
+  const refresh = async () => {try{setAdminBlogs(await getAdminBlogs());setError("")}catch(err){setError(err.message)}};
+  useEffect(()=>{refresh()},[]);
   const openAdd = () => { setForm(emptyBlog); setEditing(null); setModalOpen(true); };
   const openEdit = (b) => { setForm(b); setEditing(b.id); setModalOpen(true); };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    saveAdminBlog(editing ? { ...form, id: editing } : form);
-    refresh();
-    setModalOpen(false);
+    try{await saveAdminBlog(editing ? { ...form, id: editing } : form);await refresh();setModalOpen(false)}catch(err){setError(err.message)}
   };
-  const handleDelete = (id) => { if (confirm("Delete this blog post?")) { deleteAdminBlog(id); refresh(); } };
+  const handleDelete = async (id) => { if (confirm("Delete this blog post?")) { try{await deleteAdminBlog(id);await refresh()}catch(err){setError(err.message)} } };
 
   const allBlogs = [
     ...adminBlogs.map((b) => ({ ...b, isAdmin: true })),
@@ -46,6 +46,7 @@ export default function AdminBlogs() {
           <Plus size={14} /> Add Blog
         </button>
       </div>
+      {error&&<p role="alert" className="mb-5 rounded-xl bg-rose-50 p-3 text-sm text-rose-700">{error}</p>}
 
       <div className="relative max-w-xs mb-5">
         <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-navy-400" />
@@ -85,6 +86,7 @@ export default function AdminBlogs() {
             </div>
             <form onSubmit={handleSave} className="space-y-4">
               <div><label className="label-field">Title</label><input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="input-field" /></div>
+              <div><label className="label-field">Slug</label><input value={form.slug||""} onChange={(e)=>setForm({...form,slug:e.target.value})} placeholder="Generated from title when blank" className="input-field"/></div>
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className="label-field">Category</label>
@@ -96,6 +98,7 @@ export default function AdminBlogs() {
               </div>
               <div><label className="label-field">Short Description</label><textarea rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value, excerpt: e.target.value })} className="input-field resize-none" /></div>
               <div><label className="label-field">Full Content</label><textarea rows={6} value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} className="input-field resize-none" /></div>
+              <div className="grid gap-4 sm:grid-cols-2"><div><label className="label-field">SEO title</label><input value={form.seoTitle||""} onChange={(e)=>setForm({...form,seoTitle:e.target.value})} className="input-field"/></div><div><label className="label-field">SEO description</label><textarea rows="2" value={form.seoDescription||""} onChange={(e)=>setForm({...form,seoDescription:e.target.value})} className="input-field"/></div></div>
               <label className="flex items-center gap-2 text-sm text-navy-600"><input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} className="accent-terracotta-500" /> Published</label>
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={() => setModalOpen(false)} className="btn-secondary">Cancel</button>

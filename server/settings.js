@@ -1,5 +1,6 @@
 import {json,supabaseRequest} from "./_shared.js";
 export default async function handler(req,res){
+ if(req.method==="GET"){try{const response=await supabaseRequest("website_settings?id=eq.true&select=data&limit=1");const rows=await response.json();if(!response.ok)return json(res,502,{error:"Settings unavailable"});return json(res,200,{settings:rows[0]?.data||{}})}catch{return json(res,200,{settings:{}})}}
  if(req.method!=="POST")return json(res,405,{error:"Method not allowed"});
  const token=String(req.headers.authorization||"").replace(/^Bearer\s+/i,"");
  if(!token||!process.env.SUPABASE_URL||!process.env.SUPABASE_ANON_KEY)return json(res,401,{error:"Authentication required"});

@@ -6,7 +6,7 @@ import { PageBanner, PriceTag } from "../components/shared/Bits";
 import Reveal from "../components/shared/Reveal";
 import Seo from "../components/shared/Seo";
 import SmartImage from "../components/shared/SmartImage";
-import { saveContactLead } from "../utils/storage";
+import { savePackageLead } from "../utils/storage";
 import { whatsappHref } from "../data/siteConfig";
 
 const stats = (t) => [
@@ -29,7 +29,7 @@ export default function TrekDetail() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.phone) return;
-    const entry = await saveContactLead({ ...form, destination: trek.name, source: `${trek.category}: ${trek.name}` });
+    const entry = await savePackageLead({ ...form, destination: trek.name, packageTitle:trek.name,packageSlug:trek.slug,packageDuration:trek.duration, source: `${trek.category} quote: ${trek.name}` });
     setSubmitted(entry.id);
     setForm({ name: "", phone: "", email: "" });
   };
