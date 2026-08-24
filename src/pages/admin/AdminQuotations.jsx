@@ -33,8 +33,14 @@ const request = async (path, options = {}) => {
       "Content-Type": "application/json",
     },
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error);
+  const text = await response.text();
+  let data = {};
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    data = {};
+  }
+  if (!response.ok) throw new Error(data.error || `Quotation request failed (HTTP ${response.status})`);
   return data;
 };
 const downloadQuotation = async (quote) => {
@@ -59,6 +65,7 @@ export default function AdminQuotations() {
   const [quotes, setQuotes] = useState([]);
   const [message, setMessage] = useState("");
   const [editingId, setEditingId] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const load = async () => {
     try {
       setQuotes((await request("/api/admin/quotations")).quotations || []);
@@ -90,6 +97,8 @@ export default function AdminQuotations() {
     });
   const submit = async (event) => {
     event.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
     try {
       const { quotation } = await request("/api/admin/quotations", {
         method: editingId ? "PATCH" : "POST",
@@ -100,9 +109,13 @@ export default function AdminQuotations() {
         : `Draft ${quotation.reference} created successfully. It now appears in the quotation list below, where you can download its PDF or copy the secure share link.`);
       setForm(empty);
       setEditingId("");
-      await load();
+      setQuotes((current) => editingId
+        ? current.map((item) => item.id === quotation.id ? quotation : item)
+        : [quotation, ...current.filter((item) => item.id !== quotation.id)]);
     } catch (error) {
       setMessage(error.message);
+    } finally {
+      setSubmitting(false);
     }
   };
   const action = async (id, kind, status) => {
@@ -344,7 +357,9 @@ export default function AdminQuotations() {
                 Cancel edit
               </button>
             )}
-            <button className="btn-primary">{editingId ? "Update draft" : "Create draft"}</button>
+            <button disabled={submitting} className="btn-primary disabled:cursor-not-allowed disabled:opacity-60">
+              {submitting ? "Saving draft…" : editingId ? "Update draft" : "Create draft"}
+            </button>
           </div>
         </div>
       </form>
