@@ -50,6 +50,7 @@ const AdminNotifications = lazy(() => import("./pages/admin/AdminNotifications")
 const AdminAgents = lazy(() => import("./pages/admin/AdminAgents"));
 const AdminCustomers = lazy(() => import("./pages/admin/AdminCustomers"));
 const AdminVouchers = lazy(() => import("./pages/admin/AdminVouchers"));
+const AdminSubscribers = lazy(() => import("./pages/admin/AdminSubscribers"));
 
 function BootComplete({ onReady }) {
   useEffect(() => onReady(), [onReady]);
@@ -129,6 +130,7 @@ export default function App() {
         <Route path="agents" element={<AdminAgents />} />
         <Route path="customers" element={<AdminCustomers />} />
         <Route path="vouchers" element={<AdminVouchers />} />
+        <Route path="subscribers" element={<AdminSubscribers />} />
         <Route path="blogs" element={<AdminBlogs />} />
         <Route path="stories" element={<AdminStories />} />
         <Route path="settings" element={<AdminSettings />} />

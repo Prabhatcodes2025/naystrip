@@ -1,0 +1,3 @@
+import {requireAdmin} from "../_admin.js";
+import {json,supabaseRequest} from "../_shared.js";
+export default async function handler(req,res){const admin=await requireAdmin(req,res);if(!admin)return;if(req.method!=="GET")return json(res,405,{error:"Method not allowed"});try{const response=await supabaseRequest("newsletter_subscribers?select=*&order=created_at.desc&limit=1000");if(!response.ok)return json(res,502,{error:"Unable to load subscribers"});return json(res,200,{subscribers:await response.json()})}catch(error){console.error("admin_subscribers_failed",error);return json(res,500,{error:"Subscriber service unavailable"})}}

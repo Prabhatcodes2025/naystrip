@@ -18,6 +18,16 @@ alter table public.testimonials enable row level security;
 drop policy if exists "published testimonials are public" on public.testimonials;
 create policy "published testimonials are public" on public.testimonials for select using(status='published');
 
+create table if not exists public.newsletter_subscribers(
+  id uuid primary key default gen_random_uuid(),
+  email text unique not null,
+  source text not null default 'website',
+  status text not null default 'subscribed' check(status in ('subscribed','unsubscribed')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+alter table public.newsletter_subscribers enable row level security;
+
 create or replace function public.handle_naystrip_auth_user() returns trigger language plpgsql security definer set search_path=public as $$
 begin
  if coalesce(new.raw_user_meta_data->>'portal','customer')='agent' then

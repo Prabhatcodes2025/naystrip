@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Copy, Download, Plus, Trash2 } from "lucide-react";
+import { Copy, Download, Eye, Pencil, Plus, Trash2 } from "lucide-react";
 const empty = {
   customerName: "",
   customerEmail: "",
@@ -58,6 +58,7 @@ export default function AdminQuotations() {
   const [form, setForm] = useState(empty);
   const [quotes, setQuotes] = useState([]);
   const [message, setMessage] = useState("");
+  const [editingId, setEditingId] = useState("");
   const load = async () => {
     try {
       setQuotes((await request("/api/admin/quotations")).quotations || []);
@@ -91,11 +92,14 @@ export default function AdminQuotations() {
     event.preventDefault();
     try {
       const { quotation } = await request("/api/admin/quotations", {
-        method: "POST",
-        body: JSON.stringify(form),
+        method: editingId ? "PATCH" : "POST",
+        body: JSON.stringify({ ...form, id: editingId || undefined }),
       });
-      setMessage(`Draft ${quotation.reference} created successfully. It now appears in the quotation list below, where you can download its PDF or copy the secure share link.`);
+      setMessage(editingId
+        ? `Draft ${quotation.reference} updated successfully.`
+        : `Draft ${quotation.reference} created successfully. It now appears in the quotation list below, where you can download its PDF or copy the secure share link.`);
       setForm(empty);
+      setEditingId("");
       await load();
     } catch (error) {
       setMessage(error.message);
@@ -107,7 +111,10 @@ export default function AdminQuotations() {
         method: "POST",
         body: JSON.stringify({ id, action: kind, status }),
       });
-      if (data.url) {
+      if (data.url && kind === "preview") {
+        window.open(data.url, "_blank", "noopener,noreferrer");
+        setMessage("Secure quotation preview opened in a new tab");
+      } else if (data.url) {
         await navigator.clipboard.writeText(data.url);
         setMessage("Secure quotation link copied");
       } else if (data.reference)
@@ -116,6 +123,34 @@ export default function AdminQuotations() {
     } catch (error) {
       setMessage(error.message);
     }
+  };
+  const editQuote = (quote) => {
+    const taxable = Math.max(0, Number(quote.subtotal || 0) - Number(quote.discount || 0));
+    setForm({
+      customerName: quote.customer_name || "",
+      customerEmail: quote.customer_email || "",
+      customerPhone: quote.customer_phone || "",
+      inquiryId: quote.inquiry_id || "",
+      title: quote.title || "",
+      destination: quote.destination || "",
+      travelStart: quote.travel_start || "",
+      travelEnd: quote.travel_end || "",
+      travellerCount: quote.traveller_count || 1,
+      validUntil: quote.valid_until || "",
+      advanceRequired: quote.advance_required || 0,
+      discount: quote.discount || 0,
+      taxPercent: taxable ? (Number(quote.tax || 0) / taxable) * 100 : 0,
+      terms: quote.terms || "",
+      notes: quote.notes || "",
+      lines: (quote.lines || []).map((line) => ({
+        description: line.description,
+        quantity: line.quantity,
+        unitPrice: line.unit_price,
+      })),
+    });
+    setEditingId(quote.id);
+    setMessage(`Editing ${quote.reference}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
   return (
     <div>
@@ -295,7 +330,22 @@ export default function AdminQuotations() {
           <p className="font-display text-2xl">
             Total INR {total.toLocaleString("en-IN")}
           </p>
-          <button className="btn-primary">Create draft</button>
+          <div className="flex gap-2">
+            {editingId && (
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => {
+                  setEditingId("");
+                  setForm(empty);
+                  setMessage("");
+                }}
+              >
+                Cancel edit
+              </button>
+            )}
+            <button className="btn-primary">{editingId ? "Update draft" : "Create draft"}</button>
+          </div>
         </div>
       </form>
       <section className="mt-8">
@@ -336,7 +386,23 @@ export default function AdminQuotations() {
                     </select>
                   </td>
                   <td className="p-4">
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => editQuote(quote)}
+                        className="btn-secondary"
+                      >
+                        <Pencil size={14} />
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => action(quote.id, "preview")}
+                        className="btn-secondary"
+                      >
+                        <Eye size={14} />
+                        Preview
+                      </button>
                       <button
                         type="button"
                         onClick={() =>

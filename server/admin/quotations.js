@@ -1,17 +1,20 @@
 import { requireAdmin } from "../_admin.js";
 import { json, supabaseRequest } from "../_shared.js";
-import { clean, money } from "../_validation.js";
+import { clean, money, uuidPattern } from "../_validation.js";
 
 export default async function handler(req, res) {
   const admin = await requireAdmin(req, res);
   if (!admin) return;
   try {
     if (req.method === "GET") {
-      const response = await supabaseRequest("quotations?select=*&order=created_at.desc&limit=200");
+      const response = await supabaseRequest("quotations?select=*,lines:quotation_lines(*)&order=created_at.desc&limit=200");
       return response.ok ? json(res, 200, { quotations: await response.json() }) : json(res, 502, { error: "Unable to load quotations" });
     }
-    if (req.method !== "POST") return json(res, 405, { error: "Method not allowed" });
+    if (!["POST", "PATCH"].includes(req.method)) return json(res, 405, { error: "Method not allowed" });
     const body = req.body || {};
+    const isUpdate = req.method === "PATCH";
+    const id = clean(body.id, 40);
+    if (isUpdate && !uuidPattern.test(id)) return json(res, 422, { error: "Invalid quotation" });
     const lines = (body.lines || []).slice(0, 100).map((line, index) => ({
       description: clean(line.description, 500), quantity: Math.max(.01, Number(line.quantity || 1)),
       unit_price: money(line.unitPrice), sort_order: index,
@@ -23,20 +26,27 @@ export default async function handler(req, res) {
     const tax = money(taxable * Math.min(100, Math.max(0, Number(body.taxPercent || 0))) / 100);
     const reference = `NTQ-${new Date().toISOString().slice(0, 10).replaceAll("-", "")}-${crypto.randomUUID().slice(0, 6).toUpperCase()}`;
     const quote = {
-      reference, inquiry_id: clean(body.inquiryId, 60) || null, customer_name: clean(body.customerName, 120),
+      ...(isUpdate ? {} : { reference, created_by: admin.user_id }),
+      inquiry_id: clean(body.inquiryId, 60) || null, customer_name: clean(body.customerName, 120),
       customer_email: clean(body.customerEmail, 160) || null, customer_phone: clean(body.customerPhone, 24) || null,
       title: clean(body.title, 200), destination: clean(body.destination, 200) || null,
       travel_start: body.travelStart || null, travel_end: body.travelEnd || null,
       traveller_count: Math.max(1, Number(body.travellerCount || 1)), valid_until: body.validUntil || null,
       subtotal, discount, tax, total: money(taxable + tax), advance_required: money(body.advanceRequired),
-      terms: clean(body.terms, 5000) || null, notes: clean(body.notes, 5000) || null, created_by: admin.user_id,
+      terms: clean(body.terms, 5000) || null, notes: clean(body.notes, 5000) || null,
+      ...(isUpdate ? { updated_at: new Date().toISOString() } : {}),
     };
-    const insert = await supabaseRequest("quotations", { method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(quote) });
-    if (!insert.ok) return json(res, 502, { error: "Unable to create quotation" });
+    const insert = await supabaseRequest(isUpdate ? `quotations?id=eq.${id}` : "quotations", { method: isUpdate ? "PATCH" : "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(quote) });
+    if (!insert.ok) return json(res, 502, { error: `Unable to ${isUpdate ? "update" : "create"} quotation` });
     const [created] = await insert.json();
+    if (!created) return json(res, 404, { error: "Quotation not found" });
+    if (isUpdate) {
+      const removed = await supabaseRequest(`quotation_lines?quotation_id=eq.${id}`, { method: "DELETE" });
+      if (!removed.ok) return json(res, 502, { error: "Quotation updated but existing line items could not be replaced" });
+    }
     const lineInsert = await supabaseRequest("quotation_lines", { method: "POST", body: JSON.stringify(lines.map((line) => ({ ...line, quotation_id: created.id }))) });
-    if (!lineInsert.ok) return json(res, 502, { error: "Quotation created but line items could not be saved" });
-    return json(res, 201, { quotation: created });
+    if (!lineInsert.ok) return json(res, 502, { error: `Quotation ${isUpdate ? "updated" : "created"} but line items could not be saved` });
+    return json(res, isUpdate ? 200 : 201, { quotation: created });
   } catch (error) {
     console.error("quotations_failed", error);
     return json(res, 500, { error: "Quotation service unavailable" });

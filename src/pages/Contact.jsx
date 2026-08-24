@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Phone, Mail, MapPin, Clock, MessageCircle, CheckCircle2, Send } from "lucide-react";
 import { PageBanner } from "../components/shared/Bits";
 import Seo from "../components/shared/Seo";
 import { saveContactLead } from "../utils/storage";
-import { getSiteSettings } from "../data/siteConfig";
+import { getSiteSettings, loadSiteSettings } from "../data/siteConfig";
 
 export default function Contact() {
-  const settings = getSiteSettings();
+  const [settings,setSettings]=useState(getSiteSettings());
   const [form, setForm] = useState({ name: "", phone: "", email: "", destination: "", message: "" });
   const [errors, setErrors] = useState({});
   const [result, setResult] = useState(null);
+  useEffect(()=>{loadSiteSettings().then(setSettings).catch(()=>{})},[]);
 
   const update = (field, value) => setForm((f) => ({ ...f, [field]: value }));
 
@@ -67,11 +68,7 @@ export default function Contact() {
               </a>
             </div>
 
-            <a href="https://www.google.com/maps/search/?api=1&query=EL146%20Mahape%20Navi%20Mumbai" target="_blank" rel="noopener noreferrer" className="card-surface flex aspect-[4/3] flex-col items-center justify-center gap-3 bg-navy-50 text-center">
-              <MapPin size={28} className="text-terracotta-500" />
-              <p className="text-sm font-semibold text-navy-700">Open office location</p>
-              <p className="max-w-xs px-6 text-xs leading-5 text-navy-500">EL146, Mahape, Navi Mumbai, Maharashtra</p>
-            </a>
+            {settings.address&&<div className="card-surface overflow-hidden"><iframe title="NaysTrip office location" src={`https://www.google.com/maps?q=${encodeURIComponent(settings.address)}&output=embed`} className="aspect-[4/3] w-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade"/><a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.address)}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 p-4 text-sm font-semibold text-navy-700"><MapPin size={17} className="text-terracotta-500"/>Open verified office location</a></div>}
           </div>
 
           <div className="lg:col-span-3">

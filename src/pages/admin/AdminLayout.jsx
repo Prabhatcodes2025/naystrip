@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, Navigate, NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Map, Users, MessageSquare, Newspaper, Star, Settings, FileText, CalendarDays, BellRing,
-  Menu, X, Search, Bell, LogOut,
+  Menu, X, Search, Bell, LogOut, Mail,
 } from "lucide-react";
 import { isAdminLoggedIn, adminLogout } from "../../utils/storage";
 import BrandLogo from "../../components/branding/BrandLogo";
@@ -20,6 +20,7 @@ const navItems = [
   { to: "/admin/package-leads", label: "Package / Quote Leads", icon: FileText },
   { to: "/admin/quotations", label: "Quotations", icon: FileText },
   { to: "/admin/notifications", label: "Notifications", icon: BellRing },
+  { to: "/admin/subscribers", label: "Newsletter", icon: Mail },
   { to: "/admin/agents", label: "B2B Partner Approvals", icon: Users },
   { to: "/admin/blogs", label: "Blog Management", icon: Newspaper },
   { to: "/admin/stories", label: "Happy Travellers", icon: Star },

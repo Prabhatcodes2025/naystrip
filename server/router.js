@@ -5,6 +5,7 @@ import adminAgents from "./admin/agents.js";
 import adminDepartures from "./admin/departures.js";
 import adminLeads from "./admin/leads.js";
 import adminNotifications from "./admin/notifications.js";
+import adminSubscribers from "./admin/subscribers.js";
 import adminMedia from "./admin/media.js";
 import adminPackages from "./admin/packages.js";
 import adminQuotationActions from "./admin/quotation-actions.js";
@@ -29,6 +30,7 @@ import documentItinerary from "./documents/itinerary.js";
 import documentQuotation from "./documents/quotation.js";
 import documentServiceVoucher from "./documents/service-voucher.js";
 import leads from "./leads.js";
+import newsletter from "./newsletter.js";
 import paymentCreateOrder from "./payments/create-order.js";
 import paymentVerify from "./payments/verify.js";
 import paymentWebhook from "./payments/webhook.js";
@@ -47,6 +49,7 @@ export const routes = new Map([
   ["admin/departures", adminDepartures],
   ["admin/leads", adminLeads],
   ["admin/notifications", adminNotifications],
+  ["admin/subscribers", adminSubscribers],
   ["admin/media", adminMedia],
   ["admin/packages", adminPackages],
   ["admin/tours", adminPackages],
@@ -72,6 +75,7 @@ export const routes = new Map([
   ["documents/quotation", documentQuotation],
   ["documents/service-voucher", documentServiceVoucher],
   ["leads", leads],
+  ["newsletter", newsletter],
   ["payments/create-order", paymentCreateOrder],
   ["payments/verify", paymentVerify],
   ["payments/webhook", paymentWebhook],

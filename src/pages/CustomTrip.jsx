@@ -18,6 +18,7 @@ const serviceOptions = [
   { key: "sightseeing", label: "Sightseeing", icon: Landmark },
   { key: "visa", label: "Visa", icon: FileCheck },
   { key: "insurance", label: "Travel Insurance", icon: Shield },
+  { key: "eSim", label: "E-Sim", icon: Phone },
 ];
 
 const initialState = {
@@ -34,7 +35,7 @@ export default function CustomTrip() {
   const [errors, setErrors] = useState({});
   const [result, setResult] = useState(null);
 
-  useEffect(()=>{const slug=params.get("package");const service=params.get("service");const tour=slug&&getTourBySlug(slug);setData((current)=>{if(tour){const changed=current.packageSlug!==slug;return {...current,to:changed?tour.destinations.join(", "):current.to||tour.destinations.join(", "),nights:changed?String(Math.max(1,tour.itinerary.length-1)):current.nights,packageSlug:slug,details:changed?`Please customise the ${tour.title} itinerary.`:current.details||`Please customise the ${tour.title} itinerary.`}}if(serviceOptions.some((item)=>item.key===service))return {...current,services:{...current.services,[service]:true},details:current.details||`I need help with ${serviceOptions.find((item)=>item.key===service).label}.`};return current})},[params]);
+  useEffect(()=>{const slug=params.get("package");const service=params.get("service");const destination=params.get("destination");const requestedType=params.get("tripType");const tour=slug&&getTourBySlug(slug);setData((current)=>{if(tour){const changed=current.packageSlug!==slug;return {...current,to:changed?tour.destinations.join(", "):current.to||tour.destinations.join(", "),nights:changed?String(Math.max(1,tour.itinerary.length-1)):current.nights,packageSlug:slug,details:changed?`Please customise the ${tour.title} itinerary.`:current.details||`Please customise the ${tour.title} itinerary.`}}const selected=serviceOptions.find((item)=>item.key===service);return {...current,to:destination||current.to,tripType:requestedType||current.tripType,services:selected?{...current.services,[service]:true}:current.services,details:selected&&!current.details?`I need help with ${selected.label}.`:current.details}})},[params]);
   useEffect(()=>{sessionStorage.setItem("naystrip_trip_draft",JSON.stringify(data))},[data]);
 
   const update = (field, value) => setData((d) => ({ ...d, [field]: value }));
