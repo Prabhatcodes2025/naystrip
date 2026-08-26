@@ -18,6 +18,19 @@ export const defaultSiteSettings = {
     telegram: "https://t.me/trektoworld",
   },
   homepageCtaText: "Plan it your way",
+  topTripSlugs: [],
+  topTrekSlugs: [],
+  trustMetrics: {
+    packageCount: "",
+    googleRating: "",
+    googleReviewCount: "",
+    happyTravellers: "",
+    support24x7: false,
+    msmeRegistration: "",
+    nidhiRegistration: "",
+  },
+  team: [],
+  socialInitiative: { title: "", image: "", description: "", link: "", published: false },
 };
 
 export function getSiteSettings() {

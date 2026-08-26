@@ -31,7 +31,7 @@ export default function PortalAccess() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Unable to continue");
       if (data.access_token) sessionStorage.setItem(`naystrip_${agent ? "agent" : "customer"}_session`, data.access_token);
-      setState({ loading: false, error: "", ok: register ? "Check your email to confirm the account." : "Signed in securely." });
+      setState({ loading: false, error: "", ok: register ? (agent ? "Application received. Your B2B account will be available after approval." : (data.confirmation_required ? "Check your email to confirm the account." : "Account created. You can now sign in.")) : "Signed in securely." });
       if (!register) navigate(returnTo, { replace: true });
     } catch (error) { setState({ loading: false, error: error.message, ok: "" }); }
   };

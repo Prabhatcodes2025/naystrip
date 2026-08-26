@@ -15,7 +15,7 @@ export default function Blog() {
   useEffect(()=>{getPublicBlogs().then(setPublished).catch(()=>setPublished([]))},[]);
 
   const allBlogs = useMemo(() => {
-    return [...published, ...blogs];
+    return [...new Map([...blogs, ...published].map((item) => [item.slug || item.id, item])).values()];
   }, [published]);
 
   const categories = ["All", ...Array.from(new Set(allBlogs.map((b) => b.category)))];
@@ -75,7 +75,7 @@ export default function Blog() {
                     <Link to={`/blog/${b.slug || b.id}`}>
                       <h3 className="font-display text-lg font-semibold text-navy-900 mt-2 hover:text-terracotta-600 transition-colors line-clamp-2">{b.title}</h3>
                     </Link>
-                    <p className="text-sm text-navy-500 mt-2 line-clamp-2 leading-relaxed">{b.excerpt}</p>
+                    <p className="text-sm text-navy-500 mt-2 line-clamp-2 leading-relaxed">{b.subtitle || b.excerpt}</p>
                     <Link to={`/blog/${b.slug || b.id}`} className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-terracotta-600 hover:text-terracotta-700">
                       Read More <ArrowRight size={14} />
                     </Link>

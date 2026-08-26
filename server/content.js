@@ -1,6 +1,6 @@
 import {json,supabaseRequest} from "./_shared.js";
 
-const mapBlog=(row)=>({id:row.id,slug:row.slug,title:row.title,description:row.excerpt||"",excerpt:row.excerpt||"",content:row.body?.content||"",image:row.cover_image||"",category:row.seo?.category||"Travel Guides",seoTitle:row.seo?.title||"",seoDescription:row.seo?.description||"",published:row.status==="published",date:row.published_at||row.created_at,createdAt:row.created_at});
+const mapBlog=(row)=>({id:row.id,slug:row.slug,title:row.title,subtitle:row.body?.subtitle||"",description:row.excerpt||"",excerpt:row.excerpt||"",content:row.body?.content||"",author:row.body?.author||row.author_name||"",image:row.cover_image||"",category:row.seo?.category||"Travel Guides",seoTitle:row.seo?.title||"",seoDescription:row.seo?.description||"",featured:Boolean(row.seo?.featured),published:row.status==="published",date:row.published_at||row.created_at,createdAt:row.created_at});
 const mapStory=(row)=>({id:row.id,name:row.name,destination:row.destination,rating:row.rating,image:row.photo||"",testimonial:row.testimonial,published:row.status==="published",createdAt:row.created_at});
 
 export default async function handler(req,res){

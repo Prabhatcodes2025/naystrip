@@ -8,7 +8,7 @@ export default async function handler(req,res){
  if(!user.ok||!account.id)return json(res,401,{error:"Invalid session"});
  const role=await supabaseRequest(`admin_users?user_id=eq.${account.id}&status=eq.active&select=user_id&limit=1`);
  if(!role.ok||(await role.json()).length!==1)return json(res,403,{error:"Admin access required"});
- const allowed={brandName:req.body?.brandName,tagline:req.body?.tagline,phone:req.body?.phone,supportPhone:req.body?.supportPhone,whatsapp:req.body?.whatsapp,email:req.body?.email,cancellationEmail:req.body?.cancellationEmail,address:req.body?.address,businessHours:req.body?.businessHours,footerText:req.body?.footerText,social:req.body?.social,homepageCtaText:req.body?.homepageCtaText};
+ const allowed={brandName:req.body?.brandName,tagline:req.body?.tagline,phone:req.body?.phone,supportPhone:req.body?.supportPhone,whatsapp:req.body?.whatsapp,email:req.body?.email,cancellationEmail:req.body?.cancellationEmail,address:req.body?.address,businessHours:req.body?.businessHours,footerText:req.body?.footerText,social:req.body?.social,homepageCtaText:req.body?.homepageCtaText,topTripSlugs:Array.isArray(req.body?.topTripSlugs)?req.body.topTripSlugs.slice(0,12):[],topTrekSlugs:Array.isArray(req.body?.topTrekSlugs)?req.body.topTrekSlugs.slice(0,12):[],trustMetrics:req.body?.trustMetrics||{},team:Array.isArray(req.body?.team)?req.body.team.slice(0,20):[],socialInitiative:req.body?.socialInitiative||{}};
  const saved=await supabaseRequest("website_settings?id=eq.true",{method:"PATCH",headers:{Prefer:"return=representation"},body:JSON.stringify({data:allowed,updated_at:new Date().toISOString()})});
  if(!saved.ok)return json(res,502,{error:"Settings update failed"});
  return json(res,200,{saved:true});

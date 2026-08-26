@@ -88,6 +88,12 @@ export default function B2BDashboard() {
         <p className="mt-2 text-slate-500">
           Private rates never appear on the public website.
         </p>
+        <section className="mt-7 grid gap-4 rounded-2xl bg-white p-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div><span className="text-xs uppercase text-slate-400">Approval status</span><strong className="mt-1 block capitalize text-emerald-700">{data.agent.verification_status}</strong></div>
+          <div><span className="text-xs uppercase text-slate-400">Contact person</span><strong className="mt-1 block">{data.agent.contact_person}</strong></div>
+          <div><span className="text-xs uppercase text-slate-400">Email</span><strong className="mt-1 block break-all">{data.agent.email}</strong></div>
+          <div><span className="text-xs uppercase text-slate-400">Phone</span><strong className="mt-1 block">{data.agent.phone}</strong></div>
+        </section>
         {error && (
           <p role="alert" className="mt-4 bg-rose-50 p-3 text-sm text-rose-700">
             {error}
@@ -286,6 +292,7 @@ export default function B2BDashboard() {
                     {booking.reference} · {booking.operational_status} · Balance
                     INR {Number(booking.balance_due).toLocaleString("en-IN")}
                   </p>
+                  {(booking.documents||[]).length>0&&<p className="mt-2 text-xs text-slate-500">Documents: {booking.documents.map((document)=>document.document_type).join(", ")}</p>}
                 </article>
               ))
             ) : (

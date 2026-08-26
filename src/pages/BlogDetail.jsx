@@ -35,15 +35,15 @@ export default function BlogDetail() {
 
   return (
     <>
-      <Seo title={`${blog.title} | NaysTrip & Treks Blog`} description={blog.excerpt} />
-      <PageBanner eyebrow={blog.category} title={blog.title} image={blog.image} />
+      <Seo title={blog.seoTitle || `${blog.title} | NaysTrip & Treks Blog`} description={blog.seoDescription || blog.excerpt} />
+      <PageBanner eyebrow={blog.category} title={blog.title} subtitle={blog.subtitle || blog.excerpt} image={blog.image} />
 
       <section className="py-12 sm:py-16">
         <div className="container-lg grid lg:grid-cols-3 gap-10">
           <div className="lg:col-span-2">
             <Reveal>
               <span className="flex items-center gap-1.5 text-xs text-navy-400 mb-6">
-                <Calendar size={13} /> {new Date(blog.date || blog.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
+                <Calendar size={13} /> {new Date(blog.date || blog.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}{blog.author ? ` · ${blog.author}` : ""}
               </span>
               <p className="text-navy-600 leading-relaxed text-base whitespace-pre-line">{blog.content}</p>
             </Reveal>

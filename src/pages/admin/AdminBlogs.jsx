@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, X, Search } from "lucide-react";
+import { Eye, Plus, Pencil, Trash2, X, Search } from "lucide-react";
 import { blogs as staticBlogs } from "../../data/content";
 import { getAdminBlogs, saveAdminBlog, deleteAdminBlog } from "../../utils/storage";
 import MediaUploader from "../../components/admin/MediaUploader";
 import SmartImage from "../../components/shared/SmartImage";
 
 const emptyBlog = {
-  title: "", slug: "", category: "Travel Guides", description: "", content: "", seoTitle:"", seoDescription:"",
-  image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80",
-  published: true,
+  title: "", subtitle: "", slug: "", category: "Travel Guides", description: "", content: "", author: "", seoTitle:"", seoDescription:"",
+  image: "", featured: false, published: false,
 };
 
 export default function AdminBlogs() {
@@ -18,11 +17,12 @@ export default function AdminBlogs() {
   const [form, setForm] = useState(emptyBlog);
   const [search, setSearch] = useState("");
   const [error,setError]=useState("");
+  const [preview,setPreview]=useState(false);
 
   const refresh = async () => {try{setAdminBlogs(await getAdminBlogs());setError("")}catch(err){setError(err.message)}};
   useEffect(()=>{refresh()},[]);
-  const openAdd = () => { setForm(emptyBlog); setEditing(null); setModalOpen(true); };
-  const openEdit = (b) => { setForm(b); setEditing(b.id); setModalOpen(true); };
+  const openAdd = () => { setForm(emptyBlog); setEditing(null); setPreview(false); setModalOpen(true); };
+  const openEdit = (b) => { setForm({...emptyBlog,...b}); setEditing(b.id); setPreview(false); setModalOpen(true); };
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -86,6 +86,7 @@ export default function AdminBlogs() {
             </div>
             <form onSubmit={handleSave} className="space-y-4">
               <div><label className="label-field">Title</label><input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="input-field" /></div>
+              <div><label className="label-field">Subtitle</label><input value={form.subtitle||""} onChange={(e) => setForm({ ...form, subtitle: e.target.value })} className="input-field" /></div>
               <div><label className="label-field">Slug</label><input value={form.slug||""} onChange={(e)=>setForm({...form,slug:e.target.value})} placeholder="Generated from title when blank" className="input-field"/></div>
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
@@ -94,13 +95,16 @@ export default function AdminBlogs() {
                     <option>Travel Guides</option><option>Destinations</option><option>Trekking</option><option>Travel Tips</option>
                   </select>
                 </div>
-                <MediaUploader label="Cover image" value={form.image} onChange={(image) => setForm({ ...form, image })} scope={`blogs/${editing || "draft"}`} context={`blog ${form.category}`} />
+                <MediaUploader compact label="Cover image" value={form.image} onChange={(image) => setForm({ ...form, image })} scope={`blogs/${editing || "draft"}`} context={`blog ${form.category}`} />
               </div>
               <div><label className="label-field">Short Description</label><textarea rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value, excerpt: e.target.value })} className="input-field resize-none" /></div>
-              <div><label className="label-field">Full Content</label><textarea rows={6} value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} className="input-field resize-none" /></div>
+              <div><label className="label-field">Display author</label><input value={form.author||""} onChange={(e)=>setForm({...form,author:e.target.value})} className="input-field"/></div>
+              <div><label className="label-field">Full Content</label><textarea required rows={10} value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} className="input-field resize-y" /></div>
               <div className="grid gap-4 sm:grid-cols-2"><div><label className="label-field">SEO title</label><input value={form.seoTitle||""} onChange={(e)=>setForm({...form,seoTitle:e.target.value})} className="input-field"/></div><div><label className="label-field">SEO description</label><textarea rows="2" value={form.seoDescription||""} onChange={(e)=>setForm({...form,seoDescription:e.target.value})} className="input-field"/></div></div>
-              <label className="flex items-center gap-2 text-sm text-navy-600"><input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} className="accent-terracotta-500" /> Published</label>
+              <div className="flex flex-wrap gap-5"><label className="flex items-center gap-2 text-sm text-navy-600"><input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} className="accent-terracotta-500" /> Published</label><label className="flex items-center gap-2 text-sm text-navy-600"><input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} className="accent-terracotta-500" /> Featured</label></div>
+              {preview&&<article className="rounded-2xl border bg-[#fffaf2] p-5">{form.image&&<img src={form.image} alt="" className="mb-4 aspect-[16/9] max-h-64 w-full rounded-xl object-cover"/>}<p className="text-xs font-bold uppercase text-terracotta-600">{form.category}</p><h2 className="mt-2 font-display text-3xl text-navy-900">{form.title||"Untitled article"}</h2>{form.subtitle&&<p className="mt-2 text-lg text-navy-600">{form.subtitle}</p>}<p className="mt-4 whitespace-pre-line text-sm leading-7 text-navy-600">{form.content||"Article content preview"}</p></article>}
               <div className="flex justify-end gap-3 pt-2">
+                <button type="button" onClick={() => setPreview((value)=>!value)} className="btn-secondary"><Eye size={15}/>{preview?"Hide Preview":"Preview"}</button>
                 <button type="button" onClick={() => setModalOpen(false)} className="btn-secondary">Cancel</button>
                 <button type="submit" className="btn-primary">{editing ? "Save Changes" : "Add Blog"}</button>
               </div>

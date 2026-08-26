@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link, Navigate, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, Navigate, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Map, Users, MessageSquare, Newspaper, Star, Settings, FileText, CalendarDays, BellRing,
   Menu, X, Search, Bell, LogOut, Mail,
@@ -30,12 +30,20 @@ const navItems = [
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [session, setSession] = useState({ checking: true, admin: null });
+  const [notificationOpen,setNotificationOpen]=useState(false);
+  const [notifications,setNotifications]=useState([]);
+  const [notificationError,setNotificationError]=useState("");
+  const notificationRef=useRef(null);
   const navigate = useNavigate();
+  const location=useLocation();
   useEffect(() => {
     const token=sessionStorage.getItem("naystrip_admin_session");
     if(!token){setSession({checking:false,admin:null});return;}
     fetch("/api/auth/admin",{headers:{Authorization:`Bearer ${token}`}}).then(async(response)=>{const data=await response.json();if(!response.ok)throw new Error(data.error);setSession({checking:false,admin:data.admin});}).catch(()=>{adminLogout();setSession({checking:false,admin:null});});
   },[]);
+  useEffect(()=>{setNotificationOpen(false)},[location.pathname]);
+  useEffect(()=>{if(!notificationOpen)return undefined;const keydown=(event)=>{if(event.key==="Escape")setNotificationOpen(false)};const outside=(event)=>{if(!notificationRef.current?.contains(event.target))setNotificationOpen(false)};document.addEventListener("keydown",keydown);document.addEventListener("mousedown",outside);return()=>{document.removeEventListener("keydown",keydown);document.removeEventListener("mousedown",outside)}},[notificationOpen]);
+  const openNotifications=async()=>{const next=!notificationOpen;setNotificationOpen(next);if(!next||notifications.length)return;try{const response=await fetch("/api/admin/notifications",{headers:{Authorization:`Bearer ${sessionStorage.getItem("naystrip_admin_session")}`}});const data=await response.json();if(!response.ok)throw new Error(data.error);setNotifications((data.notifications||[]).slice(0,5));setNotificationError("")}catch(error){setNotificationError(error.message)}};
   if (session.checking) return <PageLoader full label="Checking secure admin session…" />;
   if (!isAdminLoggedIn() || !session.admin) return <Navigate to="/admin/login" replace />;
   const visibleNavItems = navItems.filter((item) => item.to !== "/admin/agents" || ["Super Admin", "B2B Manager"].includes(session.admin.role));
@@ -103,7 +111,7 @@ export default function AdminLayout() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <button className="relative text-navy-500"><Bell size={19} /><span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-terracotta-500" /></button>
+            <div className="relative" ref={notificationRef}><button onClick={openNotifications} aria-label="Recent notifications" aria-expanded={notificationOpen} className="relative text-navy-500"><Bell size={19} /><span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-terracotta-500" /></button>{notificationOpen&&<div className="absolute right-0 top-9 z-50 w-[min(360px,calc(100vw-2rem))] rounded-2xl border bg-white p-3 shadow-xl"><div className="flex items-center justify-between px-2 py-1"><strong className="text-sm">Recent notifications</strong><Link to="/admin/notifications" className="text-xs font-bold text-terracotta-600">View all</Link></div>{notificationError&&<p className="p-3 text-xs text-rose-600">{notificationError}</p>}<div className="mt-2 divide-y">{notifications.map((item)=><div key={item.id} className="p-3"><div className="flex justify-between gap-3"><strong className="text-xs capitalize">{item.event?.replaceAll("_"," ")}</strong><span className="text-[10px] capitalize text-slate-400">{item.status?.replaceAll("_"," ")}</span></div><p className="mt-1 truncate text-xs text-slate-500">{item.recipient}</p><time className="mt-1 block text-[10px] text-slate-400">{new Date(item.created_at).toLocaleString("en-IN")}</time></div>)}{!notifications.length&&!notificationError&&<p className="p-4 text-xs text-slate-400">No notifications yet.</p>}</div></div>}</div>
             <div className="flex items-center gap-2.5">
               <span className="flex h-9 w-9 items-center justify-center rounded-full bg-navy-900 text-xs font-bold text-white">A</span>
               <div className="hidden sm:block">
