@@ -8,7 +8,7 @@ async function postLead(kind, payload) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), API_TIMEOUT);
   try {
-    const captchaToken = await turnstileToken();
+    const captchaToken = await getTurnstileToken();
     const response = await fetch("/api/leads", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -46,7 +46,7 @@ async function configuredTurnstile() {
     });
   return turnstileConfiguration;
 }
-async function turnstileToken() {
+export async function getTurnstileToken() {
   const configuration = await configuredTurnstile();
   if (!configuration.enabled || !configuration.siteKey) return null;
   const sitekey = configuration.siteKey;
@@ -139,6 +139,14 @@ export const getContactLeads = async () => {
 export const getPackageLeads = async () => {
   const data = await adminRequest("/api/admin/leads?kind=package_quote");
   return data.leads;
+};
+export const getQuickLeads = async () => {
+  const data = await adminRequest("/api/admin/leads?kind=quick_quote");
+  return data.leads || [];
+};
+export const getB2BLeads = async () => {
+  const data = await adminRequest("/api/admin/leads?kind=b2b_enquiry");
+  return data.leads || [];
 };
 export const updateCustomLeadStatus = (
   id,

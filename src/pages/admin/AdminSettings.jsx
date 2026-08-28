@@ -52,11 +52,19 @@ export default function AdminSettings() {
             <div><label className="label-field">Phone Number</label><input value={form.phone} onChange={(e) => update("phone", e.target.value)} className="input-field" /></div>
             <div><label className="label-field">Support Phone</label><input value={form.supportPhone} onChange={(e) => update("supportPhone", e.target.value)} className="input-field" /></div>
             <div><label className="label-field">Email</label><input value={form.email} onChange={(e) => update("email", e.target.value)} className="input-field" /></div>
+            <div><label className="label-field">Website URL</label><input type="url" value={form.website||""} onChange={(e) => update("website", e.target.value)} className="input-field" /></div>
             <div><label className="label-field">Cancellation Email</label><input type="email" value={form.cancellationEmail} onChange={(e) => update("cancellationEmail", e.target.value)} className="input-field" /></div>
             <div><label className="label-field">WhatsApp Number</label><input value={form.whatsapp} onChange={(e) => update("whatsapp", e.target.value)} className="input-field" /></div>
           </div>
           <div><label className="label-field">Office Address</label><textarea rows={2} value={form.address} onChange={(e) => update("address", e.target.value)} className="input-field resize-none" /></div>
           <div><label className="label-field">Business Hours</label><input value={form.businessHours} onChange={(e) => update("businessHours", e.target.value)} className="input-field" /></div>
+        </div>
+
+        <div className="rounded-2xl bg-white border border-navy-100 shadow-soft p-6 space-y-4">
+          <h3 className="text-sm font-semibold text-navy-800">Invoice business details</h3>
+          <p className="text-xs text-navy-400">Optional. Blank legal or GST fields are omitted from generated invoices.</p>
+          <div className="grid gap-4 sm:grid-cols-2"><div><label className="label-field">Legal business name</label><input value={form.businessLegalName||""} onChange={(e)=>update("businessLegalName",e.target.value)} className="input-field"/></div><div><label className="label-field">GSTIN</label><input value={form.gstNumber||""} onChange={(e)=>update("gstNumber",e.target.value)} className="input-field"/></div></div>
+          <div><label className="label-field">Invoice address</label><textarea rows="2" value={form.invoiceAddress||""} onChange={(e)=>update("invoiceAddress",e.target.value)} className="input-field"/></div>
         </div>
 
         <div className="rounded-2xl bg-white border border-navy-100 shadow-soft p-6 space-y-4">
@@ -86,8 +94,14 @@ export default function AdminSettings() {
         <div className="rounded-2xl bg-white border border-navy-100 shadow-soft p-6 space-y-4">
           <h3 className="text-sm font-semibold text-navy-800">Verified trust indicators</h3>
           <p className="text-xs text-navy-400">Leave unverified values blank; blank indicators remain hidden.</p>
-          <div className="grid gap-4 sm:grid-cols-2">{[["packageCount","Verified package count"],["googleRating","Google rating"],["googleReviewCount","Google review count"],["happyTravellers","Happy travellers"],["msmeRegistration","MSME registration"],["nidhiRegistration","NIDHI registration"]].map(([key,label])=><div key={key}><label className="label-field">{label}</label><input value={form.trustMetrics[key]||""} onChange={(event)=>updateTrust(key,event.target.value)} className="input-field"/></div>)}</div>
+          <div className="grid gap-4 sm:grid-cols-2">{[["packageCount","Verified package count"],["googleRating","Google rating"],["googleReviewCount","Google review count"],["googleReviewUrl","Google review URL"],["happyTravellers","Happy travellers"],["msmeRegistration","MSME registration"],["nidhiRegistration","NIDHI registration"]].map(([key,label])=><div key={key}><label className="label-field">{label}</label><input value={form.trustMetrics[key]||""} onChange={(event)=>updateTrust(key,event.target.value)} className="input-field"/></div>)}</div>
           <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={Boolean(form.trustMetrics.support24x7)} onChange={(event)=>updateTrust("support24x7",event.target.checked)}/>Verified 24/7 support</label>
+        </div>
+
+        <div className="rounded-2xl bg-white border border-navy-100 shadow-soft p-6 space-y-4">
+          <h3 className="text-sm font-semibold text-navy-800">B2B customer quotation</h3>
+          <p className="text-xs text-navy-400">Default markup is applied to agent cost only when a partner creates a customer-facing quotation.</p>
+          <div><label className="label-field">Default customer markup (%)</label><input type="number" min="0" max="100" step="0.1" value={form.b2bDefaultMarkupPercent??10} onChange={(event)=>update("b2bDefaultMarkupPercent",event.target.value)} className="input-field"/></div>
         </div>
 
         <div className="rounded-2xl bg-white border border-navy-100 shadow-soft p-6 space-y-4">

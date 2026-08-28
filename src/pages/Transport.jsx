@@ -7,7 +7,7 @@ import Seo from "../components/shared/Seo";
 export default function Transport() {
   return (
     <>
-      <Seo title="Transport &amp; Vehicle Rentals | NaysTrip & Treks" description="Request transport for groups, holidays and airport transfers." />
+      <Seo title="Transportation &amp; Vehicle Rentals | NaysTrip & Treks" description="Request transportation for groups, holidays and airport transfers." />
       <PageBanner
         eyebrow="Move With Ease"
         title="Transport Services"

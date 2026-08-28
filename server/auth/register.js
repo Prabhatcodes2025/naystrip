@@ -1,8 +1,11 @@
 import { guard, json, supabaseRequest } from "../_shared.js";
+import { verifyCaptcha } from "../_captcha.js";
 
 export default async function handler(req, res) {
   if (!guard(req, res)) return;
-  const { email, password, name, phone, businessName, pan, portal } = req.body || {};
+  const { email, password, name, phone, businessName, pan, portal, captchaToken } = req.body || {};
+  const captcha = await verifyCaptcha(captchaToken, req.headers["x-forwarded-for"]);
+  if (!captcha.success) return json(res, 403, { error: captcha.error });
   if (!email || !password || password.length < 10 || !name || !phone || !["customer", "agent"].includes(portal)) return json(res, 422, { error: "Complete all required fields; passwords need at least 10 characters" });
   const normalizedPan = String(pan || "").trim().toUpperCase();
   if (portal === "agent" && (!businessName || !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(normalizedPan))) return json(res, 422, { error: "Business name and a valid PAN (AAAAA9999A) are required" });

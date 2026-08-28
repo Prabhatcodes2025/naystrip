@@ -57,7 +57,7 @@ export default function CustomTrip() {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) e.email = "Enter a valid email";
       if (!data.consent) e.consent = "Please accept to continue";
     }
-    if(s===2&&Number(data.minors)>0&&data.childAges.some((age)=>age===""||Number(age)<0||Number(age)>17))e.childAges="Enter an age from 0 to 17 for every child";
+    if(s===2&&Number(data.minors)>0&&data.childAges.some((age)=>age===""||Number(age)<0||Number(age)>12))e.childAges="Enter an age from 0 to 12 for every child";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -186,7 +186,7 @@ export default function CustomTrip() {
                   </div>
                   <div><label className="label-field">Rooms</label><input type="number" min="1" max="20" value={data.rooms} onChange={(e)=>update("rooms",e.target.value)} className="input-field"/></div>
                 </div>
-                {Number(data.minors)>0&&<div><p className="label-field">Age of each child</p><div className="grid gap-3 sm:grid-cols-3">{data.childAges.map((age,index)=><label key={index}><span className="text-xs text-navy-500">Child {index+1}</span><input required type="number" min="0" max="17" value={age} onChange={(e)=>updateChildAge(index,e.target.value)} className="input-field mt-1"/></label>)}</div>{errors.childAges&&<p className="mt-2 text-xs text-terracotta-500">{errors.childAges}</p>}</div>}
+                {Number(data.minors)>0&&<div><p className="label-field">Age of each child (maximum 12)</p><div className="grid gap-3 sm:grid-cols-3">{data.childAges.map((age,index)=><label key={index}><span className="text-xs text-navy-500">Child {index+1}</span><input required type="number" min="0" max="12" value={age} onChange={(e)=>updateChildAge(index,e.target.value)} className="input-field mt-1"/></label>)}</div>{errors.childAges&&<p className="mt-2 text-xs text-terracotta-500">{errors.childAges}</p>}</div>}
                 <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <label className="label-field"><Wallet size={14} className="inline mr-1.5 -mt-0.5" />Budget (per person)</label>

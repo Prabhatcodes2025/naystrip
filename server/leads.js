@@ -39,6 +39,8 @@ export default async function handler(req, res) {
   const name = suppliedName || (kind === "quick_quote" ? "Quick quote request" : "");
   const phoneNumber = clean(payload.phone, 24);
   const emailAddress = clean(payload.email, 160);
+  if (kind === "custom_trip" && Array.isArray(payload.childAges) && payload.childAges.some((age) => Number(age) < 0 || Number(age) > 12))
+    return json(res, 422, { error: "Child age must be between 0 and 12" });
   if (
     !name ||
     !phone.test(phoneNumber) ||

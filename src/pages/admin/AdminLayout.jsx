@@ -18,6 +18,8 @@ const navItems = [
   { to: "/admin/leads", label: "Custom Trip Leads", icon: Users },
   { to: "/admin/contact-leads", label: "Contact Leads", icon: MessageSquare },
   { to: "/admin/package-leads", label: "Package / Quote Leads", icon: FileText },
+  { to: "/admin/quick-quotes", label: "Quick Quote Queue", icon: FileText },
+  { to: "/admin/b2b-enquiries", label: "B2B Enquiries", icon: Users },
   { to: "/admin/quotations", label: "Quotations", icon: FileText },
   { to: "/admin/notifications", label: "Notifications", icon: BellRing },
   { to: "/admin/subscribers", label: "Newsletter", icon: Mail },

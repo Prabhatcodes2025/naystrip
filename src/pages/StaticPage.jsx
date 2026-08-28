@@ -56,12 +56,20 @@ const pageContent = {
       "How do B2B partner accounts work? — Register with valid business details and PAN. Private partner access remains unavailable until an authorised admin approves the application.",
     ],
   },
+  consent: {
+    title: "Consent",
+    body: [
+      "When you submit an enquiry or create an account, you consent to NaysTrip using the details you provide to respond, prepare travel options and service your booking.",
+      "Marketing communication is optional. You can ask us to stop non-essential messages at any time. Booking, payment and safety updates may still be sent where required to deliver an active service.",
+      "See the Privacy Policy for how personal information is handled and contact NaysTrip if you want to review or correct your details.",
+    ],
+  },
   sitemap: {
     title: "Sitemap",
     links: [
       ["Home", "/"], ["All Tours", "/tours"], ["Destinations", "/destinations"], ["Holidays", "/holidays"],
       ["Fixed Departures", "/fixed-departures"], ["Treks", "/treks"], ["Expeditions", "/expeditions"],
-      ["Transport", "/transport"], ["Custom Trip", "/custom-trip"], ["Corporate Travel", "/corporate-travel"],
+      ["Transportation", "/transport"], ["Custom Trip", "/custom-trip"], ["Corporate Travel", "/corporate-travel"],
       ["How It Works", "/how-it-works"], ["Blog", "/blog"], ["Contact Us", "/contact"],
       ["About Us", "/about"], ["Careers", "/careers"], ["Terms & Conditions", "/terms"],
       ["Privacy Policy", "/privacy"], ["Disclaimer", "/disclaimer"], ["Help & FAQs", "/faqs"],

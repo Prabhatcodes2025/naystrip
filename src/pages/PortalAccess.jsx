@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useSearchParams } from "react-router-do
 import { ArrowRight, Building2, LockKeyhole, UserRound } from "lucide-react";
 import BrandLogo from "../components/branding/BrandLogo";
 import Seo from "../components/shared/Seo";
+import { getTurnstileToken } from "../utils/storage";
 
 export default function PortalAccess() {
   const { pathname } = useLocation();
@@ -24,9 +25,10 @@ export default function PortalAccess() {
     event.preventDefault();
     setState({ loading: true, error: "", ok: "" });
     try {
+      const captchaToken = register ? await getTurnstileToken() : null;
       const response = await fetch(register ? "/api/auth/register" : "/api/auth/portal", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, portal: agent ? "agent" : "customer" }),
+        body: JSON.stringify({ ...form, portal: agent ? "agent" : "customer", captchaToken }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Unable to continue");

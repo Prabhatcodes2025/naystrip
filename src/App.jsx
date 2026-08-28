@@ -99,6 +99,7 @@ export default function App() {
         <Route path="/payment-policy" element={<StaticPage slug="payment" />} />
         <Route path="/disclaimer" element={<StaticPage slug="disclaimer" />} />
         <Route path="/faqs" element={<StaticPage slug="faqs" />} />
+        <Route path="/consent" element={<StaticPage slug="consent" />} />
         <Route path="/sitemap" element={<StaticPage slug="sitemap" />} />
         <Route path="*" element={<NotFound />} />
       </Route>
@@ -125,6 +126,8 @@ export default function App() {
         <Route path="leads" element={<AdminLeads />} />
         <Route path="contact-leads" element={<AdminContactLeads />} />
         <Route path="package-leads" element={<AdminLeads kind="package_quote" />} />
+        <Route path="quick-quotes" element={<AdminLeads kind="quick_quote" />} />
+        <Route path="b2b-enquiries" element={<AdminLeads kind="b2b_enquiry" />} />
         <Route path="quotations" element={<AdminQuotations />} />
         <Route path="notifications" element={<AdminNotifications />} />
         <Route path="agents" element={<AdminAgents />} />

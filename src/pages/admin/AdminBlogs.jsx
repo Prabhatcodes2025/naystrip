@@ -29,6 +29,7 @@ export default function AdminBlogs() {
     try{await saveAdminBlog(editing ? { ...form, id: editing } : form);await refresh();setModalOpen(false)}catch(err){setError(err.message)}
   };
   const handleDelete = async (id) => { if (confirm("Delete this blog post?")) { try{await deleteAdminBlog(id);await refresh()}catch(err){setError(err.message)} } };
+  const togglePublish = async (blog) => { try{await saveAdminBlog({...blog,published:!blog.published,id:blog.id});await refresh()}catch(err){setError(err.message)} };
 
   const allBlogs = [
     ...adminBlogs.map((b) => ({ ...b, isAdmin: true })),
@@ -53,28 +54,8 @@ export default function AdminBlogs() {
         <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search blogs..." className="w-full rounded-xl border border-navy-200 pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:border-terracotta-400" />
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {allBlogs.map((b) => (
-          <div key={b.id} className="rounded-2xl bg-white border border-navy-100 shadow-soft overflow-hidden">
-            <SmartImage src={b.image} context={`blog ${b.category}`} alt="" wrapperClassName="aspect-[16/9]" className="object-cover" />
-            <div className="p-4">
-              <span className="text-[11px] font-semibold text-terracotta-600">{b.category}</span>
-              <h4 className="text-sm font-semibold text-navy-800 mt-1 line-clamp-2">{b.title}</h4>
-              <div className="mt-3 flex items-center justify-between">
-                <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${b.published !== false ? "bg-forest-50 text-forest-700" : "bg-navy-100 text-navy-500"}`}>
-                  {b.published !== false ? "Published" : "Draft"}
-                </span>
-                {b.isAdmin ? (
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => openEdit(b)} className="flex h-7 w-7 items-center justify-center rounded-lg bg-navy-50 text-navy-600 hover:bg-navy-100"><Pencil size={13} /></button>
-                    <button onClick={() => handleDelete(b.id)} className="flex h-7 w-7 items-center justify-center rounded-lg bg-terracotta-50 text-terracotta-600 hover:bg-terracotta-100"><Trash2 size={13} /></button>
-                  </div>
-                ) : <span className="text-[10px] text-navy-300 italic">Catalogue item</span>}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      <div className="hidden overflow-x-auto rounded-2xl border bg-white md:block"><table className="w-full min-w-[920px] text-sm"><thead><tr className="border-b bg-navy-50/50 text-left text-xs uppercase text-navy-400"><th className="p-3">Cover</th><th className="p-3">Article</th><th className="p-3">Category</th><th className="p-3">Status</th><th className="p-3">Date</th><th className="p-3 text-right">Actions</th></tr></thead><tbody>{allBlogs.map((b)=><tr key={b.id} className="border-b"><td className="p-3"><SmartImage src={b.image} context={`blog ${b.category}`} alt="" wrapperClassName="h-16 w-24 overflow-hidden rounded-lg" className="object-cover"/></td><td className="max-w-sm p-3"><strong className="block line-clamp-1 text-navy-800">{b.title}</strong><span className="mt-1 block line-clamp-1 text-xs text-navy-500">{b.subtitle||b.description||b.excerpt||"—"}</span></td><td className="p-3">{b.category}</td><td className="p-3"><span className={`rounded-full px-2.5 py-1 text-xs font-bold ${b.published!==false?"bg-forest-50 text-forest-700":"bg-navy-100 text-navy-500"}`}>{b.published!==false?"Published":"Draft"}</span></td><td className="p-3 text-xs text-navy-500">{b.created_at?new Date(b.created_at).toLocaleDateString("en-IN"):b.date||"Catalogue"}</td><td className="p-3"><div className="flex justify-end gap-2">{b.isAdmin?<><button title="Edit" onClick={()=>openEdit(b)} className="btn-secondary px-3"><Pencil size={13}/>Edit</button><a title="Preview" href={`/blog/${b.slug}`} target="_blank" rel="noreferrer" className="btn-secondary px-3"><Eye size={13}/>Preview</a><button onClick={()=>togglePublish(b)} className="btn-secondary px-3">{b.published?"Unpublish":"Publish"}</button><button title="Delete" onClick={()=>handleDelete(b.id)} className="btn-secondary px-3 text-terracotta-600"><Trash2 size={13}/>Delete</button></>:<span className="text-xs italic text-navy-300">Catalogue item</span>}</div></td></tr>)}</tbody></table></div>
+      <div className="grid gap-3 md:hidden">{allBlogs.map((b)=><article key={b.id} className="flex gap-3 rounded-2xl border bg-white p-3"><SmartImage src={b.image} context={`blog ${b.category}`} alt="" wrapperClassName="h-20 w-24 shrink-0 overflow-hidden rounded-lg" className="object-cover"/><div className="min-w-0 flex-1"><span className="text-[10px] font-bold uppercase text-terracotta-600">{b.category} · {b.published!==false?"Published":"Draft"}</span><h3 className="mt-1 line-clamp-1 text-sm font-bold">{b.title}</h3><p className="line-clamp-1 text-xs text-navy-500">{b.subtitle||b.description||b.excerpt||"—"}</p>{b.isAdmin&&<div className="mt-2 flex flex-wrap gap-2"><button onClick={()=>openEdit(b)} className="text-xs font-bold">Edit</button><a href={`/blog/${b.slug}`} target="_blank" rel="noreferrer" className="text-xs font-bold">Preview</a><button onClick={()=>togglePublish(b)} className="text-xs font-bold">{b.published?"Unpublish":"Publish"}</button><button onClick={()=>handleDelete(b.id)} className="text-xs font-bold text-terracotta-600">Delete</button></div>}</div></article>)}</div>
 
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

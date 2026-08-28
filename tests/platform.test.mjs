@@ -50,3 +50,9 @@ test("booking voucher PDF includes multiple branded pages and QR data",async()=>
   assert.ok(bytes.length>3000);
   assert.equal(bytes.subarray(0,4).toString(),"%PDF");
 });
+
+test("invoice PDF renders booking charges without requiring invented GST details",async()=>{
+  const bytes=await bookingDocument({reference:"NTB-20260808-INV123",billing:{name:"Asha Patil",city:"Mumbai"},package:{title:"Maharashtra Explorer",days:5,nights:4},travel_date:"2026-12-01",end_date:"2026-12-05",traveller_count:2,subtotal:24000,discount:0,tax:1000,total:25000,amount_paid:10000,balance_due:15000,payments:[]},"invoice");
+  assert.ok(bytes.length>2500);
+  assert.equal(bytes.subarray(0,4).toString(),"%PDF");
+});

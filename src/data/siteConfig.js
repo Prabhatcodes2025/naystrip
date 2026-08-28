@@ -6,9 +6,13 @@ export const defaultSiteSettings = {
   supportPhone: "+91 8097132424",
   whatsapp: "+91 8097132424",
   email: "hello@naystrip.com",
+  website: "https://www.naystrip.com",
   trekEmail: "naystrek@gmail.com",
   cancellationEmail: "cancellation@naystrip.com",
   address: "EL146, Mahape, Navi Mumbai, Maharashtra, India",
+  businessLegalName: "",
+  gstNumber: "",
+  invoiceAddress: "",
   businessHours: "Hours confirmed when you call",
   footerText: "Mumbai-based trip planners for tailor-made holidays, group travel, Maharashtra circuits, treks, expeditions and corporate journeys.",
   social: {
@@ -24,6 +28,7 @@ export const defaultSiteSettings = {
     packageCount: "",
     googleRating: "",
     googleReviewCount: "",
+    googleReviewUrl: "",
     happyTravellers: "",
     support24x7: false,
     msmeRegistration: "",
@@ -31,6 +36,7 @@ export const defaultSiteSettings = {
   },
   team: [],
   socialInitiative: { title: "", image: "", description: "", link: "", published: false },
+  b2bDefaultMarkupPercent: 10,
 };
 
 export function getSiteSettings() {

@@ -2,6 +2,8 @@ import QRCode from "qrcode";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+import { defaultSiteSettings } from "../../src/data/siteConfig.js";
+import { supabaseRequest } from "../_shared.js";
 const C = {
   navy: rgb(35 / 255, 59 / 255, 79 / 255),
   orange: rgb(244 / 255, 92 / 255, 15 / 255),
@@ -24,6 +26,8 @@ const wrap = (font, text, size, width) => {
   return lines;
 };
 export async function bookingDocument(booking, type = "voucher") {
+  let settings=defaultSiteSettings;
+  try{const response=await supabaseRequest("website_settings?id=eq.true&select=data&limit=1");if(response.ok){const [row]=await response.json();settings={...defaultSiteSettings,...(row?.data||{})}}}catch{}
   const pdf = await PDFDocument.create();
   const regular = await pdf.embedFont(StandardFonts.Helvetica);
   const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
@@ -53,6 +57,7 @@ export async function bookingDocument(booking, type = "voucher") {
       color: C.orange,
     });
     if (logo) {
+      const watermark=logo.scaleToFit(260,260);page.drawImage(logo,{x:(595.28-watermark.width)/2,y:(841.89-watermark.height)/2-30,width:watermark.width,height:watermark.height,opacity:.05});
       const scaled = logo.scaleToFit(104, 104);
       page.drawImage(logo, {
         x: 40,
@@ -61,21 +66,21 @@ export async function bookingDocument(booking, type = "voucher") {
         height: scaled.height,
       });
     }
-    page.drawText("NAYSTRIP & TREKS", {
+    page.drawText(String(settings.brandName||"NAYSTRIP & TREKS").toUpperCase(), {
       x: 370,
       y: 790,
       size: 10,
       font: bold,
       color: C.forest,
     });
-    page.drawText("Leisure to Adventure", {
+    page.drawText(settings.tagline||"Leisure to Adventure", {
       x: 370,
       y: 775,
       size: 8,
       font: regular,
       color: C.grey,
     });
-    page.drawText("+91 8097132424 | hello@naystrip.com", {
+    page.drawText(`${settings.phone} | ${settings.email}`, {
       x: 370,
       y: 760,
       size: 7,
@@ -207,6 +212,10 @@ export async function bookingDocument(booking, type = "voucher") {
     field("Invoice number", `INV-${booking.reference.replace("NTB-", "")}`);
     field("Invoice date", new Date().toISOString().slice(0, 10));
     field("Booking reference", booking.reference);
+    heading("Issued by");
+    field("Business", settings.businessLegalName||settings.brandName);
+    field("Address", settings.invoiceAddress||settings.address);
+    if(settings.gstNumber)field("GSTIN",settings.gstNumber);
     heading("Bill to");
     field("Name", booking.billing?.name);
     field(
@@ -226,6 +235,8 @@ export async function bookingDocument(booking, type = "voucher") {
       field("Company", booking.gst_details.company_name);
     heading("Charges");
     field("Package", booking.package?.title);
+    field("Service period",[booking.travel_date,booking.end_date].filter(Boolean).join(" to "));
+    field("Travellers",booking.traveller_count);
     field(
       "Taxable subtotal",
       `INR ${Number(booking.subtotal).toLocaleString("en-IN")}`,
@@ -248,10 +259,7 @@ export async function bookingDocument(booking, type = "voucher") {
       `INR ${Number(booking.balance_due).toLocaleString("en-IN")}`,
     );
     field("Payment reference", booking.payments?.find((payment)=>payment.status==="successful")?.gateway_payment_id || "Pending");
-    text(
-      "GST registration and legal invoice fields are controlled from NaysTrip business settings and must be configured by the owner before issuing a tax invoice.",
-      { size: 8, color: C.grey },
-    );
+    if(!settings.gstNumber)text("GSTIN is omitted because it is not configured in Website Settings.",{size:8,color:C.grey});
   }
   if (type === "receipt") {
     field("Receipt number", `RCP-${booking.reference.replace("NTB-", "")}`);
@@ -299,7 +307,7 @@ export async function bookingDocument(booking, type = "voucher") {
       color: rgb(0.8, 0.8, 0.8),
     });
     p.drawText(
-      `NaysTrip & Treks | naystrip.com | Page ${index + 1} of ${pages.length}`,
+      `${settings.brandName} | ${(()=>{try{return new URL(settings.website).host}catch{return "naystrip.com"}})()} | Page ${index + 1} of ${pages.length}`,
       { x: 40, y: 20, size: 7, font: regular, color: C.grey },
     );
   }
