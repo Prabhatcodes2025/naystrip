@@ -1,3 +1,4 @@
+import {suppliedPackages} from "./suppliedPackages.js";
 const commonInclusions = [
   "Accommodation on twin sharing basis for all mentioned nights as per itinerary",
   "Breakfast at all hotels as per itinerary",
@@ -143,6 +144,7 @@ export const tours = [
     {day:3,title:"Panhala Excursion",details:"Panhala Fort, Teen Darwaza, Sajja Kothi, Ambarkhana and Jyotiba Temple, then return to Kolhapur. Overnight in Kolhapur."},
     {day:4,title:"Kolhapur to Mumbai",details:"After breakfast proceed towards Mumbai with an en-route lunch stop and evening airport or railway drop."}
   ]}),
+  ...suppliedPackages,
 ];
 
 export const getTourBySlug = (slug) => tours.find((tour) => tour.slug === slug);

@@ -14,6 +14,7 @@ import { LoadError, PageLoader } from "../components/shared/Loading";
 import { whatsappHref } from "../data/siteConfig";
 import {
   downloadProtectedDocument,
+  downloadStoredDocument,
   getToken,
   openCashfree,
   portalFetch,
@@ -37,6 +38,17 @@ export default function CustomerDashboard() {
     setError("");
     try {
       await downloadProtectedDocument(reference, type);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy("");
+    }
+  };
+  const downloadStored = async (document) => {
+    setBusy(document.id);
+    setError("");
+    try {
+      await downloadStoredDocument(document.id, document.original_filename || document.display_name || "NAYSTRIP-Travel-Document.pdf");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -152,6 +164,7 @@ export default function CustomerDashboard() {
                     booking={booking}
                     busy={busy}
                     onDownload={download}
+                    onDownloadStored={downloadStored}
                     onPay={pay}
                     onCancel={cancel}
                   />
@@ -178,6 +191,7 @@ export default function CustomerDashboard() {
                     booking={booking}
                     busy={busy}
                     onDownload={download}
+                    onDownloadStored={downloadStored}
                   />
                 ))}
               </div>
@@ -196,7 +210,7 @@ function ProfileEditor({profile,onSaved}) {
   return <section className="mt-8 rounded-2xl bg-white p-5"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-display text-xl text-[#173c34]">Your profile</h2><p className="text-sm text-slate-500">{profile.email} · {profile.phone||"Phone not added"}</p></div><button type="button" onClick={()=>setEditing(value=>!value)} className="btn-secondary">{editing?"Close":"Edit profile"}</button></div>{message&&<p className="mt-3 text-sm">{message}</p>}{editing&&<form onSubmit={save} className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"><label><span className="label-field">First name</span><input required value={form.firstName} onChange={event=>setForm({...form,firstName:event.target.value})} className="input-field"/></label><label><span className="label-field">Last name</span><input value={form.lastName} onChange={event=>setForm({...form,lastName:event.target.value})} className="input-field"/></label><label><span className="label-field">Phone</span><input required value={form.phone} onChange={event=>setForm({...form,phone:event.target.value})} className="input-field"/></label><label><span className="label-field">WhatsApp</span><input value={form.whatsapp} onChange={event=>setForm({...form,whatsapp:event.target.value})} className="input-field"/></label><button className="btn-primary sm:col-span-2 lg:col-span-1">Save profile</button></form>}</section>;
 }
 
-function BookingCard({ booking, busy, onDownload, onPay, onCancel }) {
+function BookingCard({ booking, busy, onDownload, onDownloadStored, onPay, onCancel }) {
   const progress = booking.total
     ? Math.min(
         100,
@@ -256,6 +270,14 @@ function BookingCard({ booking, busy, onDownload, onPay, onCancel }) {
             {busy === `${booking.reference}-${type}` ? "Preparing…" : type}
           </button>
         ))}
+        {(booking.documents || [])
+          .filter((document) => ["hotel_voucher", "transport_voucher", "ticket", "other"].includes(document.document_type))
+          .map((document) => (
+            <button key={document.id} disabled={busy === document.id} onClick={() => onDownloadStored(document)} className="btn-secondary">
+              <Download size={14} />
+              {busy === document.id ? "Downloading…" : document.display_name || document.document_type.replaceAll("_", " ")}
+            </button>
+          ))}
         {booking.balance_due > 0 && onPay && (
           <button
             disabled={busy === booking.reference}

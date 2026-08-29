@@ -21,6 +21,10 @@ const templates = {
     subject: `Invoice ready - ${p.reference}`,
     html: `<h2>Your invoice is ready</h2><p>Open your customer dashboard to securely download it.</p>`,
   }),
+  document_ready: (p) => ({
+    subject: `${p.documentName || "Travel document"} ready • ${p.reference}`,
+    html: `<h2>Your ${htmlEscape(p.documentName || "travel document")} is ready</h2><p>For your security, open the customer dashboard to view or download it.</p><p><a href="${htmlEscape(p.portalUrl)}">Open customer dashboard</a></p>`,
+  }),
   payment_reminder: (p) => ({
     subject: `Payment reminder - ${p.reference}`,
     html: `<h2>Balance payment reminder</h2><p>INR ${htmlEscape(p.balanceDue)} remains due for ${htmlEscape(p.packageTitle)}.</p>`,

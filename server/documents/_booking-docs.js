@@ -143,7 +143,8 @@ export async function bookingDocument(booking, type = "voucher") {
     field("Booking status", booking.operational_status);
     field("Payment status", booking.payment_state);
     field("Customer", booking.billing?.name);
-    field("Package", booking.package?.title);
+    field("Package", `${booking.package?.title || "Travel services"} · Qty 1 · INR ${Number(booking.subtotal || booking.total).toLocaleString("en-IN")}`);
+    for (const addon of booking.addons || []) field(addon.addon_name, `Qty ${addon.quantity} · INR ${Number(addon.unit_amount).toLocaleString("en-IN")} each · INR ${Number(addon.total_amount).toLocaleString("en-IN")}`);
     field("Destination", (booking.package?.destination_names || []).join(", "));
     field(
       "Travel dates",
@@ -245,7 +246,7 @@ export async function bookingDocument(booking, type = "voucher") {
       "Discount",
       `INR ${Number(booking.discount || 0).toLocaleString("en-IN")}`,
     );
-    field("Tax / GST", `INR ${Number(booking.tax).toLocaleString("en-IN")}`);
+    if(Number(booking.tax)>0)field(settings.gstNumber?"Tax / GST":"Tax", `INR ${Number(booking.tax).toLocaleString("en-IN")}`);
     field(
       "Final amount",
       `INR ${Number(booking.total).toLocaleString("en-IN")}`,

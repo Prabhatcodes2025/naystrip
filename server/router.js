@@ -1,4 +1,5 @@
 import adminBookings from "./admin/bookings.js";
+import adminBookingDocuments from "./admin/booking-documents.js";
 import adminContent from "./admin/content.js";
 import adminCustomers from "./admin/customers.js";
 import adminAgents from "./admin/agents.js";
@@ -44,6 +45,7 @@ import settings from "./settings.js";
 export const routes = new Map([
   ["admin/agents", adminAgents],
   ["admin/bookings", adminBookings],
+  ["admin/booking-documents", adminBookingDocuments],
   ["admin/content", adminContent],
   ["admin/customers", adminCustomers],
   ["admin/departures", adminDepartures],
@@ -108,13 +110,18 @@ async function parseBody(req) {
   for await (const chunk of req) {
     const value = Buffer.from(chunk);
     bytes += value.length;
-    if (bytes > 2_000_000)
+    if (bytes > (type.includes("application/pdf") ? 10_000_000 : 2_000_000))
       throw Object.assign(new Error("Request body too large"), {
         statusCode: 413,
       });
     chunks.push(value);
   }
-  const raw = Buffer.concat(chunks).toString("utf8");
+  const buffer = Buffer.concat(chunks);
+  if (type.includes("application/pdf")) {
+    req.body = buffer;
+    return;
+  }
+  const raw = buffer.toString("utf8");
   if (!raw) {
     req.body = {};
     return;

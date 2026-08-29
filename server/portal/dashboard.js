@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     return json(res, 405, { error: "Method not allowed" });
   try {
     const response = await supabaseRequest(
-      `bookings?customer_id=eq.${session.user.id}&select=id,reference,travel_date,end_date,traveller_count,total,amount_paid,balance_due,currency,payment_state,operational_status,status,created_at,package:packages(title,slug,destination_names,days,nights),travellers:booking_travellers(id,full_name,traveller_type,nationality),documents:booking_documents(id,document_type,version,generated_at),payments(id,amount,status,payment_method,captured_at,created_at),cancellations:cancellation_requests(id,status,reason,created_at)&order=travel_date.asc`,
+      `bookings?customer_id=eq.${session.user.id}&select=id,reference,travel_date,end_date,traveller_count,total,amount_paid,balance_due,currency,payment_state,operational_status,status,created_at,package:packages(title,slug,destination_names,days,nights),travellers:booking_travellers(id,full_name,traveller_type,nationality),documents:booking_documents(id,document_type,version,generated_at,display_name,original_filename),payments(id,amount,status,payment_method,captured_at,created_at),cancellations:cancellation_requests(id,status,reason,created_at)&order=travel_date.asc`,
     );
     const bookings = await response.json();
     if (!response.ok)

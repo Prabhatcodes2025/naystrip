@@ -33,6 +33,7 @@ const BookingVerify = lazy(() => import("./pages/BookingVerify"));
 const CustomerDashboard = lazy(() => import("./pages/CustomerDashboard"));
 const B2BDashboard = lazy(() => import("./pages/B2BDashboard"));
 const QuotationView = lazy(() => import("./pages/QuotationView"));
+const Reviews = lazy(() => import("./pages/Reviews"));
 
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
@@ -87,6 +88,7 @@ export default function App() {
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogDetail />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/reviews" element={<Reviews />} />
         <Route path="/about" element={<StaticPage slug="about" />} />
         <Route path="/careers" element={<StaticPage slug="careers" />} />
         <Route path="/terms" element={<StaticPage slug="terms" />} />

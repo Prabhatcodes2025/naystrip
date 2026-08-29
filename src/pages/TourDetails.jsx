@@ -164,9 +164,8 @@ export default function TourDetails({ shareable = false }) {
               Quote
             </p>
             <p className="mt-1 font-display text-xl text-[#173c34]">
-              {bookingInfo?.booking_state?.online &&
-              bookingInfo.price_from != null
-                ? `From INR ${Number(bookingInfo.price_from).toLocaleString("en-IN")}`
+              {bookingInfo?.price_from != null || tour.price != null
+                ? `INR ${Number(bookingInfo?.price_from ?? tour.price).toLocaleString("en-IN")} PP`
                 : "Price on request"}
             </p>
           </div>
@@ -191,6 +190,7 @@ export default function TourDetails({ shareable = false }) {
             <p className="mt-5 max-w-3xl leading-7 text-slate-600">
               {tour.overview}
             </p>
+            {tour.bestFor&&<p className="mt-3 max-w-3xl text-sm font-semibold text-[#173c34]">Best for: {tour.bestFor}</p>}
             <div className="mt-7 flex flex-wrap gap-2 print:hidden">
               {bookingInfo?.booking_state?.online && (
                 <Link to={`/checkout/${tour.slug}`} className="btn-primary">
