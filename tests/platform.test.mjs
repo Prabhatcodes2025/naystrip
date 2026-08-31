@@ -22,7 +22,7 @@ test("Vercel Hobby deployment has exactly one function entry",()=>{
 
 test("every Admin lazy import resolves to source and no hashed chunk is hardcoded",()=>{
   const app=readFileSync(join(process.cwd(),"src","App.jsx"),"utf8");
-  const names=["AdminLayout","AdminDashboard","AdminBookings","AdminLeads","AdminTours","AdminQuotations","AdminDepartures","AdminNotifications","AdminSettings","AdminBlogs","AdminStories"];
+  const names=["AdminLayout","AdminDashboard","AdminBookings","AdminInvoices","AdminLeads","AdminTours","AdminQuotations","AdminDepartures","AdminNotifications","AdminSettings","AdminBlogs","AdminStories"];
   for(const name of names){assert.match(app,new RegExp(`lazy\\(\\(\\) => import\\(\\"\\./pages/admin/${name}\\"\\)\\)`));assert.equal(existsSync(join(process.cwd(),"src","pages","admin",`${name}.jsx`)),true)}
   assert.doesNotMatch(app,/assets\/[A-Za-z]+-[A-Za-z0-9_-]+\.js/);
 });

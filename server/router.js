@@ -1,5 +1,7 @@
 import adminBookings from "./admin/bookings.js";
 import adminBookingDocuments from "./admin/booking-documents.js";
+import adminDocumentDelivery from "./admin/document-delivery.js";
+import adminInvoices from "./admin/invoices.js";
 import adminContent from "./admin/content.js";
 import adminCustomers from "./admin/customers.js";
 import adminAgents from "./admin/agents.js";
@@ -46,6 +48,8 @@ export const routes = new Map([
   ["admin/agents", adminAgents],
   ["admin/bookings", adminBookings],
   ["admin/booking-documents", adminBookingDocuments],
+  ["admin/document-delivery", adminDocumentDelivery],
+  ["admin/invoices", adminInvoices],
   ["admin/content", adminContent],
   ["admin/customers", adminCustomers],
   ["admin/departures", adminDepartures],

@@ -21,10 +21,13 @@ const templates = {
     subject: `Invoice ready - ${p.reference}`,
     html: `<h2>Your invoice is ready</h2><p>Open your customer dashboard to securely download it.</p>`,
   }),
-  document_ready: (p) => ({
-    subject: `${p.documentName || "Travel document"} ready • ${p.reference}`,
-    html: `<h2>Your ${htmlEscape(p.documentName || "travel document")} is ready</h2><p>For your security, open the customer dashboard to view or download it.</p><p><a href="${htmlEscape(p.portalUrl)}">Open customer dashboard</a></p>`,
-  }),
+  document_ready: (p) => {
+    const type=p.documentType;
+    const title=type==="hotel_voucher"?"Hotel Booking Voucher":type==="transport_voucher"?"Transport Booking Voucher":type==="invoice"?`Invoice ${p.invoiceNumber||""}`:p.documentName||"Travel Document";
+    const subject=type==="hotel_voucher"?`Your Hotel Booking Voucher | ${p.reference} | NaysTrip`:type==="transport_voucher"?`Your Transport Booking Voucher | ${p.reference} | NaysTrip`:type==="invoice"?`Invoice ${p.invoiceNumber||p.reference} | NaysTrip`:`${title} | ${p.reference} | NaysTrip`;
+    const detail=type==="hotel_voucher"?`<p><strong>Hotel:</strong> ${htmlEscape(p.hotelName||"Confirmed accommodation")}<br><strong>Check-in / check-out:</strong> ${htmlEscape(p.checkIn||"-")} / ${htmlEscape(p.checkOut||"-")}<br><strong>Status:</strong> ${htmlEscape(p.bookingStatus||"confirmed")}</p>`:type==="transport_voucher"?`<p><strong>Route:</strong> ${htmlEscape(p.route||"Confirmed transport service")}<br><strong>Travel date:</strong> ${htmlEscape(p.travelDate||"-")}<br>${p.vehicle?`<strong>Vehicle:</strong> ${htmlEscape(p.vehicle)}<br>`:""}<strong>Reference:</strong> ${htmlEscape(p.reference)}</p>`:type==="invoice"?`<p><strong>Invoice number:</strong> ${htmlEscape(p.invoiceNumber)}<br><strong>Booking reference:</strong> ${htmlEscape(p.reference||"-")}<br><strong>Invoice date:</strong> ${htmlEscape(p.invoiceDate||"-")}<br><strong>Total:</strong> INR ${htmlEscape(p.total||0)}<br><strong>Paid:</strong> INR ${htmlEscape(p.paid||0)}<br><strong>Balance:</strong> INR ${htmlEscape(p.balance||0)}</p>`:`<p><strong>Reference:</strong> ${htmlEscape(p.reference)}</p>`;
+    return {subject,html:`<h2 style="margin:0 0 12px;color:#173c34">Hello ${htmlEscape(p.customerName||"Traveller")},</h2><p>Your NaysTrip ${htmlEscape(title)} is ready.</p>${detail}<p style="margin:24px 0"><a href="${htmlEscape(p.documentUrl)}" style="display:inline-block;background:#f45c0f;color:#fff;text-decoration:none;padding:12px 20px;border-radius:6px;font-weight:700">View / download ${htmlEscape(title)}</a></p><p style="color:#59636b;font-size:13px">This secure link expires automatically. The PDF is also attached when size permits.</p>`};
+  },
   payment_reminder: (p) => ({
     subject: `Payment reminder - ${p.reference}`,
     html: `<h2>Balance payment reminder</h2><p>INR ${htmlEscape(p.balanceDue)} remains due for ${htmlEscape(p.packageTitle)}.</p>`,
@@ -83,6 +86,7 @@ export async function deliverNotification({
   channel = "email",
   payload = {},
   idempotencyKey,
+  attachments = [],
 }) {
   const provider =
     channel === "email"
@@ -116,6 +120,7 @@ export async function deliverNotification({
       const content = (templates[event] || templates.booking_confirmed)(
         payload,
       );
+      if(!recipient)throw new Error("Recipient email is missing");
       const response = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
@@ -126,10 +131,11 @@ export async function deliverNotification({
           from: process.env.RESEND_FROM,
           to: [recipient],
           subject: content.subject,
-          html: `<div style="font-family:Arial,sans-serif;color:#233b4f"><img src="https://www.naystrip.com/branding/naystrip-logo.png" width="170" alt="NaysTrip – Leisure to Adventure">${content.html}<p>Support: ${process.env.SUPPORT_EMAIL || "hello@naystrip.com"} · +91 8097132424</p></div>`,
+          html: `<div style="background:#fff8f1;padding:24px"><div style="max-width:620px;margin:auto;background:#fff;border-top:6px solid #f45c0f;padding:28px;font-family:Arial,sans-serif;color:#233b4f"><img src="https://www.naystrip.com/branding/naystrip-logo.png" width="170" alt="NaysTrip - Leisure to Adventure" style="margin-bottom:24px">${content.html}<hr style="border:0;border-top:1px solid #dde2e5;margin:28px 0"><p style="font-size:13px;color:#59636b">Support: ${htmlEscape(process.env.SUPPORT_EMAIL || "hello@naystrip.com")} | +91 8097132424</p></div></div>`,
+          ...(attachments.length?{attachments:attachments.map((item)=>({filename:item.filename,content:Buffer.from(item.content).toString("base64")}))}:{}),
         }),
       });
-      const data = await response.json();
+      const data = await response.json().catch(()=>({}));
       if (!response.ok)
         throw new Error(data.message || "Resend delivery failed");
       await patch(row.id, {

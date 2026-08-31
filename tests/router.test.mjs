@@ -7,6 +7,7 @@ import dispatch,{routeFromRequest,routes} from "../server/router.js";
 
 const expected=["admin/agents","admin/bookings","admin/content","admin/customers","admin/departures","admin/leads","admin/media","admin/notifications","admin/packages","admin/subscribers","admin/tours","admin/quotation-actions","admin/quotations","auth/admin","auth/portal","auth/recover","auth/register","auth/update-password","b2b/create-booking","b2b/dashboard","bookings/create","bookings/options","bookings/preview","bookings/verify","config","content","cron/reminders","departures","documents/booking","documents/itinerary","documents/quotation","documents/service-voucher","leads","newsletter","packages","payments/create-order","payments/verify","payments/webhook","portal/cancel","portal/dashboard","portal/profile","quotations/view","settings"];
 expected.push("admin/booking-documents");
+expected.push("admin/document-delivery","admin/invoices");
 
 function response(){return {statusCode:200,headers:{},body:null,status(code){this.statusCode=code;return this},setHeader(key,value){this.headers[key]=value;return this},json(value){this.body=value;return this},end(value){this.body=value;return this},send(value){this.body=value;return this}}}
 function request({path,method="GET",body,headers={}}){const req=Readable.from(body===undefined?[]:[Buffer.from(body)]);req.method=method;req.url=`/api/${path}`;req.query={route:path.split("/")};req.headers=headers;return req}

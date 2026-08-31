@@ -12,6 +12,7 @@ const navItems = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/admin/tours", label: "Tour Management", icon: Map },
   { to: "/admin/bookings", label: "Bookings", icon: FileText },
+  { to: "/admin/invoices", label: "Invoices", icon: FileText },
   { to: "/admin/vouchers", label: "Hotel & Taxi Vouchers", icon: FileText },
   { to: "/admin/customers", label: "Customers", icon: Users },
   { to: "/admin/departures", label: "Fixed Departures", icon: CalendarDays },

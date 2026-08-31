@@ -51,6 +51,7 @@ const AdminNotifications = lazy(() => import("./pages/admin/AdminNotifications")
 const AdminAgents = lazy(() => import("./pages/admin/AdminAgents"));
 const AdminCustomers = lazy(() => import("./pages/admin/AdminCustomers"));
 const AdminVouchers = lazy(() => import("./pages/admin/AdminVouchers"));
+const AdminInvoices = lazy(() => import("./pages/admin/AdminInvoices"));
 const AdminSubscribers = lazy(() => import("./pages/admin/AdminSubscribers"));
 
 function BootComplete({ onReady }) {
@@ -124,6 +125,7 @@ export default function App() {
         <Route index element={<AdminDashboard />} />
         <Route path="tours" element={<AdminTours />} />
         <Route path="bookings" element={<AdminBookings />} />
+        <Route path="invoices" element={<AdminInvoices />} />
         <Route path="departures" element={<AdminDepartures />} />
         <Route path="leads" element={<AdminLeads />} />
         <Route path="contact-leads" element={<AdminContactLeads />} />

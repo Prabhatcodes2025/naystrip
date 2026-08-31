@@ -12,6 +12,7 @@
     "seed": "node scripts/seed.mjs"
   },
   "dependencies": {
+    "docx": "^9.5.1",
     "framer-motion": "^12.42.2",
     "lucide-react": "^0.400.0",
     "pdf-lib": "^1.17.1",
