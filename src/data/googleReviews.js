@@ -33,7 +33,7 @@ export const googleReviews = [
     "id": 5,
     "name": "Shankar Karale",
     "date": "8 months ago",
-    "text": "Our Himachal trip with Naystrip and Treks was absolutely amazing! The entire journey—from planning to completion—was smooth, well-organized, and completely hassle-free. The team arranged comfortable hotels, reliable transportation, and a …More",
+    "text": "Our Himachal trip with Naystrip and Treks was absolutely amazing! The entire journey—from planning to completion—was smooth, well-organized, and completely hassle-free. The team arranged comfortable hotels, reliable transportation, and a perfectly balanced itinerary covering all the best spots in Himachal. Their coordination and communication were excellent throughout the trip, and they were always available whenever we needed assistance. Thanks to Naystrip and Treks, we had a safe, memorable, and truly enjoyable vacation. Highly recommend their services for anyone planning a Himachal getaway!",
     "rating": 5
   },
   {
@@ -117,7 +117,7 @@ export const googleReviews = [
     "id": 17,
     "name": "Pravin Bhile",
     "date": "8 months ago",
-    "text": "Proper planning and execution is the onus of any trip….Agency planned out Vaishnodevi trip very nicely and team got involved personally, Yatra was seamless trouble free and extra value for money. …More",
+    "text": "Proper planning and execution is the onus of any trip….Agency planned out Vaishnodevi trip very nicely and team got involved personally, Yatra was seamless trouble free and extra value for money. I highly recommend Mr. Lokesh and team as a Travell planner and executor.",
     "rating": 5
   },
   {
@@ -171,10 +171,10 @@ export const googleReviews = [
   },
   {
     "id": 25,
-    "name": "Deepika kulkarni",
+    "name": "Deepika Kulkarni",
     "date": "a month ago",
-    "text": "From the initial planning stage to the completion of our trip, the entire experience was handled with exceptional professionalism. Every aspect of our itinerary was well thought out and perfectly coordinated. Their recommendations for …More",
+    "text": "From the initial planning stage to the completion of our trip, the entire experience was handled with exceptional professionalism. Every aspect of our itinerary was well thought out and perfectly coordinated. Their recommendations for destinations, sightseeing, and local experiences added tremendous value to our trip. They provided excellent travel deals and selected hotels that offered the perfect balance of comfort, location, and value for money. Every booking was seamless, and all arrangements were made well in advance, which allowed us to enjoy our vacation without any stress or last-minute surprises. I highly recommend them to anyone looking for a hassle-free vacation with excellent service and outstanding value. I will definitely choose them again for my future travels.",
     "rating": 5
   }
 ];
-export const featuredGoogleReviews = googleReviews.filter((review)=>[2,3,7,8,10,11,15,18].includes(review.id));
+export const featuredGoogleReviews = googleReviews.filter((review)=>[25,1,17,6,5,4,2,3].includes(review.id));

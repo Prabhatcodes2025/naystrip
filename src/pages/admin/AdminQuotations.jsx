@@ -366,11 +366,13 @@ export default function AdminQuotations() {
       <section className="mt-8">
         <h2 className="font-display text-xl">Recent quotations</h2>
         <div className="mt-3 overflow-x-auto rounded-2xl border bg-white">
-          <table className="w-full min-w-[850px] text-sm">
+          <table className="w-full min-w-[1050px] text-sm">
             <thead>
               <tr className="border-b text-left">
                 <th className="p-4">Reference</th>
                 <th className="p-4">Customer</th>
+                <th className="p-4">Agent / Agency</th>
+                <th className="p-4">Enquiry</th>
                 <th className="p-4">Total</th>
                 <th className="p-4">Status</th>
                 <th className="p-4">Actions</th>
@@ -381,6 +383,8 @@ export default function AdminQuotations() {
                 <tr key={quote.id} className="border-b">
                   <td className="p-4 font-mono">{quote.reference}</td>
                   <td className="p-4">{quote.customer_name}</td>
+                  <td className="p-4">{quote.agent?.business_name||quote.agent_id||"Direct"}</td>
+                  <td className="p-4 font-mono text-xs">{quote.inquiry?.id||quote.inquiry_id||"—"}</td>
                   <td className="p-4">
                     INR {Number(quote.total).toLocaleString("en-IN")}
                   </td>

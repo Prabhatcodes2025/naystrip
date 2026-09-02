@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   if (!admin) return;
   try {
     if (req.method === "GET") {
-      const response = await supabaseRequest("quotations?select=*,lines:quotation_lines(*)&order=created_at.desc&limit=200");
+      const response = await supabaseRequest("quotations?select=*,agent:b2b_agents(id,business_name),inquiry:inquiries(id,enquiry_source,package_id),lines:quotation_lines(*)&order=created_at.desc&limit=200");
       return response.ok
         ? json(res, 200, { quotations: await response.json() })
         : json(res, 502, { error: await databaseError(response, "Unable to load quotations") });

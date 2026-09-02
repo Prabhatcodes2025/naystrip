@@ -78,17 +78,19 @@ function invoiceModel(booking, invoice, settings) {
 function hotelModel(booking) {
   const details = booking.document_details?.hotel_voucher || {};
   const policySections = [["Cancellation Policy", details.cancellationPolicy], ["Check-in Instructions", details.checkInInstructions], ["Important Information", details.importantInformation], ["Other Information", details.otherInformation], ["Hotel Booking Policy", details.bookingPolicy], ["No-show", details.noShowPolicy], ["Amendments", details.amendmentPolicy], ["Refund Information", details.refundInformation]];
-  const guests = (booking.travellers || []).map((item) => item.full_name || [item.first_name, item.last_name].filter(Boolean).join(" ")).filter(Boolean);
+  const guests = list(details.guestNames).length ? list(details.guestNames) : (booking.travellers || []).map((item) => item.full_name || [item.first_name, item.last_name].filter(Boolean).join(" ")).filter(Boolean);
+  const fareParts = [["Base amount", details.baseAmount ?? booking.subtotal], ["Taxes / charges", details.taxes ?? booking.tax], ["Service charges", details.serviceCharges]].filter(([, value]) => present(value));
+  const calculatedTotal = fareParts.length ? fareParts.reduce((sum, [, value]) => sum + Number(value || 0), 0) : Number(details.total ?? booking.total ?? 0);
   const reference = safeReference(booking.reference);
   return {
     type: "hotel_voucher", title: "HOTEL BOOKING VOUCHER", subtitle: details.hotelName || booking.package?.title || "Hotel accommodation", reference,
     filenameBase: `NAYSTRIP-Hotel-Voucher-${reference}`,
-    meta: rows([["Voucher number", details.voucherNumber || reference], ["Reference ID", booking.reference], ["Booking status", booking.operational_status]]),
+    metaLayout: "compact", meta: rows([["Voucher number", details.voucherNumber || reference], ["Reference ID", booking.reference], ["Booking status", booking.operational_status]]),
     sections: [
       { heading: "Hotel Details", rows: rows([["Hotel name", details.hotelName], ["Address", details.hotelAddress], ["Rating", details.rating]]) },
-      { heading: "Booking Details", rows: rows([["Check-in", date(details.checkIn || booking.travel_date)], ["Check-out", date(details.checkOut || booking.end_date)], ["Check-in time", details.checkInTime], ["Check-out time", details.checkOutTime], ["Duration", details.duration || (booking.package?.days ? `${booking.package.days} days / ${booking.package.nights || 0} nights` : "")], ["Accommodation type", details.accommodationType || booking.hotel_category], ["Rooms", details.rooms || booking.room_count], ["Guests", details.guests || booking.traveller_count]]) },
-      { heading: "Staying Guest Details", table: { headers: ["Room type", "Staying guests", "Inclusions / policy"], rows: [[details.roomType || booking.hotel_category, details.guestNames || guests.join(", "), details.inclusions || ""]] } },
-      { heading: "Fare Details", rows: rows([["Base amount", money(details.baseAmount ?? booking.subtotal)], ["Taxes / charges", money(details.taxes ?? booking.tax)], ["Management / service charges", money(details.serviceCharges)], ["Total", money(details.total ?? booking.total)]]) },
+      { heading: "Booking Details", layout: "grid", rows: rows([["Check-in date", date(details.checkIn || booking.travel_date)], ["Check-in time", details.checkInTime], ["Check-out date", date(details.checkOut || booking.end_date)], ["Check-out time", details.checkOutTime], ["Duration", details.duration || (booking.package?.days ? `${booking.package.days} days / ${booking.package.nights || 0} nights` : "")], ["Accommodation type", details.accommodationType || booking.hotel_category], ["Rooms", details.rooms || booking.room_count], ["Guests", details.guests || booking.traveller_count]]) },
+      { heading: "Staying Guest Details", table: { widths: [1300, 1250, 2800, 4010], headers: ["Room type", "Staying guests", "Guest name(s)", "Inclusions / policy"], rows: (guests.length ? guests : [""]).map((guest, index) => [index === 0 ? details.roomType || booking.hotel_category : "", index === 0 ? String(details.guests || booking.traveller_count || guests.length || "") : "", guest, index === 0 ? details.inclusions || "" : ""]) } },
+      { heading: "Fare Details", layout: "fare", rows: [...fareParts.map(([label, value]) => ({ label, value: money(value) })), { label: "Total", value: money(calculatedTotal) }] },
       ...policySections.filter(([, value]) => present(value)).map(([heading, value]) => ({ heading, bullets: list(value) })),
     ], summary: { customerName: booking.billing?.name, hotelName: details.hotelName || booking.package?.title, checkIn: date(details.checkIn || booking.travel_date), checkOut: date(details.checkOut || booking.end_date), status: booking.operational_status },
   };
