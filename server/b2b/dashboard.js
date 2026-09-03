@@ -33,7 +33,7 @@ export default async function handler(req,res){
    const [packagesResponse,ratesResponse,bookingsResponse,enquiriesResponse,quotesResponse,site]=await Promise.all([
     supabaseRequest("packages?status=eq.published&deleted_at=is.null&select=id,slug,title,package_type,destination_names,days,nights,price_from,status&order=featured.desc,created_at.desc"),
     supabaseRequest("package_agent_rates?active=eq.true&select=id,package_id,retail_price,agent_price,markup,commission,valid_from,valid_until&order=created_at.desc"),
-    supabaseRequest(`bookings?agent_id=eq.${agentId}&select=id,reference,travel_date,traveller_count,total,amount_paid,balance_due,payment_state,operational_status,package:packages(title),documents:booking_documents(id,document_type,created_at)&order=created_at.desc&limit=100`),
+    supabaseRequest(`bookings?agent_id=eq.${agentId}&select=id,reference,travel_date,traveller_count,total,amount_paid,balance_due,payment_state,operational_status,package:packages(title),documents:booking_documents(id,document_type,created_at:generated_at)&order=created_at.desc&limit=100`),
     supabaseRequest(`inquiries?agent_id=eq.${agentId}&kind=eq.b2b_enquiry&select=*,activities:lead_activities(id,notes,activity_type,agent_id,created_at),package:packages(id,slug,title,days,nights)&order=created_at.desc&limit=100`),
     supabaseRequest(`quotations?agent_id=eq.${agentId}&select=*,inquiry:inquiries(id,package_id,enquiry_source),lines:quotation_lines(*)&order=created_at.desc&limit=100`),settings(),
    ]);

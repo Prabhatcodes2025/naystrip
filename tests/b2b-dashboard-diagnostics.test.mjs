@@ -14,6 +14,10 @@ function setup(t){
   if(parsed.pathname==="/auth/v1/user")return Response.json({id:agentId});
   if(table==="b2b_agents")return Response.json([{id:agentId,user_id:agentId,verification_status:"approved",email:"private@example.invalid"}]);
   if(["inquiries","quotations","bookings"].includes(table))assert.equal(parsed.searchParams.get("agent_id"),"eq."+agentId);
+  if(table==="bookings"){
+   assert.match(parsed.searchParams.get("select"),/documents:booking_documents\(id,document_type,created_at:generated_at\)/);
+   assert.equal(parsed.searchParams.get("order"),"created_at.desc"); // Orders bookings, not documents.
+  }
   if(table===state.failed)return Response.json(state.body,{status:state.status,statusText:"Bad Request"});
   return Response.json([]);
  };
