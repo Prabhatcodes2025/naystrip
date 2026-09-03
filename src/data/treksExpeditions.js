@@ -4,9 +4,9 @@ export const treks = [
     name: "Everest Base Camp",
     category: "Trek",
     country: "Nepal",
-    image: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?fm=webp&fit=crop&w=1200&q=80",
     gallery: [
-      "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?fm=webp&fit=crop&w=1200&q=80",
       "https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=1200&q=80",
     ],
     bestSeason: "March–May, Sept–Nov",

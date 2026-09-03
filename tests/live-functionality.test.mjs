@@ -15,7 +15,7 @@ function response(){return {statusCode:200,headers:{},raw:"",status(code){this.s
 function jsonBody(res){return typeof res.raw==="string"?JSON.parse(res.raw):res.raw}
 function jsonResponse(body,status=200){return new Response(JSON.stringify(body),{status,headers:{"content-type":"application/json"}})}
 function configureSupabase(){process.env.SUPABASE_URL="https://example.supabase.co";process.env.SUPABASE_SERVICE_ROLE_KEY="test-service-role"}
-function leadRequest(path="leads",payload={name:"Test Traveller",phone:"9876543210",email:""},kind="contact"){const body=JSON.stringify({kind,payload,clientReference:`CTC-20260813-${crypto.randomUUID().slice(0,8)}`,website:"naystrip.com",captchaToken:null});const req=Readable.from([Buffer.from(body)]);req.method="POST";req.url=`/api/${path}`;req.query={route:path};req.headers={"content-type":"application/json",origin:"https://www.naystrek.com","x-forwarded-for":crypto.randomUUID()};return req}
+function leadRequest(path="leads",payload={name:"Test Traveller",phone:"9876543210",email:""},kind="contact"){const body=JSON.stringify({kind,payload,clientReference:`CTC-20260813-${crypto.randomUUID().slice(0,8)}`,website:"naystrip.com",captchaToken:null});const req=Readable.from([Buffer.from(body)]);req.method="POST";req.url=`/api/${path}`;req.query={route:path};req.headers={"content-type":"application/json",origin:"https://www.naystrip.com","x-forwarded-for":crypto.randomUUID()};return req}
 
 test.afterEach(restore);
 
@@ -66,5 +66,5 @@ test("catch-all router dispatches separate contact, custom-trip, package and qui
 
 test("production origin allowlist includes the live domain and configured canonical origin",()=>{
   process.env.PUBLIC_SITE_URL="https://preview.example.com/path";
-  assert.equal(isAllowedOrigin("https://www.naystrek.com"),true);assert.equal(isAllowedOrigin("https://preview.example.com"),true);assert.equal(isAllowedOrigin("https://evil.example"),false);
+  assert.equal(isAllowedOrigin("https://www.naystrip.com"),true);assert.equal(isAllowedOrigin("https://preview.example.com"),true);assert.equal(isAllowedOrigin("https://evil.example"),false);
 });

@@ -9,7 +9,7 @@ import { clean, dateOnly, money, uuidPattern } from "../_validation.js";
 import { deliverNotification } from "../_notifications.js";
 
 const reference=(prefix)=>`${prefix}-${new Date().toISOString().slice(0,10).replaceAll("-","")}-${crypto.randomUUID().slice(0,6).toUpperCase()}`;
-const quoteUrl=(quote,token)=>`${process.env.PUBLIC_SITE_URL||"https://naystrip.vercel.app"}/quotation/${quote.reference}?token=${token}`;
+const quoteUrl=(quote,token)=>`${(process.env.PUBLIC_SITE_URL||"https://www.naystrip.com").replace(/\/$/,"")}/quotation/${quote.reference}?token=${token}`;
 const amount=(value)=>value===null||value===undefined||value===""?null:(Number.isFinite(Number(value))&&Number(value)>=0?Number(value):null);
 async function dashboardRows(response,query){
  const body=await response.json().catch(()=>null);

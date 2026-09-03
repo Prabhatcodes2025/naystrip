@@ -32,7 +32,7 @@ test("admin can create, list, reopen, edit and preview a quotation", async (t) =
   process.env.SUPABASE_URL = "https://db.example";
   process.env.SUPABASE_ANON_KEY = "anon";
   process.env.SUPABASE_SERVICE_ROLE_KEY = "service";
-  process.env.PUBLIC_SITE_URL = "https://www.naystrek.com";
+  process.env.PUBLIC_SITE_URL = "https://www.naystrip.com";
 
   let quote;
   let lines = [];
@@ -98,5 +98,5 @@ test("admin can create, list, reopen, edit and preview a quotation", async (t) =
 
   const preview = await invoke(quotationActions, "POST", { id: quoteId, action: "preview" });
   assert.equal(preview.status, 200);
-  assert.match(preview.data.url, /^https:\/\/www\.naystrek\.com\/quotation\/NTQ-/);
+  assert.match(preview.data.url, /^https:\/\/www\.naystrip\.com\/quotation\/NTQ-/);
 });

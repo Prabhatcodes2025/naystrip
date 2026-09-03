@@ -4,7 +4,7 @@ import { json, supabaseRequest } from "../_shared.js";
 import { bookingReference, clean, uuidPattern } from "../_validation.js";
 
 const publicQuoteUrl = (quote, token) =>
-  `${process.env.PUBLIC_SITE_URL || "https://naystrip.vercel.app"}/quotation/${quote.reference}?token=${token}`;
+  `${(process.env.PUBLIC_SITE_URL || "https://www.naystrip.com").replace(/\/$/, "")}/quotation/${quote.reference}?token=${token}`;
 
 export default async function handler(req, res) {
   const admin = await requireAdmin(req, res);

@@ -69,7 +69,7 @@ Purpose: optional operational notifications. No WhatsApp success is fabricated w
 Purpose: serverless APIs, scheduled reminders and production delivery.
 
 1. In **Vercel Project > Settings > Environment Variables**, add every variable listed in `.env.example` to the correct Preview and Production environments.
-2. For the domain migration, set `PUBLIC_SITE_URL=https://www.naystrip.com` in Production and Preview only when those environments can resolve that hostname. Keep the current production value until the DNS cutover is ready.
+2. Set `PUBLIC_SITE_URL=https://www.naystrip.com` in Production. For Preview, use the intended preview hostname.
 3. Generate a long random secret for `CRON_SECRET`.
 4. Redeploy after variables are saved. Never commit `.env` files or expose service-role/payment secrets as `VITE_` variables.
 5. Confirm **Settings > Cron Jobs** shows `/api/cron/reminders` at `0 4 * * *`. Vercel automatically sends the configured cron authorization; manually calling it requires `Authorization: Bearer YOUR_CRON_SECRET`.

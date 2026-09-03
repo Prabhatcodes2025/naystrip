@@ -62,13 +62,13 @@ export function PriceTag({ original, price, size = "base" }) {
   );
 }
 
-export function PageBanner({ eyebrow, title, subtitle, image }) {
+export function PageBanner({ eyebrow, title, subtitle, image, imageAlt }) {
   return (
     <section className="page-hero relative flex items-end overflow-hidden bg-navy-950">
       <SmartImage
         src={image}
         context={title}
-        alt={title}
+        alt={imageAlt || title}
         wrapperClassName="absolute inset-0"
         className="object-cover"
         loading="eager"

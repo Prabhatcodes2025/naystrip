@@ -46,7 +46,8 @@ export function Treks() {
         eyebrow="For The Bold"
         title="Treks"
         subtitle="Guided journeys into the mountains, with safety and pacing built into every itinerary."
-        image="https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1600&q=80"
+        image="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?fm=webp&fit=crop&w=1600&q=80"
+        imageAlt="Mountain valley and snow-capped peaks"
       />
       <section className="py-10 sm:py-14"><div className="container-lg"><TrekGrid items={treks} /></div></section>
     </>
