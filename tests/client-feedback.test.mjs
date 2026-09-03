@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import test from "node:test";
 import assert from "node:assert/strict";
 import register from "../server/auth/register.js";
@@ -13,9 +14,9 @@ test("B2B signup sends raw Auth REST metadata and persists a pending PAN profile
   const originalFetch=global.fetch;const original={...process.env};
   process.env.SUPABASE_URL="https://db.example";process.env.SUPABASE_ANON_KEY="anon";process.env.SUPABASE_SERVICE_ROLE_KEY="service";
   let signupBody;let profileBody;
-  global.fetch=async(url,options={})=>{const value=String(url);if(value.includes("/auth/v1/signup")){signupBody=JSON.parse(options.body);return Response.json({user:{id:userId,identities:[{id:"identity"}]},session:null})}if(value.includes("/rest/v1/b2b_agents?"))return Response.json([]);if(value.endsWith("/rest/v1/b2b_agents")){profileBody=JSON.parse(options.body);return new Response(null,{status:201})}throw new Error(`Unexpected URL ${value}`)};
+  global.fetch=async(url,options={})=>{const value=String(url);if(value.includes("registration_challenges?"))return Response.json([{answer_hash:crypto.createHmac("sha256","service").update(userId+":9").digest("hex"),expires_at:new Date(Date.now()+60000).toISOString()}]);if(value.includes("/auth/v1/signup")){signupBody=JSON.parse(options.body);return Response.json({user:{id:userId,identities:[{id:"identity"}]},session:null})}if(value.includes("/rest/v1/b2b_agents?"))return Response.json([]);if(value.endsWith("/rest/v1/b2b_agents")){profileBody=JSON.parse(options.body);return new Response(null,{status:201})}throw new Error(`Unexpected URL ${value}`)};
   t.after(()=>{global.fetch=originalFetch;process.env=original});
-  const result=await invoke(register,{email:"agent@example.com",password:"strong-pass-1",name:"Agent Name",phone:"8097132424",businessName:"Travel Partner",pan:"abcde1234f",portal:"agent"},{origin:"http://localhost"});
+  const result=await invoke(register,{mathChallengeId:userId,mathAnswer:"9",email:"agent@example.com",password:"strong-pass-1",name:"Agent Name",phone:"8097132424",businessName:"Travel Partner",pan:"abcde1234f",portal:"agent"},{origin:"http://localhost"});
   assert.equal(result.status,201);assert.equal(result.data.confirmation_required,true);
   assert.equal(signupBody.data.portal,"agent");assert.equal(signupBody.data.pan,"ABCDE1234F");
   assert.equal(profileBody.verification_status,"pending");assert.equal(profileBody.pan,"ABCDE1234F");

@@ -144,8 +144,8 @@ export const getQuickLeads = async () => {
   const data = await adminRequest("/api/admin/leads?kind=quick_quote");
   return data.leads || [];
 };
-export const getB2BLeads = async () => {
-  const data = await adminRequest("/api/admin/leads?kind=b2b_enquiry");
+export const getB2BLeads = async (agentId="") => {
+  const data = await adminRequest("/api/admin/leads?kind=b2b_enquiry"+(agentId?"&agentId="+encodeURIComponent(agentId):""));
   return data.leads || [];
 };
 export const updateCustomLeadStatus = (

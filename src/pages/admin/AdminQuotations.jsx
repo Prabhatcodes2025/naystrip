@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Copy, Download, Eye, Pencil, Plus, Trash2 } from "lucide-react";
 const empty = {
   customerName: "",
@@ -62,20 +62,21 @@ const downloadQuotation = async (quote) => {
 };
 export default function AdminQuotations() {
   const [form, setForm] = useState(empty);
+  const [agentFilter,setAgentFilter]=useState("");
   const [quotes, setQuotes] = useState([]);
   const [message, setMessage] = useState("");
   const [editingId, setEditingId] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
-      setQuotes((await request("/api/admin/quotations")).quotations || []);
+      setQuotes((await request("/api/admin/quotations"+(/^[a-f0-9-]{36}$/i.test(agentFilter)?"?agentId="+encodeURIComponent(agentFilter):""))).quotations || []);
     } catch (error) {
       setMessage(error.message);
     }
-  };
+  }, [agentFilter]);
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
   const subtotal = useMemo(
     () =>
       form.lines.reduce(
@@ -330,7 +331,7 @@ export default function AdminQuotations() {
             />
           </label>
           <label className="sm:col-span-3">
-            <span className="label-field">Terms and cancellation policy</span>
+            <span className="label-field">Internal notes / revision requests</span><textarea rows="3" value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})} className="input-field"/><span className="label-field">Terms and cancellation policy</span>
             <textarea
               rows="4"
               value={form.terms}
@@ -364,7 +365,7 @@ export default function AdminQuotations() {
         </div>
       </form>
       <section className="mt-8">
-        <h2 className="font-display text-xl">Recent quotations</h2>
+        <h2 className="font-display text-xl">Recent quotations</h2><label className="mt-3 block"><span className="label-field">Filter by Agent ID</span><input className="input-field" value={agentFilter} onChange={e=>setAgentFilter(e.target.value)} placeholder="Full Agent ID"/></label>
         <div className="mt-3 overflow-x-auto rounded-2xl border bg-white">
           <table className="w-full min-w-[1050px] text-sm">
             <thead>
@@ -383,7 +384,7 @@ export default function AdminQuotations() {
                 <tr key={quote.id} className="border-b">
                   <td className="p-4 font-mono">{quote.reference}</td>
                   <td className="p-4">{quote.customer_name}</td>
-                  <td className="p-4">{quote.agent?.business_name||quote.agent_id||"Direct"}</td>
+                  <td className="p-4">{quote.agent?.business_name||quote.agent_id||"Direct"}<span className="block text-xs">{quote.agent_id}</span>{quote.notes?.includes("Revision requested")&&<strong className="block text-xs text-orange-700">Revision requested — open Edit to review</strong>}</td>
                   <td className="p-4 font-mono text-xs">{quote.inquiry?.id||quote.inquiry_id||"—"}</td>
                   <td className="p-4">
                     INR {Number(quote.total).toLocaleString("en-IN")}

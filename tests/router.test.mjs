@@ -6,7 +6,7 @@ import test from "node:test";
 import dispatch,{routeFromRequest,routes} from "../server/router.js";
 
 const expected=["admin/agents","admin/bookings","admin/content","admin/customers","admin/departures","admin/leads","admin/media","admin/notifications","admin/packages","admin/subscribers","admin/tours","admin/quotation-actions","admin/quotations","auth/admin","auth/portal","auth/recover","auth/register","auth/update-password","b2b/create-booking","b2b/dashboard","bookings/create","bookings/options","bookings/preview","bookings/verify","config","content","cron/reminders","departures","documents/booking","documents/itinerary","documents/quotation","documents/service-voucher","leads","newsletter","packages","payments/create-order","payments/verify","payments/webhook","portal/cancel","portal/dashboard","portal/profile","quotations/view","settings"];
-expected.push("admin/booking-documents");
+expected.push("admin/booking-documents","auth/math-captcha","b2b/wallet","admin/wallet","b2b/deals","admin/deals");
 expected.push("admin/document-delivery","admin/invoices");
 
 function response(){return {statusCode:200,headers:{},body:null,status(code){this.statusCode=code;return this},setHeader(key,value){this.headers[key]=value;return this},json(value){this.body=value;return this},end(value){this.body=value;return this},send(value){this.body=value;return this}}}

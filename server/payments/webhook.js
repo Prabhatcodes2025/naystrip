@@ -1,3 +1,4 @@
+import { reconcileWallet } from "../b2b/wallet.js";
 import crypto from "node:crypto";
 import {json,supabaseRequest} from "../_shared.js";
 import {cashfreeConfiguration} from "./_cashfree.js";
@@ -17,6 +18,8 @@ export default async function handler(req,res){
   const expected=cashfreeWebhookSignature(timestamp,raw,configuration.clientSecret);
   if(!safe(expected,signature))return json(res,400,{error:"Invalid webhook signature"});
   let event;try{event=JSON.parse(raw.toString("utf8"))}catch{return json(res,400,{error:"Invalid payload"})}
+  const walletOrderId=String(event?.data?.order?.order_id||"");
+  if(walletOrderId.startsWith("NTW-")){try{return json(res,200,await reconcileWallet(walletOrderId))}catch{return json(res,502,{error:"Wallet verification failed; retry delivery"})}}
   const eventId=String(req.headers["x-idempotency-key"]||crypto.createHash("sha256").update(raw).digest("hex"));
   const eventType=String(event.type||"unknown");
   const inserted=await supabaseRequest("payment_webhook_events",{method:"POST",headers:{Prefer:"resolution=ignore-duplicates,return=representation"},body:JSON.stringify({id:eventId,provider:"cashfree",event_type:eventType,payload:event,processing_status:"received"})});

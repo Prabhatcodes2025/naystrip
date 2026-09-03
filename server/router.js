@@ -1,3 +1,6 @@
+import {agentDeals,adminDeals} from "./b2b/deals.js";
+import mathCaptcha from "./auth/math-captcha.js";
+import wallet, {adminWallet} from "./b2b/wallet.js";
 import adminBookings from "./admin/bookings.js";
 import adminBookingDocuments from "./admin/booking-documents.js";
 import adminDocumentDelivery from "./admin/document-delivery.js";
@@ -45,6 +48,10 @@ import quotationView from "./quotations/view.js";
 import settings from "./settings.js";
 
 export const routes = new Map([
+ ["b2b/deals",agentDeals], ["admin/deals",adminDeals],
+  ["auth/math-captcha", mathCaptcha],
+  ["b2b/wallet", wallet],
+  ["admin/wallet", adminWallet],
   ["admin/agents", adminAgents],
   ["admin/bookings", adminBookings],
   ["admin/booking-documents", adminBookingDocuments],

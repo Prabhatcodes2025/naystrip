@@ -1,8 +1,10 @@
+import { consumeMathChallenge } from "./math-captcha.js";
 import { guard, json, supabaseRequest } from "../_shared.js";
 import { verifyCaptcha } from "../_captcha.js";
 
 export default async function handler(req, res) {
   if (!guard(req, res)) return;
+  try { if (!await consumeMathChallenge(req.body?.mathChallengeId, req.body?.mathAnswer)) return json(res,403,{error:"Incorrect or expired math answer. Please answer the new question."}); } catch { return json(res,503,{error:"Math check unavailable. Please retry."}); }
   const { email, password, name, phone, businessName, pan, portal, captchaToken } = req.body || {};
   const captcha = await verifyCaptcha(captchaToken, req.headers["x-forwarded-for"]);
   if (!captcha.success) return json(res, 403, { error: captcha.error });

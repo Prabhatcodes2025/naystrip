@@ -1,0 +1,6 @@
+import { useEffect, useState } from "react";
+export default function MathCaptcha({attempt,onChange}) {
+  const [challenge,setChallenge]=useState(null),[error,setError]=useState(""),[refresh,setRefresh]=useState(0);
+  useEffect(()=>{let live=true;setChallenge(null);setError("");onChange({mathChallengeId:"",mathAnswer:""});fetch("/api/auth/math-captcha").then(async r=>{const data=await r.json().catch(()=>{throw new Error("Math check is temporarily unavailable. Please retry.")});if(!r.ok)throw new Error(data.error);if(live){setChallenge(data);onChange({mathChallengeId:data.id,mathAnswer:""})}}).catch(e=>{if(live)setError(e.message)});return()=>{live=false}},[attempt,refresh,onChange]);
+  return <div className="rounded-xl border bg-white p-4"><label><span className="label-field">{challenge?.question||(error?"Math check unavailable":"Loading math check…")}</span><input key={challenge?.id||"loading"} required disabled={!challenge} inputMode="numeric" pattern="[0-9]{1,2}" maxLength={2} aria-label="Math check answer" className="input-field" onChange={e=>onChange({mathChallengeId:challenge.id,mathAnswer:e.target.value})}/></label>{error&&<p role="alert" className="text-sm text-rose-700">{error}</p>}<button type="button" className="mt-2 text-sm font-bold text-orange-700" onClick={()=>setRefresh(v=>v+1)}>New question</button></div>
+}

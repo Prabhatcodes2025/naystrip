@@ -1,3 +1,4 @@
+import MathCaptcha from "../components/shared/MathCaptcha";
 import { useState } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowRight, Building2, LockKeyhole, UserRound } from "lucide-react";
@@ -13,6 +14,7 @@ export default function PortalAccess() {
   const register = pathname.endsWith("/register");
   const [form, setForm] = useState({ email: "", password: "", name: "", businessName: "", pan: "", phone: "" });
   const [state, setState] = useState({ loading: false, error: "", ok: "" });
+  const [math,setMath]=useState({}),[attempt,setAttempt]=useState(0);
   const Icon = agent ? Building2 : UserRound;
   const requestedReturn = params.get("returnTo") || "";
   const returnTo = requestedReturn.startsWith("/") && !requestedReturn.startsWith("//")
@@ -28,14 +30,14 @@ export default function PortalAccess() {
       const captchaToken = register ? await getTurnstileToken() : null;
       const response = await fetch(register ? "/api/auth/register" : "/api/auth/portal", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, portal: agent ? "agent" : "customer", captchaToken }),
+        body: JSON.stringify({ ...form, ...math, portal: agent ? "agent" : "customer", captchaToken }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Unable to continue");
       if (data.access_token) sessionStorage.setItem(`naystrip_${agent ? "agent" : "customer"}_session`, data.access_token);
       setState({ loading: false, error: "", ok: register ? (agent ? "Application received. Your B2B account will be available after approval." : (data.confirmation_required ? "Check your email to confirm the account." : "Account created. You can now sign in.")) : "Signed in securely." });
       if (!register) navigate(returnTo, { replace: true });
-    } catch (error) { setState({ loading: false, error: error.message, ok: "" }); }
+    } catch (error) { setState({ loading: false, error: error.message, ok: "" }); if(register)setAttempt(v=>v+1); }
   };
 
   return <>
@@ -59,9 +61,10 @@ export default function PortalAccess() {
           </>}
           <label className="block"><span className="label-field">Email</span><input type="email" required value={form.email} onChange={update("email")} className="input-field" /></label>
           <label className="block"><span className="label-field">Password</span><div className="relative"><LockKeyhole size={17} className="absolute left-4 top-3.5 text-slate-400" /><input type="password" minLength="10" required value={form.password} onChange={update("password")} className="input-field pl-11" /></div></label>
+          {register && <MathCaptcha attempt={attempt} onChange={setMath}/>}
           {state.error && <p role="alert" className="text-sm text-rose-600">{state.error}</p>}
           {state.ok && <p role="status" className="text-sm text-emerald-700">{state.ok}</p>}
-          <button disabled={state.loading} className="btn-primary w-full">{state.loading ? "Please wait…" : register ? "Create account" : "Sign in"}<ArrowRight size={16} /></button>
+          <button disabled={state.loading||(register&&!math.mathChallengeId)} className="btn-primary w-full">{state.loading ? "Please wait…" : register ? "Create account" : "Sign in"}<ArrowRight size={16} /></button>
         </form>
         {!register && <Link className="mt-4 block text-sm font-bold text-orange-600" to={agent ? "/b2b/forgot-password" : "/account/forgot-password"}>Forgot password?</Link>}
         <p className="mt-6 text-sm text-slate-500">{register ? "Already registered? " : "New here? "}<Link className="font-bold text-orange-600" to={`${agent ? (register ? "/b2b/login" : "/b2b/register") : (register ? "/account/login" : "/account/register")}${preserveReturn}`}>{register ? "Sign in" : "Create an account"}</Link></p>

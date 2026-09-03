@@ -1,3 +1,4 @@
+import HomeContentSettings from "../../components/admin/HomeContentSettings";
 import { useEffect, useState } from "react";
 import { CheckCircle2, Plus, Save, Trash2 } from "lucide-react";
 import { defaultSiteSettings, getSiteSettings, loadSiteSettings, saveSiteSettings } from "../../data/siteConfig";
@@ -38,6 +39,7 @@ export default function AdminSettings() {
       <p className="text-sm text-navy-500 mt-1 mb-6">Changes here reflect across the public website in real time.</p>
 
       <form onSubmit={handleSave} className="max-w-2xl space-y-6">
+        <HomeContentSettings form={form} update={update}/>
         <div className="rounded-2xl bg-white border border-navy-100 shadow-soft p-6 space-y-4">
           <h3 className="text-sm font-semibold text-navy-800">General</h3>
           <div className="grid sm:grid-cols-2 gap-4">
