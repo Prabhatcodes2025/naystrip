@@ -11,7 +11,19 @@ import { deliverNotification } from "../_notifications.js";
 const reference=(prefix)=>`${prefix}-${new Date().toISOString().slice(0,10).replaceAll("-","")}-${crypto.randomUUID().slice(0,6).toUpperCase()}`;
 const quoteUrl=(quote,token)=>`${process.env.PUBLIC_SITE_URL||"https://naystrip.vercel.app"}/quotation/${quote.reference}?token=${token}`;
 const amount=(value)=>value===null||value===undefined||value===""?null:(Number.isFinite(Number(value))&&Number(value)>=0?Number(value):null);
-async function settings(){const response=await supabaseRequest("website_settings?id=eq.true&select=data&limit=1");const [row]=response.ok?await response.json():[];return row?.data||{}}
+async function dashboardRows(response,query){
+ const body=await response.json().catch(()=>null);
+ if(response.ok&&Array.isArray(body))return body;
+ // Only schema errors have safe message/details payloads. Other PostgreSQL
+ // errors can echo row values, identifiers supplied by users, or credentials.
+ const code=typeof body?.code==="string"&&/^[A-Z0-9]{5,12}$/.test(body.code)?body.code:null;
+ const schemaError=["42703","42P01","PGRST200","PGRST201","PGRST204","PGRST205"].includes(code);
+ console.error("b2b_dashboard_query_failed",{query,status:response.status,statusText:response.statusText,code,
+  message:response.ok?"Expected an array response":schemaError?body.message:"Upstream request failed; non-schema error text withheld",
+  details:schemaError?body.details??null:null});
+ return null;
+}
+async function settings(){const response=await supabaseRequest("website_settings?id=eq.true&select=data&limit=1");const [row]=(await dashboardRows(response,"website_settings"))||[];return row?.data||{}}
 async function owned(agentId,table,id,select="*"){if(!id||(table==="quotations"&&!uuidPattern.test(id)))return null;const response=await supabaseRequest(`${table}?id=eq.${encodeURIComponent(id)}&agent_id=eq.${agentId}&select=${select}&limit=1`);const rows=response.ok?await response.json():[];return rows[0]||null}
 
 export default async function handler(req,res){
@@ -25,10 +37,16 @@ export default async function handler(req,res){
     supabaseRequest(`inquiries?agent_id=eq.${agentId}&kind=eq.b2b_enquiry&select=*,activities:lead_activities(id,notes,activity_type,agent_id,created_at),package:packages(id,slug,title,days,nights)&order=created_at.desc&limit=100`),
     supabaseRequest(`quotations?agent_id=eq.${agentId}&select=*,inquiry:inquiries(id,package_id,enquiry_source),lines:quotation_lines(*)&order=created_at.desc&limit=100`),settings(),
    ]);
-   if([packagesResponse,ratesResponse,bookingsResponse,enquiriesResponse,quotesResponse].some(r=>!r.ok))return json(res,502,{error:"Partner records could not be loaded"});
-   const packages=packagesResponse.ok?await packagesResponse.json():[];const rates=ratesResponse.ok?await ratesResponse.json():[];const today=new Date().toISOString().slice(0,10);const currentRates=rates.filter((rate)=>(!rate.valid_from||rate.valid_from<=today)&&(!rate.valid_until||rate.valid_until>=today));const rateByPackage=new Map([...currentRates].reverse().map((rate)=>[rate.package_id,rate]));const defaultMarkupPercent=Math.min(100,Math.max(0,(Number.isFinite(Number(site.b2bDefaultMarkupPercent))?Number(site.b2bDefaultMarkupPercent):10)));
+   const [packages,rates,bookings,enquiries,quotations]=await Promise.all([
+    dashboardRows(packagesResponse,"packages"),dashboardRows(ratesResponse,"package_agent_rates"),
+    dashboardRows(bookingsResponse,"bookings + packages + booking_documents"),
+    dashboardRows(enquiriesResponse,"inquiries + lead_activities + packages"),
+    dashboardRows(quotesResponse,"quotations + inquiries + quotation_lines"),
+   ]);
+   if([packages,rates,bookings,enquiries,quotations].some(rows=>rows===null))return json(res,502,{error:"Partner records could not be loaded"});
+   const today=new Date().toISOString().slice(0,10);const currentRates=rates.filter((rate)=>(!rate.valid_from||rate.valid_from<=today)&&(!rate.valid_until||rate.valid_until>=today));const rateByPackage=new Map([...currentRates].reverse().map((rate)=>[rate.package_id,rate]));const defaultMarkupPercent=Math.min(100,Math.max(0,(Number.isFinite(Number(site.b2bDefaultMarkupPercent))?Number(site.b2bDefaultMarkupPercent):10)));
    const catalogue=packages.map((pkg)=>{const configured=rateByPackage.get(pkg.id),publicPrice=amount(pkg.price_from),netRate=amount(configured?.agent_price??pkg.price_from),configuredMarkup=amount(configured?.markup),markupPercent=Math.min(100,configuredMarkup??defaultMarkupPercent);return {...pkg,rateId:configured?.id||null,publicPrice,netRate,markupPercent,sellingPrice:netRate===null?null:money(netRate*(1+markupPercent/100)),validFrom:configured?.valid_from||null,validUntil:configured?.valid_until||null,rateSource:configured?"configured_b2b":"public_price"}});
-   return json(res,200,{agent:safeAgent(session.profile),rates:catalogue,bookings:bookingsResponse.ok?await bookingsResponse.json():[],enquiries:enquiriesResponse.ok?await enquiriesResponse.json():[],quotations:quotesResponse.ok?await quotesResponse.json():[],defaultMarkupPercent,support:{phone:site.supportPhone||site.phone||"+91 8097132424",whatsapp:site.whatsapp||site.phone||"+91 8097132424"}})
+   return json(res,200,{agent:safeAgent(session.profile),rates:catalogue,bookings,enquiries,quotations,defaultMarkupPercent,support:{phone:site.supportPhone||site.phone||"+91 8097132424",whatsapp:site.whatsapp||site.phone||"+91 8097132424"}})
   }
   if(req.method!=="POST")return json(res,405,{error:"Method not allowed"});const body=req.body||{};
   if(body.action==="update_profile")return updateProfile(session,body,res);

@@ -1,6 +1,7 @@
 -- Existing enquiries, activities, coupons and website CMS remain authoritative.
 alter table public.lead_activities add column if not exists agent_id uuid references public.b2b_agents(id);
 alter table public.lead_activities enable row level security;
+drop policy if exists "agents read own lead activities" on public.lead_activities;
 create policy "agents read own lead activities" on public.lead_activities for select using (
   exists(select 1 from public.inquiries i join public.b2b_agents a on a.id=i.agent_id where i.id=inquiry_id and a.user_id=auth.uid() and a.verification_status='approved')
 );
@@ -30,6 +31,7 @@ create table if not exists public.agent_wallet_orders (
 );
 create index if not exists agent_wallet_orders_agent_idx on public.agent_wallet_orders(agent_id,created_at desc);
 alter table public.agent_wallet_orders enable row level security;
+drop policy if exists "agents read own wallet" on public.agent_wallet_orders;
 create policy "agents read own wallet" on public.agent_wallet_orders for select using (
   exists(select 1 from public.b2b_agents a where a.id=agent_id and a.user_id=auth.uid() and a.verification_status='approved')
 );
