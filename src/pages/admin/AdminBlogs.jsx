@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Eye, Plus, Pencil, Trash2, X, Search } from "lucide-react";
-import { blogs as staticBlogs } from "../../data/content";
 import { getAdminBlogs, saveAdminBlog, deleteAdminBlog } from "../../utils/storage";
 import MediaUploader from "../../components/admin/MediaUploader";
 import SmartImage from "../../components/shared/SmartImage";
@@ -31,10 +30,7 @@ export default function AdminBlogs() {
   const handleDelete = async (id) => { if (confirm("Delete this blog post?")) { try{await deleteAdminBlog(id);await refresh()}catch(err){setError(err.message)} } };
   const togglePublish = async (blog) => { try{await saveAdminBlog({...blog,published:!blog.published,id:blog.id});await refresh()}catch(err){setError(err.message)} };
 
-  const allBlogs = [
-    ...adminBlogs.map((b) => ({ ...b, isAdmin: true })),
-    ...staticBlogs.map((b) => ({ ...b, id: b.slug, isAdmin: false, published: true })),
-  ].filter((b) => b.title.toLowerCase().includes(search.toLowerCase()));
+  const allBlogs = adminBlogs.map((blog)=>({...blog,isAdmin:true})).filter((b) => b.title.toLowerCase().includes(search.trim().toLowerCase()));
 
   return (
     <div>

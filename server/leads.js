@@ -2,7 +2,7 @@ import { guard, json, supabaseRequest } from "./_shared.js";
 import { rateLimit } from "./_rate-limit.js";
 import { deliverNotification } from "./_notifications.js";
 import { verifyCaptcha } from "./_captcha.js";
-const email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { normalizeEmail, validEmail } from "./_validation.js";
 const phone = /^[+\d][\d\s()-]{7,20}$/;
 const clean = (v, max = 500) =>
   String(v ?? "")
@@ -38,13 +38,13 @@ export default async function handler(req, res) {
   );
   const name = suppliedName || (kind === "quick_quote" ? "Quick quote request" : "");
   const phoneNumber = clean(payload.phone, 24);
-  const emailAddress = clean(payload.email, 160);
+  const emailAddress = normalizeEmail(payload.email);
   if (kind === "custom_trip" && Array.isArray(payload.childAges) && payload.childAges.some((age) => Number(age) < 0 || Number(age) > 12))
     return json(res, 422, { error: "Child age must be between 0 and 12" });
   if (
     !name ||
     !phone.test(phoneNumber) ||
-    (emailAddress && !email.test(emailAddress))
+    (emailAddress && !validEmail(emailAddress))
   )
     return json(res, 422, {
       error: "Please check your name, phone and email.",

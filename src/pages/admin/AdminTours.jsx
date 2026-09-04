@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Copy, Download, ExternalLink, MessageCircle, Plus, Search, Trash2, X } from "lucide-react";
 import MediaUploader from "../../components/admin/MediaUploader";
 import { TableSkeleton } from "../../components/shared/Loading";
+import { packagePlacements } from "../../data/packageCategories";
 const empty = {
   title: "",
   slug: "",
@@ -310,6 +311,7 @@ export default function AdminTours() {
             </h2>
             <form onSubmit={save} className="mt-6 space-y-7">
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <label><span className="label-field">Package type</span><select value={form.packageType} onChange={(event)=>setForm({...form,packageType:event.target.value})} className="input-field"><option value="tour">Trip / tour</option><option value="trek">Trek</option><option value="expedition">Expedition</option><option value="service">Travel service</option></select></label>
                 {[
                   ["Title", "title"],
                   ["Slug", "slug"],
@@ -369,6 +371,7 @@ export default function AdminTours() {
                     type="number"
                     min="0"
                     value={form.priceFrom}
+                    placeholder="10000"
                     onChange={(e) =>
                       setForm({ ...form, priceFrom: e.target.value })
                     }
@@ -412,6 +415,11 @@ export default function AdminTours() {
                   </select>
                 </label>
               </div>
+              <section className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <h3 className="font-bold text-[#173c34]">Website and header placement</h3>
+                <p className="mt-1 text-xs text-slate-500">Assign this package to one or more existing content areas. The same package record is reused everywhere.</p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{packagePlacements.map((placement)=><label key={placement.value} className="flex items-start gap-2 rounded-xl bg-white p-3 text-sm"><input type="checkbox" className="mt-1" checked={(form.policies?.placements||[]).includes(placement.value)} onChange={(event)=>{const current=form.policies?.placements||[];const placements=event.target.checked?[...current,placement.value]:current.filter((value)=>value!==placement.value);setForm({...form,policies:{...form.policies,placements}})}}/><span>{placement.label}</span></label>)}</div>
+              </section>
               <div className="grid gap-6 lg:grid-cols-2">
                 <MediaUploader label="Hero / cover image" value={form.heroImage} onChange={(heroImage) => setForm({ ...form, heroImage })} scope={`packages/${form.id || form.slug || "draft"}/hero`} context={`${form.title} ${form.destinations.join(" ")}`} />
                 <div><label className="label-field">Image alt text</label><input value={form.seo?.hero_alt || ""} onChange={(event) => setForm({ ...form, seo: { ...form.seo, hero_alt: event.target.value } })} className="input-field" placeholder="Describe the destination shown"/><details className="mt-3 text-xs text-slate-500"><summary className="cursor-pointer font-bold">Use an existing image URL</summary><input value={form.heroImage} onChange={(event) => setForm({ ...form, heroImage: event.target.value })} className="input-field mt-2" placeholder="https://…"/></details></div>

@@ -22,6 +22,8 @@ export const defaultSiteSettings = {
     telegram: "https://t.me/trektoworld",
   },
   homepageCtaText: "Plan it your way",
+  monthlyPicks: [],
+  events: [],
   topTripSlugs: [],
   topTrekSlugs: [],
   trustMetrics: {
@@ -43,7 +45,7 @@ export function getSiteSettings() {
   return defaultSiteSettings;
 }
 
-export async function loadSiteSettings(){const response=await fetch("/api/settings",{headers:{Accept:"application/json"}});const data=await response.json();if(!response.ok)throw new Error(data.error||"Settings unavailable");return {...defaultSiteSettings,...data.settings,social:{...defaultSiteSettings.social,...(data.settings?.social||{})}}}
+export async function loadSiteSettings(){const response=await fetch("/api/settings",{headers:{Accept:"application/json"}});const data=await response.json();if(!response.ok)throw new Error(data.error||"Settings unavailable");return {...defaultSiteSettings,...data.settings,social:{...defaultSiteSettings.social,...(data.settings?.social||{})},monthlyPicks:Array.isArray(data.settings?.monthlyPicks)?data.settings.monthlyPicks:[],events:Array.isArray(data.settings?.events)?data.settings.events:[]}}
 
 export function whatsappHref(message = "") {
   const number = getSiteSettings().whatsapp.replace(/\D/g, "");

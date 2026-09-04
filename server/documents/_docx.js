@@ -22,8 +22,8 @@ export async function createDocumentDocx(model, settings) {
   const headerRuns = [];
   if (logo) headerRuns.push(new ImageRun({ data: logo, transformation: { width: 150, height: 67 }, type: "png" }));
   children.push(new Paragraph({ children: headerRuns, spacing: { after: 80 } }));
-  children.push(new Paragraph({ children: [run(model.title, { bold: true, size: 38, color: FOREST })], spacing: { after: 30 } }));
-  children.push(new Paragraph({ children: [run(model.subtitle, { size: 22, color: GREY }), new TextRun({ text: `\t${model.reference}`, font: "Arial", size: 20, bold: true, color: ORANGE })], tabStops: [{ type: "right", position: 9360 }], spacing: { after: 180 } }));
+  children.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [run(model.title, { bold: true, size: 38, color: FOREST })], spacing: { after: 30 } }));
+  children.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [run(model.subtitle, { size: 22, color: GREY })], spacing: { after: 180 } }));
   if (model.meta?.length) children.push(model.metaLayout === "compact" ? compactMetaTable(model.meta) : keyValueTable(model.meta));
   for (const section of model.sections || []) {
     if (!section?.heading || (!section.rows?.length && !section.table?.rows?.length && !section.bullets?.length && !section.text)) continue;

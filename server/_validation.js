@@ -1,5 +1,7 @@
 export const clean=(value,max=500)=>String(value??"").trim().replace(/[<>]/g,"").slice(0,max);
-export const emailPattern=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export const emailPattern=/^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+$/i;
+export const normalizeEmail=(value)=>clean(value,160).toLowerCase();
+export const validEmail=(value)=>{const email=normalizeEmail(value),local=email.split("@")[0]||"";return !email.includes("..")&&!local.startsWith(".")&&!local.endsWith(".")&&emailPattern.test(email)};
 export const phonePattern=/^[+\d][\d\s()-]{7,20}$/;
 export const uuidPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 export const referencePattern=/^NT[A-Z]-\d{8}-[A-Z0-9]{6}$/;

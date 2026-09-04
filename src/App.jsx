@@ -9,6 +9,7 @@ const Home = lazy(() => import("./pages/Home"));
 const ToursListing = lazy(() => import("./pages/ToursListing"));
 const TourCategoryPage = lazy(() => import("./pages/TourCategoryPage"));
 const TourDetails = lazy(() => import("./pages/TourDetails"));
+const PackageCategoryPage = lazy(() => import("./pages/PackageCategoryPage"));
 const DestinationsListing = lazy(() => import("./pages/DestinationsListing"));
 const DestinationDetail = lazy(() => import("./pages/DestinationDetail"));
 const Holidays = lazy(() => import("./pages/Holidays"));
@@ -53,6 +54,8 @@ const AdminCustomers = lazy(() => import("./pages/admin/AdminCustomers"));
 const AdminVouchers = lazy(() => import("./pages/admin/AdminVouchers"));
 const AdminInvoices = lazy(() => import("./pages/admin/AdminInvoices"));
 const AdminSubscribers = lazy(() => import("./pages/admin/AdminSubscribers"));
+const AdminMonthlyPicks = lazy(() => import("./pages/admin/AdminMonthlyPicks"));
+const AdminEvents = lazy(() => import("./pages/admin/AdminEvents"));
 
 function BootComplete({ onReady }) {
   useEffect(() => onReady(), [onReady]);
@@ -72,6 +75,7 @@ export default function App() {
         <Route path="/tours/international" element={<TourCategoryPage kind="international" />} />
         <Route path="/tours/:slug" element={<TourDetails />} />
         <Route path="/trips/:slug" element={<TourDetails shareable />} />
+        <Route path="/packages/:category" element={<PackageCategoryPage />} />
         <Route path="/destinations" element={<DestinationsListing />} />
         <Route path="/destinations/:slug" element={<DestinationDetail />} />
         <Route path="/holidays" element={<Holidays />} />
@@ -124,6 +128,8 @@ export default function App() {
       <Route path="/admin" element={<AdminErrorBoundary><AdminLayout /></AdminErrorBoundary>}>
         <Route index element={<AdminDashboard />} />
         <Route path="tours" element={<AdminTours />} />
+        <Route path="monthly-picks" element={<AdminMonthlyPicks />} />
+        <Route path="events" element={<AdminEvents />} />
         <Route path="bookings" element={<AdminBookings />} />
         <Route path="invoices" element={<AdminInvoices />} />
         <Route path="departures" element={<AdminDepartures />} />

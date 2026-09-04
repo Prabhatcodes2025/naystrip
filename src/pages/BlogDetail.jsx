@@ -1,6 +1,5 @@
 import { useParams, Navigate, Link } from "react-router-dom";
 import { Calendar, Facebook, Twitter, Linkedin, Link2 } from "lucide-react";
-import { blogs, getBlogBySlug } from "../data/content";
 import { getDestinationBySlug } from "../data/destinations";
 import { tours } from "../data/tours";
 import { getPublicBlogs } from "../utils/storage";
@@ -17,14 +16,14 @@ export default function BlogDetail() {
   const [loading,setLoading]=useState(true);
   useEffect(()=>{getPublicBlogs().then(setPublicBlogs).catch(()=>setPublicBlogs([])).finally(()=>setLoading(false))},[]);
   const adminBlog = publicBlogs.find((b) => b.slug === slug || b.id === slug);
-  const blog = adminBlog || getBlogBySlug(slug);
+  const blog = adminBlog;
 
   if (loading&&!blog) return <PageLoader label="Loading article…"/>;
   if (!blog) return <Navigate to="/blog" replace />;
 
   const destination = blog.relatedDestination ? getDestinationBySlug(blog.relatedDestination) : null;
   const relatedTours = destination ? tours.filter((t) => t.destination.toLowerCase().includes(destination.name.split(" ")[0].toLowerCase())).slice(0, 2) : [];
-  const relatedBlogs = blogs.filter((b) => b.slug !== blog.slug).slice(0, 3);
+  const relatedBlogs = publicBlogs.filter((b) => b.slug !== blog.slug).slice(0, 3);
 
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const handleCopy = () => {

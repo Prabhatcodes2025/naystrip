@@ -30,7 +30,7 @@ export default function PortalAccess() {
       const captchaToken = register ? await getTurnstileToken() : null;
       const response = await fetch(register ? "/api/auth/register" : "/api/auth/portal", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, ...math, portal: agent ? "agent" : "customer", captchaToken }),
+        body: JSON.stringify({ ...form, email:form.email.trim().toLowerCase(), ...math, portal: agent ? "agent" : "customer", captchaToken }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Unable to continue");
@@ -57,9 +57,9 @@ export default function PortalAccess() {
           {register && <>
             <label className="block"><span className="label-field">{agent ? "Contact person" : "Full name"}</span><input required value={form.name} onChange={update("name")} className="input-field" /></label>
             {agent && <><label className="block"><span className="label-field">Business name</span><input required value={form.businessName} onChange={update("businessName")} className="input-field" /></label><label className="block"><span className="label-field">PAN</span><input required maxLength="10" pattern="[A-Za-z]{5}[0-9]{4}[A-Za-z]" title="Use the format AAAAA9999A" value={form.pan} onChange={(event)=>setForm({...form,pan:event.target.value.toUpperCase()})} className="input-field uppercase" placeholder="AAAAA9999A" /></label></>}
-            <label className="block"><span className="label-field">Phone</span><input required inputMode="tel" value={form.phone} onChange={update("phone")} className="input-field" /></label>
+            <label className="block"><span className="label-field">Phone</span><input required inputMode="tel" value={form.phone} onChange={update("phone")} className="input-field" placeholder="+91 98765 43210" /></label>
           </>}
-          <label className="block"><span className="label-field">Email</span><input type="email" required value={form.email} onChange={update("email")} className="input-field" /></label>
+          <label className="block"><span className="label-field">Email</span><input type="email" required value={form.email} onChange={update("email")} onBlur={()=>setForm((current)=>({...current,email:current.email.trim().toLowerCase()}))} className="input-field" placeholder="name@example.com" /></label>
           <label className="block"><span className="label-field">Password</span><div className="relative"><LockKeyhole size={17} className="absolute left-4 top-3.5 text-slate-400" /><input type="password" minLength="10" required value={form.password} onChange={update("password")} className="input-field pl-11" /></div></label>
           {register && <MathCaptcha attempt={attempt} onChange={setMath}/>}
           {state.error && <p role="alert" className="text-sm text-rose-600">{state.error}</p>}

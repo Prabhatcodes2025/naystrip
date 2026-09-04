@@ -59,16 +59,17 @@ function invoiceModel(booking, invoice, settings) {
   return {
     type: "invoice",
     title: "INVOICE",
-    subtitle: `Invoice ${invoiceNumber}`,
+    subtitle: "Travel services invoice",
     reference: safeReference(booking?.reference || source.bookingReference || invoiceNumber),
     filenameBase: `NAYSTRIP-Invoice-${invoiceNumber}`,
     status: invoice?.status || source.status || "draft",
-    meta: rows([["Invoice number", invoiceNumber], ["Invoice date", date(invoice?.invoice_date || source.invoiceDate || new Date())], ["Booking reference", booking?.reference || source.bookingReference]]),
+    metaLayout: "compact", meta: rows([["Invoice number", invoiceNumber], ["Invoice date", date(invoice?.invoice_date || source.invoiceDate || new Date())], ["Booking reference", booking?.reference || source.bookingReference]]),
     sections: [
       { heading: "Issued by", rows: rows([["Business", settings.businessLegalName || settings.brandName], ["Address", settings.invoiceAddress || settings.address], ["GSTIN", settings.gstNumber]]) },
       { heading: "Bill to", rows: rows([["Customer / company", billing.companyName || billing.name], ["Address", [billing.address, billing.city, billing.state, billing.postal_code || billing.postalCode].filter(Boolean).join(", ")], ["Email", billing.email], ["Phone", billing.phone], ["GSTIN", billing.gstNumber || booking?.gst_details?.gst_number]]) },
       { heading: "Service details", table: { headers: ["Description", "Traveller / service details", "Qty", "Rate", "Amount"], rows: lineItems.map((item) => [text(item.description), text(item.travellerDetails || item.details), text(item.quantity || 1), money(item.rate), money(item.amount ?? Number(item.quantity || 0) * Number(item.rate || 0))]) } },
-      { heading: "Amount calculation", rows: rows([["Subtotal", money(subtotal)], ["Convenience fee", money(charges.convenienceFee)], ["Service fee", money(charges.serviceFee)], ["Management fee", money(charges.managementFee)], ["Discount", Number(charges.discount) ? `- ${money(charges.discount)}` : ""], [settings.gstNumber ? "Tax / GST" : "Tax", money(charges.tax)], ["TDS", money(charges.tds)], ["Adjustments", money(charges.adjustments)], ["Paid", money(paid)], ["Balance", money(Math.max(0, total - paid))], ["NET AMOUNT", money(total)], ["Amount in words", source.amountInWords || amountInWords(total)]]) },
+      { heading: "Amount calculation", layout: "fare", rows: rows([["Subtotal", money(subtotal)], ["Convenience fee", money(charges.convenienceFee)], ["Service fee", money(charges.serviceFee)], ["Management fee", money(charges.managementFee)], ["Discount", Number(charges.discount) ? `- ${money(charges.discount)}` : ""], [settings.gstNumber ? "Tax / GST" : "Tax", money(charges.tax)], ["TDS", money(charges.tds)], ["Adjustments", money(charges.adjustments)], ["Paid", money(paid)], ["Balance", money(Math.max(0, total - paid))], ["NET AMOUNT", money(total)]]) },
+      { heading: "Amount in words", text: source.amountInWords || amountInWords(total) },
       ...(list(source.notes).length ? [{ heading: "Notes", bullets: list(source.notes) }] : []),
     ],
     summary: { total, paid, balance: Math.max(0, total - paid), customerName: billing.companyName || billing.name, invoiceNumber },
@@ -111,7 +112,7 @@ function transportModel(booking) {
       ...(list(details.inclusions).length ? [{ heading: "Inclusions", bullets: list(details.inclusions) }] : []),
       ...(list(details.exclusions).length ? [{ heading: "Exclusions", bullets: list(details.exclusions) }] : []),
       ...(list(details.rules).length ? [{ heading: "Toll, Parking & Driver Rules", bullets: list(details.rules) }] : []),
-      { heading: "Fare", rows: rows([["Total amount", money(details.totalAmount ?? booking.total)]]) },
+      { heading: "Fare", layout: "fare", rows: rows([["Total amount", money(details.totalAmount ?? booking.total)]]) },
     ], summary: { customerName: details.passengerName || booking.billing?.name, route: details.route || [details.pickup, details.drop].filter(Boolean).join(" to "), travelDate: date(details.travelDate || booking.travel_date), vehicle: details.vehicleType },
   };
 }

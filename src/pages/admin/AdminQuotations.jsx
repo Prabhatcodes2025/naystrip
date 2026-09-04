@@ -5,7 +5,7 @@ const empty = {
   customerEmail: "",
   customerPhone: "",
   inquiryId: "",
-  title: "Custom travel proposal",
+  title: "",
   destination: "",
   travelStart: "",
   travelEnd: "",
@@ -19,7 +19,7 @@ const empty = {
   notes: "",
   lines: [
     {
-      description: "Package services as per agreed itinerary",
+      description: "",
       quantity: 1,
       unitPrice: 0,
     },
@@ -67,6 +67,8 @@ export default function AdminQuotations() {
   const [message, setMessage] = useState("");
   const [editingId, setEditingId] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [listFilters,setListFilters]=useState({search:"",status:""});
+  const [page,setPage]=useState(1);const pageSize=25;
   const load = useCallback(async () => {
     try {
       setQuotes((await request("/api/admin/quotations"+(/^[a-f0-9-]{36}$/i.test(agentFilter)?"?agentId="+encodeURIComponent(agentFilter):""))).quotations || []);
@@ -89,6 +91,8 @@ export default function AdminQuotations() {
   const total =
     Math.max(0, subtotal - Number(form.discount || 0)) *
     (1 + Number(form.taxPercent || 0) / 100);
+  const filteredQuotes=useMemo(()=>{const term=listFilters.search.trim().toLowerCase();return quotes.filter((quote)=>(!listFilters.status||quote.status===listFilters.status)&&(!term||[quote.reference,quote.customer_name,quote.customer_email,quote.customer_phone,quote.destination,quote.agent?.business_name,quote.agent_id,quote.inquiry?.enquiry_source,quote.created_at].join(" ").toLowerCase().includes(term)))},[quotes,listFilters]);
+  const pageCount=Math.max(1,Math.ceil(filteredQuotes.length/pageSize));const visibleQuotes=filteredQuotes.slice((Math.min(page,pageCount)-1)*pageSize,Math.min(page,pageCount)*pageSize);
   const updateLine = (index, key, value) =>
     setForm({
       ...form,
@@ -186,6 +190,8 @@ export default function AdminQuotations() {
             <label key={key}>
               <span className="label-field">{label}</span>
               <input
+                type={key === "customerEmail" ? "email" : key === "customerPhone" ? "tel" : "text"}
+                placeholder={key === "customerEmail" ? "name@example.com" : key === "customerPhone" ? "+91 98765 43210" : undefined}
                 required={["customerName", "title"].includes(key)}
                 value={form[key]}
                 onChange={(e) => setForm({ ...form, [key]: e.target.value })}
@@ -365,7 +371,7 @@ export default function AdminQuotations() {
         </div>
       </form>
       <section className="mt-8">
-        <h2 className="font-display text-xl">Recent quotations</h2><label className="mt-3 block"><span className="label-field">Filter by Agent ID</span><input className="input-field" value={agentFilter} onChange={e=>setAgentFilter(e.target.value)} placeholder="Full Agent ID"/></label>
+        <h2 className="font-display text-xl">All quotations</h2><div className="mt-3 grid gap-3 sm:grid-cols-3"><label><span className="label-field">Search</span><input className="input-field" value={listFilters.search} onChange={e=>{setListFilters({...listFilters,search:e.target.value});setPage(1)}} placeholder="Reference, customer, agent, destination"/></label><label><span className="label-field">Status</span><select className="input-field" value={listFilters.status} onChange={e=>{setListFilters({...listFilters,status:e.target.value});setPage(1)}}><option value="">All statuses</option>{["draft","sent","accepted","rejected","expired","cancelled"].map(value=><option key={value}>{value}</option>)}</select></label><label><span className="label-field">Agent ID</span><input className="input-field" value={agentFilter} onChange={e=>setAgentFilter(e.target.value)} placeholder="Full Agent ID (optional)"/></label></div><p className="mt-3 text-sm text-slate-500">{filteredQuotes.length} quotation{filteredQuotes.length===1?"":"s"} · newest first</p>
         <div className="mt-3 overflow-x-auto rounded-2xl border bg-white">
           <table className="w-full min-w-[1050px] text-sm">
             <thead>
@@ -374,18 +380,20 @@ export default function AdminQuotations() {
                 <th className="p-4">Customer</th>
                 <th className="p-4">Agent / Agency</th>
                 <th className="p-4">Enquiry</th>
+                <th className="p-4">Source / date</th>
                 <th className="p-4">Total</th>
                 <th className="p-4">Status</th>
                 <th className="p-4">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {quotes.map((quote) => (
+              {visibleQuotes.map((quote) => (
                 <tr key={quote.id} className="border-b">
                   <td className="p-4 font-mono">{quote.reference}</td>
                   <td className="p-4">{quote.customer_name}</td>
                   <td className="p-4">{quote.agent?.business_name||quote.agent_id||"Direct"}<span className="block text-xs">{quote.agent_id}</span>{quote.notes?.includes("Revision requested")&&<strong className="block text-xs text-orange-700">Revision requested — open Edit to review</strong>}</td>
                   <td className="p-4 font-mono text-xs">{quote.inquiry?.id||quote.inquiry_id||"—"}</td>
+                  <td className="p-4 text-xs"><strong className="block capitalize">{quote.inquiry?.enquiry_source|| (quote.agent_id?"B2B partner":"Admin")}</strong>{new Date(quote.created_at).toLocaleString("en-IN")}</td>
                   <td className="p-4">
                     INR {Number(quote.total).toLocaleString("en-IN")}
                   </td>
@@ -456,6 +464,8 @@ export default function AdminQuotations() {
             </tbody>
           </table>
         </div>
+        {!filteredQuotes.length&&<p className="rounded-b-2xl border border-t-0 bg-white p-8 text-center text-slate-400">No quotations match the current filters.</p>}
+        {pageCount>1&&<div className="mt-4 flex items-center justify-end gap-3"><button type="button" disabled={page<=1} onClick={()=>setPage(value=>Math.max(1,value-1))} className="btn-secondary">Previous</button><span className="text-sm">Page {Math.min(page,pageCount)} of {pageCount}</span><button type="button" disabled={page>=pageCount} onClick={()=>setPage(value=>Math.min(pageCount,value+1))} className="btn-secondary">Next</button></div>}
       </section>
     </div>
   );

@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { requireAdmin } from "../_admin.js";
 import { json, supabaseRequest } from "../_shared.js";
-import { clean, money, uuidPattern } from "../_validation.js";
+import { clean, money, normalizeEmail, validEmail, uuidPattern } from "../_validation.js";
 
 async function databaseError(response, fallback) {
   const details = await response.json().catch(() => ({}));
@@ -16,7 +16,7 @@ export default async function handler(req, res) {
   try {
     if (req.method === "GET") {
       const agentFilter=uuidPattern.test(req.query?.agentId||"")?"&agent_id=eq."+req.query.agentId:"";
-      const response = await supabaseRequest("quotations?select=*,agent:b2b_agents(id,business_name),inquiry:inquiries(id,enquiry_source,package_id),lines:quotation_lines(*)&order=created_at.desc&limit=200"+agentFilter);
+      const response = await supabaseRequest("quotations?select=*,agent:b2b_agents(id,business_name),inquiry:inquiries(id,enquiry_source,package_id),lines:quotation_lines(*)&order=created_at.desc"+agentFilter);
       return response.ok
         ? json(res, 200, { quotations: await response.json() })
         : json(res, 502, { error: await databaseError(response, "Unable to load quotations") });
@@ -30,6 +30,8 @@ export default async function handler(req, res) {
       description: clean(line.description, 500), quantity: Math.max(.01, Number(line.quantity || 1)),
       unit_price: money(line.unitPrice), sort_order: index,
     })).filter((line) => line.description);
+    const customerEmail=normalizeEmail(body.customerEmail);
+    if(customerEmail&&!validEmail(customerEmail))return json(res,422,{error:"Enter a valid customer email address"});
     if (!clean(body.customerName, 120) || !clean(body.title, 200) || !lines.length) return json(res, 422, { error: "Customer, title and at least one line item are required" });
     const subtotal = money(lines.reduce((sum, line) => sum + line.quantity * line.unit_price, 0));
     const discount = Math.min(subtotal, money(body.discount));
@@ -46,7 +48,7 @@ export default async function handler(req, res) {
     const quote = {
       ...(isUpdate ? {} : { reference, created_by: admin.user_id }),
       inquiry_id: inquiryId, customer_name: clean(body.customerName, 120),
-      customer_email: clean(body.customerEmail, 160) || null, customer_phone: clean(body.customerPhone, 24) || null,
+      customer_email: customerEmail || null, customer_phone: clean(body.customerPhone, 24) || null,
       title: clean(body.title, 200), destination: clean(body.destination, 200) || null,
       travel_start: body.travelStart || null, travel_end: body.travelEnd || null,
       traveller_count: Math.max(1, Number(body.travellerCount || 1)), valid_until: body.validUntil || null,

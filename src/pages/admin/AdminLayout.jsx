@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard, Map, Users, MessageSquare, Newspaper, Star, Settings, FileText, CalendarDays, BellRing,
+  LayoutDashboard, Map, Users, MessageSquare, Newspaper, Star, Settings, FileText, CalendarDays, BellRing, Sparkles,
   Menu, X, Search, Bell, LogOut, Mail,
 } from "lucide-react";
 import { isAdminLoggedIn, adminLogout } from "../../utils/storage";
@@ -11,6 +11,8 @@ import { PageLoader } from "../../components/shared/Loading";
 const navItems = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/admin/tours", label: "Tour Management", icon: Map },
+  { to: "/admin/monthly-picks", label: "Monthly Picks", icon: Sparkles },
+  { to: "/admin/events", label: "Events", icon: CalendarDays },
   { to: "/admin/bookings", label: "Bookings", icon: FileText },
   { to: "/admin/invoices", label: "Invoices", icon: FileText },
   { to: "/admin/vouchers", label: "Hotel & Taxi Vouchers", icon: FileText },

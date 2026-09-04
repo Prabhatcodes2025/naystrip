@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, Calendar, ArrowRight } from "lucide-react";
-import { blogs } from "../data/content";
 import { getPublicBlogs } from "../utils/storage";
 import { PageBanner } from "../components/shared/Bits";
 import Reveal from "../components/shared/Reveal";
@@ -11,11 +10,11 @@ import SmartImage from "../components/shared/SmartImage";
 export default function Blog() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
-  const [published,setPublished]=useState([]);
-  useEffect(()=>{getPublicBlogs().then(setPublished).catch(()=>setPublished([]))},[]);
+  const [published,setPublished]=useState([]);const [loading,setLoading]=useState(true);
+  useEffect(()=>{getPublicBlogs().then(setPublished).catch(()=>setPublished([])).finally(()=>setLoading(false))},[]);
 
   const allBlogs = useMemo(() => {
-    return [...new Map([...blogs, ...published].map((item) => [item.slug || item.id, item])).values()];
+    return [...new Map(published.map((item) => [item.slug || item.id, item])).values()];
   }, [published]);
 
   const categories = ["All", ...Array.from(new Set(allBlogs.map((b) => b.category)))];
@@ -84,6 +83,7 @@ export default function Blog() {
               </Reveal>
             ))}
           </div>
+          {!loading&&!filtered.length&&<div className="rounded-2xl border border-navy-100 bg-white p-10 text-center"><h2 className="font-display text-2xl text-navy-900">No published articles found</h2><p className="mt-2 text-sm text-navy-500">Try clearing the search or check back when the next article is published.</p></div>}
         </div>
       </section>
     </>

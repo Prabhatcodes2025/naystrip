@@ -1,14 +1,16 @@
 import { consumeMathChallenge } from "./math-captcha.js";
 import { guard, json, supabaseRequest } from "../_shared.js";
 import { verifyCaptcha } from "../_captcha.js";
+import { normalizeEmail, validEmail } from "../_validation.js";
 
 export default async function handler(req, res) {
   if (!guard(req, res)) return;
   try { if (!await consumeMathChallenge(req.body?.mathChallengeId, req.body?.mathAnswer)) return json(res,403,{error:"Incorrect or expired math answer. Please answer the new question."}); } catch { return json(res,503,{error:"Math check unavailable. Please retry."}); }
-  const { email, password, name, phone, businessName, pan, portal, captchaToken } = req.body || {};
+  const { password, name, phone, businessName, pan, portal, captchaToken } = req.body || {};
+  const email=normalizeEmail(req.body?.email);
   const captcha = await verifyCaptcha(captchaToken, req.headers["x-forwarded-for"]);
   if (!captcha.success) return json(res, 403, { error: captcha.error });
-  if (!email || !password || password.length < 10 || !name || !phone || !["customer", "agent"].includes(portal)) return json(res, 422, { error: "Complete all required fields; passwords need at least 10 characters" });
+  if (!validEmail(email) || !password || password.length < 10 || !name || !phone || !["customer", "agent"].includes(portal)) return json(res, 422, { error: "Complete all required fields with a valid email; passwords need at least 10 characters" });
   const normalizedPan = String(pan || "").trim().toUpperCase();
   if (portal === "agent" && (!businessName || !/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(normalizedPan))) return json(res, 422, { error: "Business name and a valid PAN (AAAAA9999A) are required" });
   if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY || (portal === "agent" && !process.env.SUPABASE_SERVICE_ROLE_KEY)) return json(res, 503, { error: "Registration is being configured" });

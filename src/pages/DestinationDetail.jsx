@@ -2,7 +2,6 @@ import { Link, useParams, Navigate } from "react-router-dom";
 import { Sun, Cloud, MapPinned, Lightbulb, MessageCircle } from "lucide-react";
 import { getDestinationBySlug } from "../data/destinations";
 import { tours } from "../data/tours";
-import { blogs } from "../data/content";
 import { PageBanner, SectionHeading } from "../components/shared/Bits";
 import Reveal from "../components/shared/Reveal";
 import Seo from "../components/shared/Seo";
@@ -14,7 +13,7 @@ export default function DestinationDetail() {
   if (!destination) return <Navigate to="/destinations" replace />;
 
   const relatedTours = tours.filter((t) => t.destination.toLowerCase().includes(destination.name.split(" ")[0].toLowerCase()));
-  const relatedBlogs = blogs.filter((b) => b.relatedDestination === destination.slug);
+  const relatedBlogs = [];
 
   return (
     <>
@@ -96,7 +95,7 @@ export default function DestinationDetail() {
                 <p className="text-xs text-navy-400">Packages starting from</p>
                 <p className="font-display text-2xl font-bold text-navy-900">₹{destination.startingPrice.toLocaleString("en-IN")}</p>
                 <p className="text-xs text-navy-400 mt-1">{destination.packageCount} curated packages available</p>
-                <Link to={`/tours?destination=${destination.name}`} className="btn-primary w-full mt-5">Explore Packages</Link>
+                <Link to={destination.slug === "maharashtra" ? "/packages/maharashtra" : `/tours?destination=${encodeURIComponent(destination.name)}`} className="btn-primary w-full mt-5">Explore Packages</Link>
                 <Link to="/contact" className="btn-secondary w-full mt-3">
                   <MessageCircle size={16} /> Enquire Now
                 </Link>
