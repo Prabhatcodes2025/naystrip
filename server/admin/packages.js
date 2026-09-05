@@ -50,6 +50,8 @@ const packageRecord = (body) => {
   });
 };
 const bookingConfigurationError=(record)=>record.status==="published"&&record.policies.booking_mode==="flexible_date"&&record.price_from==null?"A published flexible-date package needs an approved starting price before online booking can be enabled":null;
+const upstreamError=async(response,fallback)=>{const body=await response.text();try{const error=body?JSON.parse(body):{};return clean(error.message||error.details||error.hint,500)||fallback}catch{return fallback}};
+async function availableSlug(base){let slug=base;for(let suffix=2;suffix<1000;suffix++){const response=await supabaseRequest(`packages?slug=eq.${encodeURIComponent(slug)}&select=id&limit=1`);if(!response.ok)throw new Error(await upstreamError(response,"Package slug could not be checked"));const rows=await response.json();if(!rows.length)return slug;slug=`${base}-${suffix}`}throw new Error("Unable to generate a unique package slug")}
 
 async function replaceChildren(packageId, body) {
   await supabaseRequest(`package_itinerary_days?package_id=eq.${packageId}`, {
@@ -152,6 +154,7 @@ export default async function handler(req, res) {
       const record = packageRecord(body);
       if (!record.title || !record.slug)
         return json(res, 422, { error: "Title and slug are required" });
+      record.slug=await availableSlug(record.slug);
       const configurationError=bookingConfigurationError(record);
       if(configurationError)return json(res,422,{error:configurationError});
       const inserted = await supabaseRequest("packages", {
@@ -160,8 +163,9 @@ export default async function handler(req, res) {
         body: JSON.stringify(record),
       });
       if (!inserted.ok)
-        return json(res, 502, { error: "Package could not be created" });
-      const [created] = await inserted.json();
+        return json(res, inserted.status===409?409:502, { error: await upstreamError(inserted,"Package could not be created") });
+      const rows=await inserted.json().catch(()=>[]);const created=rows[0];
+      if(!created?.id)return json(res,502,{error:"Package was not returned after creation"});
       await replaceChildren(created.id, body);
       return json(res, 201, { package: created });
     }
