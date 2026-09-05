@@ -2,11 +2,11 @@ import PartnerWallet from "../components/shared/PartnerWallet";
 import PartnerProfile from "../components/shared/PartnerProfile";
 import PartnerDeals from "../components/shared/PartnerDeals";
 import EnquiryDetails from "../components/shared/EnquiryDetails";
+import PortalSidebar from "../components/shared/PortalSidebar";
 import {downloadStoredDocument} from "../utils/portal";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { BadgeCheck, FileText, Headphones, LogOut, Mail, MessageCircle, Plus, WalletCards } from "lucide-react";
-import BrandLogo from "../components/branding/BrandLogo";
+import { BadgeCheck, FileText, Headphones, Mail, MessageCircle, Plus, WalletCards } from "lucide-react";
 import { LoadError, PageLoader } from "../components/shared/Loading";
 import { getToken, portalFetch, sessionKey } from "../utils/portal";
 
@@ -42,8 +42,8 @@ export default function B2BDashboard(){
  const filteredBookings=data.bookings.filter(item=>(!filters.status||item.operational_status===filters.status)&&(!filters.date||item.travel_date===filters.date)&&(!filters.search||[item.reference,item.id,item.package?.title,data.agent.id].join(" ").toLowerCase().includes(filters.search.toLowerCase())));
  const selling=(pkg)=>{const v=Number(rateMarkup.value),net=Number(pkg.netRate);return pkg.netRate===null?null:!Number.isFinite(v)||v<0||(rateMarkup.type==="percentage"&&v>100)?null:Math.round((net+(rateMarkup.type==="fixed"?v:net*v/100))*100)/100};
  const supportPhone=String(data.support.phone||"").replace(/\D/g,""),whatsapp=String(data.support.whatsapp||"").replace(/\D/g,"");
- return <main className="min-h-screen bg-[#f5f3ed] text-slate-800 [&_section]:min-w-0 [&_section[id]]:scroll-mt-64 sm:[&_section[id]]:scroll-mt-44">
-  <header className="sticky top-0 z-30 border-b bg-white"><div className="container-lg flex min-h-20 flex-wrap items-center justify-between gap-3 py-2"><Link to="/"><BrandLogo className="h-16"/></Link><nav className="flex max-w-full gap-4 overflow-x-auto text-sm font-bold"><a href="#dashboard">Dashboard</a><a href="#enquiries">Enquiries</a><a href="#bookings">Bookings</a><a href="#rates">Rates</a><a href="#booking-documents">Documents</a><a href="#payments">Payments</a><a href="#support">Support</a></nav><button onClick={logout} className="btn-secondary"><LogOut size={15}/>Logout</button></div></header>
+ return <main className="min-h-screen bg-[#f5f3ed] text-slate-800 lg:pl-64 [&_section]:min-w-0 [&_section[id]]:scroll-mt-20">
+  <PortalSidebar eyebrow="B2B Partner Portal" onLogout={logout} items={[{label:"Dashboard",href:"#dashboard"},{label:"Enquiries",href:"#enquiries"},{label:"Bookings",href:"#bookings"},{label:"Rates",href:"#rates"},{label:"Documents",href:"#booking-documents"},{label:"Payments",href:"#payments"},{label:"Support",href:"#support"}]}/>
   <div id="dashboard" className="container-lg pb-24 pt-8 sm:pt-10"><p className="eyebrow">B2B PARTNER PORTAL</p><div className="flex flex-wrap items-center gap-3"><h1 className="mt-2 font-display text-3xl text-[#173c34] sm:text-5xl">Welcome, {data.agent.business_name}</h1><span className="mt-2 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold capitalize text-emerald-800"><BadgeCheck size={14}/>{data.agent.verification_status} Partner</span></div>
    {error&&<p role="alert" className="mt-5 rounded-xl bg-rose-50 p-4 text-sm text-rose-700">{error}</p>}{message&&<p role="status" className="mt-5 break-words rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800">{message}</p>}
    {shareUrl&&<a className="btn-primary mt-3" href={shareUrl} target="_blank" rel="noopener noreferrer">Open customer sharing link</a>}

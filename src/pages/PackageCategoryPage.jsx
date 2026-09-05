@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Navigate, Link, useParams } from "react-router-dom";
 import { Search } from "lucide-react";
 import Seo from "../components/shared/Seo";
@@ -7,18 +7,22 @@ import PackageCard from "../components/tours/PackageCard";
 import usePublicPackages from "../hooks/usePublicPackages";
 import { tours } from "../data/tours";
 import { categoryPages, packageMatchesCategory } from "../data/packageCategories";
+import { defaultHeaderMenuOptions, loadSiteSettings } from "../data/siteConfig";
 
 export default function PackageCategoryPage() {
   const { category } = useParams();
-  const config = categoryPages[category];
+  const [menuOptions,setMenuOptions]=useState(defaultHeaderMenuOptions);
+  useEffect(()=>{loadSiteSettings().then(settings=>setMenuOptions(settings.headerMenuOptions||[])).catch(()=>{})},[]);
+  const option=menuOptions.find(item=>item.slug===category&&item.published!==false);
+  const config = categoryPages[category] || (option ? {title:`${option.label} Packages`} : null);
   const { packages } = usePublicPackages();
   const [query, setQuery] = useState("");
   const items = useMemo(() => {
     const merged = new Map();
-    for (const item of [...tours, ...packages]) if (packageMatchesCategory(item, category)) merged.set(item.slug, item);
+    for (const item of [...tours, ...packages]) if (packageMatchesCategory(item, category, option)) merged.set(item.slug, item);
     const term = query.trim().toLowerCase();
     return [...merged.values()].filter((item) => !term || [item.title, item.package_type, item.tripType, ...(item.destination_names || item.destinations || [])].join(" ").toLowerCase().includes(term));
-  }, [category, packages, query]);
+  }, [category, option, packages, query]);
   if (!config) return <Navigate to="/tours/domestic" replace />;
   const hero = items[0]?.hero_image || items[0]?.image || tours[0]?.image;
   return <>

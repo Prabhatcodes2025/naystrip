@@ -5,12 +5,12 @@ Production-oriented travel catalogue and enquiry platform for NaysTrip & Treks (
 ## Included
 
 - Premium responsive public website with NaysTrip identity and official contacts/social links
-- Sixteen structured Maharashtra packages imported from the supplied itinerary document
+- Thirty-six structured tour, trek and expedition packages available for safe Supabase import
 - Search and duration filtering, source-preserving day itineraries, inclusions, exclusions, notes and cancellation slabs
 - Three-step custom trip planner and contact/quote forms
 - Customer, B2B partner and admin authentication entry points backed by Supabase Auth
 - PostgreSQL/Supabase schema for roles, customers, agents, packages, departures, enquiries, bookings, travellers, payments, refunds, content, media and audit logs
-- Idempotent REST seed script using the structured package source
+- Insert-only, idempotent REST import using stable slugs and the structured package source
 - Server-side Cashfree order creation, payment-status verification and signed webhook processing
 - Static sitemap, robots policy, manifest, canonical metadata and TravelAgency structured data
 
@@ -33,7 +33,7 @@ Apply every file in `supabase/migrations/` in numeric order with the Supabase CL
 corepack pnpm run seed
 ```
 
-The seed upserts categories and packages by stable slugs, replaces itinerary/items for each package, and can be safely run again.
+The import reads all 36 static package definitions, skips any slug already in Supabase, and adds itinerary/items only for newly inserted packages. It never overwrites admin-edited rows and never creates B2B rates. Keep the static public fallback until the import report and public database rendering have been verified; only then remove that fallback in a separate change.
 
 ## Environment variables
 

@@ -56,6 +56,7 @@ const AdminInvoices = lazy(() => import("./pages/admin/AdminInvoices"));
 const AdminSubscribers = lazy(() => import("./pages/admin/AdminSubscribers"));
 const AdminMonthlyPicks = lazy(() => import("./pages/admin/AdminMonthlyPicks"));
 const AdminEvents = lazy(() => import("./pages/admin/AdminEvents"));
+const AdminMenuOptions = lazy(() => import("./pages/admin/AdminMenuOptions"));
 
 function BootComplete({ onReady }) {
   useEffect(() => onReady(), [onReady]);
@@ -130,6 +131,7 @@ export default function App() {
         <Route path="tours" element={<AdminTours />} />
         <Route path="monthly-picks" element={<AdminMonthlyPicks />} />
         <Route path="events" element={<AdminEvents />} />
+        <Route path="menu-options" element={<AdminMenuOptions />} />
         <Route path="bookings" element={<AdminBookings />} />
         <Route path="invoices" element={<AdminInvoices />} />
         <Route path="departures" element={<AdminDepartures />} />

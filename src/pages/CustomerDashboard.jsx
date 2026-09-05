@@ -4,11 +4,10 @@ import {
   CalendarDays,
   Download,
   Headphones,
-  LogOut,
   Plane,
   WalletCards,
 } from "lucide-react";
-import BrandLogo from "../components/branding/BrandLogo";
+import PortalSidebar from "../components/shared/PortalSidebar";
 import Seo from "../components/shared/Seo";
 import { LoadError, PageLoader } from "../components/shared/Loading";
 import { whatsappHref } from "../data/siteConfig";
@@ -98,19 +97,9 @@ export default function CustomerDashboard() {
   return (
     <>
       <Seo title="Customer Dashboard | NaysTrip" />
-      <main className="min-h-screen bg-[#f5f3ed]">
-        <header className="border-b bg-white">
-          <div className="container-lg flex h-24 items-center justify-between">
-            <Link to="/">
-              <BrandLogo className="h-20" />
-            </Link>
-            <button onClick={logout} className="btn-secondary">
-              <LogOut size={16} />
-              Sign out
-            </button>
-          </div>
-        </header>
-        <div className="container-lg py-10">
+      <main className="min-h-screen bg-[#f5f3ed] lg:pl-64">
+        <PortalSidebar eyebrow="Customer Portal" onLogout={logout} items={[{label:"Dashboard",href:"#dashboard"},{label:"Profile",href:"#profile"},{label:"Upcoming trips",href:"#upcoming"},{label:"Past trips",href:"#past"},{label:"Support",href:"#support"}]}/>
+        <div id="dashboard" className="container-lg py-10">
           <p className="eyebrow">Customer portal</p>
           <h1 className="mt-2 font-display text-4xl text-[#173c34]">
             Welcome, {data.profile.firstName || "traveller"}.
@@ -142,7 +131,7 @@ export default function CustomerDashboard() {
               </p>
               <p className="text-sm text-slate-500">Balance due</p>
             </div>
-            <a
+            <a id="support"
               href={whatsappHref()}
               className="bg-[#173c34] p-5 text-white"
             >
@@ -151,8 +140,8 @@ export default function CustomerDashboard() {
               <p className="text-sm text-white/60">WhatsApp NaysTrip</p>
             </a>
           </div>
-          <ProfileEditor profile={data.profile} onSaved={load} />
-          <section className="mt-10">
+          <div id="profile"><ProfileEditor profile={data.profile} onSaved={load} /></div>
+          <section id="upcoming" className="mt-10">
             <h2 className="font-display text-2xl text-[#173c34]">
               Upcoming trips
             </h2>
@@ -180,7 +169,7 @@ export default function CustomerDashboard() {
             </div>
           </section>
           {past.length > 0 && (
-            <section className="mt-10">
+            <section id="past" className="mt-10">
               <h2 className="font-display text-2xl text-[#173c34]">
                 Past trips
               </h2>

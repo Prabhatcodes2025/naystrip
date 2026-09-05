@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Copy, Download, ExternalLink, MessageCircle, Plus, Search, Trash2, X } from "lucide-react";
 import MediaUploader from "../../components/admin/MediaUploader";
 import { TableSkeleton } from "../../components/shared/Loading";
-import { packagePlacements } from "../../data/packageCategories";
+import { packagePrimaryPlacement, primaryPlacements } from "../../data/packageCategories";
+import { loadSiteSettings } from "../../data/siteConfig";
 const empty = {
   title: "",
   slug: "",
@@ -38,7 +39,7 @@ const empty = {
   exclusions: [],
   notes: [],
   faqs: [],
-  policies: {},
+  policies: { primaryPlacement: "tours-domestic", menuCategoryIds: [] },
   seo: {},
 };
 const request = async (path, options = {}) => {
@@ -78,10 +79,13 @@ export default function AdminTours() {
   const [busy, setBusy] = useState(false);
   const [slugTouched,setSlugTouched]=useState(false);
   const [notice,setNotice]=useState("");
+  const [menuOptions,setMenuOptions]=useState([]);
   const load = async () => {
     setBusy(true);
     try {
-      setPackages((await request("/api/admin/packages")).packages || []);
+      const [packageData,settings]=await Promise.all([request("/api/admin/packages"),loadSiteSettings()]);
+      setPackages(packageData.packages || []);
+      setMenuOptions(settings.headerMenuOptions || []);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -141,7 +145,7 @@ export default function AdminTours() {
       faqs: (item.items || [])
         .filter((x) => x.item_type === "faq")
         .map((x) => x.body),
-      policies: item.policies || {},
+      policies: { ...(item.policies || {}), primaryPlacement: packagePrimaryPlacement(item), menuCategoryIds: item.policies?.menuCategoryIds || [] },
       seo: item.seo || {},
     });
     setOpen(true);
@@ -417,8 +421,9 @@ export default function AdminTours() {
               </div>
               <section className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
                 <h3 className="font-bold text-[#173c34]">Website and header placement</h3>
-                <p className="mt-1 text-xs text-slate-500">Assign this package to one or more existing content areas. The same package record is reused everywhere.</p>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{packagePlacements.map((placement)=><label key={placement.value} className="flex items-start gap-2 rounded-xl bg-white p-3 text-sm"><input type="checkbox" className="mt-1" checked={(form.policies?.placements||[]).includes(placement.value)} onChange={(event)=>{const current=form.policies?.placements||[];const placements=event.target.checked?[...current,placement.value]:current.filter((value)=>value!==placement.value);setForm({...form,policies:{...form.policies,placements}})}}/><span>{placement.label}</span></label>)}</div>
+                <p className="mt-1 text-xs text-slate-500">Choose one primary site placement. Destination and region menu categories are assigned separately.</p>
+                <label className="mt-4 block max-w-lg"><span className="label-field">Primary placement</span><select value={form.policies?.primaryPlacement||packagePrimaryPlacement(form)} onChange={(event)=>setForm({...form,policies:{...form.policies,primaryPlacement:event.target.value}})} className="input-field">{[...new Set(primaryPlacements.map(item=>item.group))].map(group=><optgroup key={group} label={group}>{primaryPlacements.filter(item=>item.group===group).map(item=><option key={item.value} value={item.value}>{item.label}</option>)}</optgroup>)}</select></label>
+                <fieldset className="mt-4"><legend className="label-field">Header destination / region options</legend><div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{menuOptions.filter(option=>option.published!==false).map(option=><label key={option.id} className="flex items-start gap-2 rounded-xl bg-white p-3 text-sm"><input type="checkbox" className="mt-1" checked={(form.policies?.menuCategoryIds||[]).includes(option.id)} onChange={(event)=>{const current=form.policies?.menuCategoryIds||[];const menuCategoryIds=event.target.checked?[...current,option.id]:current.filter(value=>value!==option.id);setForm({...form,policies:{...form.policies,menuCategoryIds}})}}/><span>{option.label}<small className="block text-slate-400">{option.section}{option.subgroup?` / ${option.subgroup}`:""}</small></span></label>)}</div></fieldset>
               </section>
               <div className="grid gap-6 lg:grid-cols-2">
                 <MediaUploader label="Hero / cover image" value={form.heroImage} onChange={(heroImage) => setForm({ ...form, heroImage })} scope={`packages/${form.id || form.slug || "draft"}/hero`} context={`${form.title} ${form.destinations.join(" ")}`} />

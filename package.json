@@ -9,7 +9,8 @@
     "lint": "oxlint",
     "test": "node --test tests/*.test.mjs",
     "preview": "vite preview",
-    "seed": "node scripts/seed.mjs"
+    "seed": "node scripts/import-static-packages.mjs",
+    "import:static-packages": "node scripts/import-static-packages.mjs"
   },
   "dependencies": {
     "docx": "^9.5.1",

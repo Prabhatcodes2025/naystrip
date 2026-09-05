@@ -11,6 +11,7 @@ import { PageLoader } from "../../components/shared/Loading";
 const navItems = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/admin/tours", label: "Tour Management", icon: Map },
+  { to: "/admin/menu-options", label: "Header Categories", icon: Map },
   { to: "/admin/monthly-picks", label: "Monthly Picks", icon: Sparkles },
   { to: "/admin/events", label: "Events", icon: CalendarDays },
   { to: "/admin/bookings", label: "Bookings", icon: FileText },
