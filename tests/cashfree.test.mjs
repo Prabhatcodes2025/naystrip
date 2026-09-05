@@ -4,7 +4,7 @@ import {readFileSync} from "node:fs";
 import {join} from "node:path";
 import {Readable} from "node:stream";
 import test from "node:test";
-import {cashfreeConfiguration,cashfreeRequest} from "../server/payments/_cashfree.js";
+import {cashfreeConfiguration,cashfreeRequest,readCashfreeResponse,safeCashfreeError} from "../server/payments/_cashfree.js";
 import webhook,{cashfreeWebhookSignature} from "../server/payments/webhook.js";
 
 const originalFetch=globalThis.fetch;
@@ -28,6 +28,15 @@ test("Cashfree production API requires an explicit environment switch",()=>{
   assert.equal(cashfreeConfiguration().baseUrl,"https://api.cashfree.com/pg");
   process.env.CASHFREE_ENV="anything-else";
   assert.equal(cashfreeConfiguration().baseUrl,"https://sandbox.cashfree.com/pg");
+});
+
+test("Cashfree errors are parsed safely without exposing authentication data",async()=>{
+  const empty=await readCashfreeResponse(new Response("",{status:401}),{});
+  assert.deepEqual(empty,{});
+  const invalid=await readCashfreeResponse(new Response("upstream unavailable",{status:502}),{});
+  assert.deepEqual(safeCashfreeError(invalid),{code:"CASHFREE_REQUEST_FAILED",message:"upstream unavailable"});
+  assert.deepEqual(safeCashfreeError({code:"authentication_failed",message:"invalid credentials"}),{code:"authentication_failed",message:"invalid credentials"});
+  assert.doesNotMatch(safeCashfreeError({message:"Authorization: Bearer secret-token"}).message,/secret-token/);
 });
 
 test("Cashfree webhook signature uses timestamp plus exact raw bytes",()=>{

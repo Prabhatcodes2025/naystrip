@@ -1,7 +1,7 @@
 import {guard,json,supabaseRequest} from "../_shared.js";
 import {requirePortalUser} from "../_auth.js";
 import {clean,money} from "../_validation.js";
-import {cashfreeConfiguration,cashfreeRequest} from "./_cashfree.js";
+import {cashfreeConfiguration,cashfreeRequest,readCashfreeResponse,safeCashfreeError} from "./_cashfree.js";
 
 export default async function handler(req,res){
   if(!guard(req,res))return;
@@ -23,15 +23,16 @@ export default async function handler(req,res){
   const siteUrl=String(process.env.PUBLIC_SITE_URL||"https://www.naystrip.com").replace(/\/$/,"");
   const phone=String(booking.billing?.phone||session.profile?.phone||"").replace(/\D/g,"").slice(-15);
   if(phone.length<10)return json(res,422,{error:"A valid customer phone is required for online payment"});
-  const gateway=await cashfreeRequest("/orders",{method:"POST",headers:{"x-idempotency-key":crypto.randomUUID(),"x-request-id":crypto.randomUUID()},body:JSON.stringify({
+  let gateway;
+  try{gateway=await cashfreeRequest("/orders",{method:"POST",headers:{"x-idempotency-key":crypto.randomUUID(),"x-request-id":crypto.randomUUID()},body:JSON.stringify({
     order_id:orderId,order_amount:payable,order_currency:booking.currency||"INR",
     customer_details:{customer_id:String(session.user.id).replace(/[^a-zA-Z0-9_-]/g,"").slice(0,50),customer_name:clean(booking.billing?.name,100)||"NaysTrip Customer",customer_email:clean(booking.billing?.email||session.user.email,160)||undefined,customer_phone:phone},
     order_meta:{return_url:`${siteUrl}/account/dashboard?cashfree_order_id={order_id}`,notify_url:`${siteUrl}/api/payments/webhook`},
     order_note:`NaysTrip booking ${booking.reference} ${purpose}`,
     order_tags:{booking_id:booking.id,booking_reference:booking.reference,purpose},
-  })});
-  const order=await gateway.json().catch(()=>({}));
-  if(!gateway.ok||!order.order_id||!order.payment_session_id){console.error("cashfree_order_failed",gateway.status,order);return json(res,502,{error:"Payment gateway is temporarily unavailable"})}
+  })})}catch(error){console.error("cashfree_order_failed",{status:0,error:safeCashfreeError({code:"CASHFREE_NETWORK_ERROR",message:error?.message})});return json(res,502,{error:"Payment gateway is temporarily unavailable",gateway_error:{code:"CASHFREE_NETWORK_ERROR",message:"Cashfree could not be reached"}})}
+  const order=await readCashfreeResponse(gateway,{});
+  if(!gateway.ok||!order.order_id||!order.payment_session_id){const gatewayError=safeCashfreeError(order);console.error("cashfree_order_failed",{status:gateway.status,error:gatewayError});return json(res,502,{error:`Payment gateway is temporarily unavailable: ${gatewayError.message}`,gateway_error:{status:gateway.status,...gatewayError}})}
   const saved=await supabaseRequest("payments",{method:"POST",headers:{Prefer:"resolution=ignore-duplicates"},body:JSON.stringify({booking_id:booking.id,gateway:"cashfree",gateway_order_id:order.order_id,amount:payable,currency:booking.currency||"INR",status:"created",payment_purpose:purpose,idempotency_key:`cashfree:${order.order_id}`,raw_status:{order_status:order.order_status,payment_session_id:order.payment_session_id,cf_order_id:order.cf_order_id}})});
   if(!saved.ok)return json(res,502,{error:"Could not initialise payment record"});
   await supabaseRequest(`bookings?id=eq.${booking.id}`,{method:"PATCH",body:JSON.stringify({operational_status:"pending_payment",updated_at:new Date().toISOString()})});
