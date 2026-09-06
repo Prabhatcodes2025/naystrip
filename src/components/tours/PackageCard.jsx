@@ -5,6 +5,7 @@ import SmartImage from "../shared/SmartImage";
 export default function PackageCard({ tour, commercial, priority = false }) {
   const online = Boolean(commercial?.booking_state?.online);
   const price = commercial?.price_from ?? tour.price;
+  const original=Number(commercial?.policies?.originalPrice),selling=Number(price),discount=original>selling&&selling>=0?Math.round((original-selling)*100/original):0;
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_12px_36px_rgba(19,52,45,.08)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_52px_rgba(19,52,45,.13)]">
       <Link to={`/tours/${tour.slug}`} className="relative block aspect-[4/3] overflow-hidden bg-slate-100">
@@ -15,7 +16,7 @@ export default function PackageCard({ tour, commercial, priority = false }) {
         <p className="flex items-center gap-2 text-xs font-semibold text-slate-500"><MapPin size={14} className="text-orange-600" />{tour.destinations.slice(0, 3).join(" · ")}</p>
         <h3 className="mt-3 line-clamp-2 font-display text-2xl leading-tight text-[#173c34]"><Link to={`/tours/${tour.slug}`}>{tour.title}</Link></h3>
         <div className="mt-auto flex items-end justify-between gap-4 border-t border-slate-100 pt-4">
-          <div><span className="block text-[10px] font-bold uppercase tracking-[.14em] text-slate-400">{price != null ? "Per person" : "Pricing"}</span><strong className="mt-1 block text-lg text-[#173c34]">{price != null ? `₹${Number(price).toLocaleString("en-IN")}` : "Price on request"}</strong></div>
+          <div><span className="block text-[10px] font-bold uppercase tracking-[.14em] text-slate-400">{price != null ? "Per person" : "Pricing"}</span>{discount>0&&<span className="text-sm text-slate-400 line-through">₹{original.toLocaleString("en-IN")}</span>}<strong className="mt-1 block text-lg text-[#173c34]">{price != null ? `₹${Number(price).toLocaleString("en-IN")}` : "Price on request"}</strong>{discount>0&&<span className="text-xs font-extrabold text-emerald-700">{discount}% OFF</span>}</div>
           <Link to={online ? `/checkout/${tour.slug}` : `/tours/${tour.slug}`} className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-4 py-2.5 text-xs font-extrabold text-white hover:bg-orange-600">{online ? <CalendarDays size={14}/> : null}{online ? "Book now" : "View & enquire"}<ArrowRight size={14}/></Link>
         </div>
       </div>

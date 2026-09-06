@@ -20,6 +20,7 @@ const empty = {
   heroImage: "",
   gallery: [],
   priceFrom: "",
+  originalPrice: "",
   taxPercent: 5,
   advancePercent: 50,
   bookingMode: "enquiry_only",
@@ -114,6 +115,7 @@ export default function AdminTours() {
       heroImage: item.hero_image || "",
       gallery: item.gallery || [],
       priceFrom: item.price_from ?? "",
+      originalPrice: item.policies?.originalPrice ?? "",
       taxPercent: item.tax_percent || 0,
       advancePercent: item.advance_percent || 50,
       bookingMode:
@@ -315,7 +317,7 @@ export default function AdminTours() {
             </h2>
             <form onSubmit={save} className="mt-6 space-y-7">
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <label><span className="label-field">Package type</span><select value={form.packageType} onChange={(event)=>setForm({...form,packageType:event.target.value})} className="input-field"><option value="tour">Trip / tour</option><option value="trek">Trek</option><option value="expedition">Expedition</option><option value="service">Travel service</option></select></label>
+                <label><span className="label-field">Package type</span><select value={form.packageType} onChange={(event)=>setForm({...form,packageType:event.target.value})} className="input-field"><option value="tour">Trip / tour</option><option value="villa">Villa / weekend getaway</option><option value="trek">Trek</option><option value="expedition">Expedition</option><option value="service">Travel service</option></select></label>
                 {[
                   ["Title", "title"],
                   ["Slug", "slug"],
@@ -368,6 +370,10 @@ export default function AdminTours() {
                     }
                     className="input-field"
                   />
+                </label>
+                <label>
+                  <span className="label-field">Original price / MRP</span>
+                  <input type="number" min="0" value={form.originalPrice} placeholder="10000" onChange={(e)=>setForm({...form,originalPrice:e.target.value})} className="input-field" />
                 </label>
                 <label>
                   <span className="label-field">Price from</span>

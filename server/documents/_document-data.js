@@ -13,6 +13,14 @@ const date = (value) => {
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? text(value) : parsed.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 };
+export const humanTime = (value) => {
+  if (!present(value)) return "";
+  const match = text(value).match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+  if (!match) return text(value);
+  const hour = Number(match[1]);
+  if (hour > 23) return text(value);
+  return `${hour % 12 || 12}:${match[2]} ${hour < 12 ? "AM" : "PM"}`;
+};
 const rows = (entries) => entries.filter(([, value]) => present(value)).map(([label, value]) => ({ label, value: text(value) }));
 const safeReference = (value) => text(value).replace(/[^A-Za-z0-9-]/g, "").slice(0, 60) || "DOCUMENT";
 
@@ -89,7 +97,7 @@ function hotelModel(booking) {
     metaLayout: "compact", meta: rows([["Voucher number", details.voucherNumber || reference], ["Reference ID", booking.reference], ["Booking status", booking.operational_status]]),
     sections: [
       { heading: "Hotel Details", rows: rows([["Hotel name", details.hotelName], ["Address", details.hotelAddress], ["Rating", details.rating]]) },
-      { heading: "Booking Details", layout: "grid", rows: rows([["Check-in date", date(details.checkIn || booking.travel_date)], ["Check-in time", details.checkInTime], ["Check-out date", date(details.checkOut || booking.end_date)], ["Check-out time", details.checkOutTime], ["Duration", details.duration || (booking.package?.days ? `${booking.package.days} days / ${booking.package.nights || 0} nights` : "")], ["Accommodation type", details.accommodationType || booking.hotel_category], ["Rooms", details.rooms || booking.room_count], ["Guests", details.guests || booking.traveller_count]]) },
+      { heading: "Booking Details", layout: "grid", rows: rows([["Check-in date", date(details.checkIn || booking.travel_date)], ["Check-in time", humanTime(details.checkInTime)], ["Check-out date", date(details.checkOut || booking.end_date)], ["Check-out time", humanTime(details.checkOutTime)], ["Duration", details.duration || (booking.package?.days ? `${booking.package.days} days / ${booking.package.nights || 0} nights` : "")], ["Accommodation type", details.accommodationType || booking.hotel_category], ["Rooms", details.rooms || booking.room_count], ["Guests", details.guests || booking.traveller_count]]) },
       { heading: "Staying Guest Details", table: { widths: [1300, 1250, 2800, 4010], headers: ["Room type", "Staying guests", "Guest name(s)", "Inclusions / policy"], rows: (guests.length ? guests : [""]).map((guest, index) => [index === 0 ? details.roomType || booking.hotel_category : "", index === 0 ? String(details.guests || booking.traveller_count || guests.length || "") : "", guest, index === 0 ? details.inclusions || "" : ""]) } },
       { heading: "Fare Details", layout: "fare", rows: [...fareParts.map(([label, value]) => ({ label, value: money(value) })), { label: "Total", value: money(calculatedTotal) }] },
       ...policySections.filter(([, value]) => present(value)).map(([heading, value]) => ({ heading, bullets: list(value) })),
@@ -106,7 +114,7 @@ function transportModel(booking) {
     filenameBase: `NAYSTRIP-Transport-Voucher-${reference}`,
     meta: rows([["Voucher number", details.voucherNumber || reference], ["Booking reference", booking.reference], ["Booking status", booking.operational_status]]),
     sections: [
-      { heading: "Passenger & Journey", rows: rows([["Passenger", details.passengerName || booking.billing?.name], ["Travel date", date(details.travelDate || booking.travel_date)], ["Total days / nights", details.duration || (booking.package?.days ? `${booking.package.days} days / ${booking.package.nights || 0} nights` : "")], ["Total KM", details.totalKm], ["Vehicle", details.vehicleType], ["Pickup", details.pickup || booking.pickup_preference || booking.package?.start_point], ["Drop", details.drop || booking.package?.end_point], ["Route", details.route]]) },
+      { heading: "Passenger & Journey", rows: rows([["Passenger", details.passengerName || booking.billing?.name], ["Travel date", date(details.travelDate || booking.travel_date)], ["Total days / nights", details.duration || (booking.package?.days ? `${booking.package.days} days / ${booking.package.nights || 0} nights` : "")], ["Total KM", details.totalKm], ["Vehicle", details.vehicleType], ["Pickup", details.pickup || booking.pickup_preference || booking.package?.start_point], ["Pickup time", humanTime(details.pickupTime)], ["Drop", details.drop || booking.package?.end_point], ["Drop date", date(details.dropDate)], ["Drop time", humanTime(details.dropTime)], ["Route", details.route]]) },
       ...(itinerary.length ? [{ heading: "Day-wise Itinerary", table: { headers: ["Day", "Plan", "Details"], rows: itinerary.map((item, index) => [text(item.day || index + 1), text(item.title), text(item.details || item.description)]) } }] : []),
       ...(list(details.sightseeing).length ? [{ heading: "Sightseeing / Add-ons", bullets: list(details.sightseeing) }] : []),
       ...(list(details.inclusions).length ? [{ heading: "Inclusions", bullets: list(details.inclusions) }] : []),

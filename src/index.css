@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+.review-carousel { scrollbar-width: none; overscroll-behavior-inline: contain; }
+.review-carousel::-webkit-scrollbar { display: none; }
+
 @media print {
   header, footer, aside, button, .print\:hidden { display: none !important; }
   body { background: #fff !important; color: #172033 !important; }

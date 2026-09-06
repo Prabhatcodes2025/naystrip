@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Copy, Download, Eye, Pencil, Plus, Trash2 } from "lucide-react";
+import { Copy, Download, Eye, Mail, MessageCircle, Pencil, Plus, Trash2 } from "lucide-react";
 const empty = {
   customerName: "",
   customerEmail: "",
@@ -127,9 +127,15 @@ export default function AdminQuotations() {
     try {
       const data = await request("/api/admin/quotation-actions", {
         method: "POST",
-        body: JSON.stringify({ id, action: kind, status }),
+        body: JSON.stringify({ id, action: kind === "whatsapp" ? "share" : kind, status }),
       });
-      if (data.url && kind === "preview") {
+      if (kind === "email" && data.sent) {
+        setMessage(`Quotation emailed to ${data.recipient}`);
+      } else if (kind === "whatsapp" && data.url) {
+        const quote=quotes.find(item=>item.id===id),phone=String(quote?.customer_phone||"").replace(/\D/g,"");
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(`NaysTrip quotation ${quote.reference}: ${data.url}`)}`,"_blank","noopener,noreferrer");
+        setMessage("WhatsApp sharing opened");
+      } else if (data.url && kind === "preview") {
         window.open(data.url, "_blank", "noopener,noreferrer");
         setMessage("Secure quotation preview opened in a new tab");
       } else if (data.url) {
@@ -450,6 +456,8 @@ export default function AdminQuotations() {
                         <Copy size={14} />
                         Share
                       </button>
+                      <button disabled={!quote.customer_email} onClick={() => action(quote.id, "email")} className="btn-secondary"><Mail size={14}/>Email</button>
+                      <button disabled={!quote.customer_phone} onClick={() => action(quote.id, "whatsapp")} className="btn-secondary"><MessageCircle size={14}/>WhatsApp</button>
                       <button
                         disabled={Boolean(quote.converted_booking_id)}
                         onClick={() => action(quote.id, "convert")}

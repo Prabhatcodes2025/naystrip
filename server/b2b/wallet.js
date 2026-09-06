@@ -12,7 +12,7 @@ export async function reconcileWallet(orderId, agentId) {
   if(record.status==="paid") return {status:"paid"};
   const response=await cashfreeRequest(`/orders/${orderId}`),order=await response.json();
   if(!response.ok||order.order_id!==orderId||order.order_currency!=="INR"||Number(order.order_amount)!==Number(record.amount)) throw new Error("Payment verification failed");
-  if(order.order_status!=="PAID") return {status:"pending"};
+  if(order.order_status!=="PAID") {const failed=["EXPIRED","TERMINATED","TERMINATION_REQUESTED"].includes(order.order_status);if(failed)await supabaseRequest(`agent_wallet_orders?order_id=eq.${orderId}&status=eq.created`,{method:"PATCH",body:JSON.stringify({status:"failed"})});return {status:failed?"failed":"pending"};}
   const paymentsResponse=await cashfreeRequest(`/orders/${orderId}/payments`);
   if(!paymentsResponse.ok) throw new Error("Payment verification unavailable");
   const payment=(await paymentsResponse.json()).find(p=>p.payment_status==="SUCCESS"&&p.payment_currency==="INR"&&Number(p.payment_amount)===Number(record.amount));
@@ -26,7 +26,7 @@ export default async function handler(req,res) {
   const agentId=session.profile.id;
   try {
     if(req.method==="GET") {
-      const [balance,history]=await Promise.all([supabaseRequest("rpc/agent_wallet_balance",{method:"POST",body:JSON.stringify({p_agent_id:agentId})}),supabaseRequest(`agent_wallet_orders?agent_id=eq.${agentId}&select=order_id,amount,status,created_at,paid_at&order=created_at.desc&limit=100`)]);
+      const [balance,history]=await Promise.all([supabaseRequest("rpc/agent_wallet_balance",{method:"POST",body:JSON.stringify({p_agent_id:agentId})}),supabaseRequest(`agent_wallet_orders?agent_id=eq.${agentId}&select=order_id,amount,status,gateway_payment_id,created_at,paid_at&order=created_at.desc&limit=100`)]);
       if(!balance.ok||!history.ok)throw new Error("Wallet unavailable");
       return json(res,200,{balance:await balance.json(),transactions:await history.json()});
     }
@@ -51,6 +51,6 @@ export async function adminWallet(req,res) {
   const admin=await requireAdmin(req,res);if(!admin)return;
   if(!["Super Admin","Accounts","B2B Manager"].includes(admin.role?.name))return json(res,403,{error:"Wallet access is restricted"});
   if(req.method!=="GET")return json(res,405,{error:"Method not allowed"});
-  const result=await supabaseRequest("agent_wallet_orders?select=order_id,agent_id,amount,status,created_at,paid_at,agent:b2b_agents(business_name)&order=created_at.desc&limit=500");
+  const result=await supabaseRequest("agent_wallet_orders?select=order_id,agent_id,amount,status,gateway_payment_id,created_at,paid_at,agent:b2b_agents(business_name)&order=created_at.desc&limit=500");
   return result.ok?json(res,200,{transactions:await result.json()}):json(res,502,{error:"Wallet transactions unavailable"});
 }

@@ -109,6 +109,7 @@ export default function TourDetails({ shareable = false }) {
   const wa = whatsappHref(`Hi NaysTrip, I would like a quote for ${tour.title} (${tour.duration}).`);
   const itineraryPath=`/api/documents/itinerary?slug=${encodeURIComponent(tour.slug)}`;
   const itineraryUrl=`${window.location.origin}${itineraryPath}`;
+  const sellingPrice=bookingInfo?.price_from??tour.price,originalPrice=Number(bookingInfo?.policies?.originalPrice??tour.commercial?.policies?.originalPrice),discountPercent=originalPrice>Number(sellingPrice)&&Number(sellingPrice)>=0?Math.round((originalPrice-Number(sellingPrice))*100/originalPrice):0;
   const copyItinerary=async()=>{await navigator.clipboard.writeText(itineraryUrl);setState({status:"idle",message:"PDF link copied"})};
   const itineraryWhatsApp=whatsappHref(`Here is the NaysTrip itinerary PDF for ${tour.title} (${tour.duration}): ${itineraryUrl}`);
   return (
@@ -164,9 +165,7 @@ export default function TourDetails({ shareable = false }) {
               Quote
             </p>
             <p className="mt-1 font-display text-xl text-[#173c34]">
-              {bookingInfo?.price_from != null || tour.price != null
-                ? `INR ${Number(bookingInfo?.price_from ?? tour.price).toLocaleString("en-IN")} PP`
-                : "Price on request"}
+              {sellingPrice != null ? <>{discountPercent>0&&<><span className="mr-2 text-base text-slate-400 line-through">INR {originalPrice.toLocaleString("en-IN")}</span></>}INR {Number(sellingPrice).toLocaleString("en-IN")} PP{discountPercent>0&&<span className="ml-2 text-sm font-bold text-emerald-700">{discountPercent}% OFF</span>}</> : "Price on request"}
             </p>
           </div>
           <div className="p-6 sm:px-8">

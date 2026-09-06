@@ -44,12 +44,13 @@ const packageRecord = (body) => {
   status: ["draft", "published", "archived"].includes(body.status)
     ? body.status
     : "draft",
-  policies: { ...(body.policies || {}), booking_mode: mode },
+  policies: { ...(body.policies || {}), booking_mode: mode, originalPrice: body.originalPrice === "" || body.originalPrice == null ? null : money(body.originalPrice) },
   seo: body.seo || {},
   source: "admin",
   });
 };
 const bookingConfigurationError=(record)=>record.status==="published"&&record.policies.booking_mode==="flexible_date"&&record.price_from==null?"A published flexible-date package needs an approved starting price before online booking can be enabled":null;
+const pricingError=(record)=>record.policies.originalPrice!=null&&record.price_from!=null&&record.policies.originalPrice<record.price_from?"Original price must be greater than or equal to the selling price":null;
 const upstreamError=async(response,fallback)=>{const body=await response.text();try{const error=body?JSON.parse(body):{};return clean(error.message||error.details||error.hint,500)||fallback}catch{return fallback}};
 async function availableSlug(base){let slug=base;for(let suffix=2;suffix<1000;suffix++){const response=await supabaseRequest(`packages?slug=eq.${encodeURIComponent(slug)}&select=id&limit=1`);if(!response.ok)throw new Error(await upstreamError(response,"Package slug could not be checked"));const rows=await response.json();if(!rows.length)return slug;slug=`${base}-${suffix}`}throw new Error("Unable to generate a unique package slug")}
 
@@ -155,7 +156,7 @@ export default async function handler(req, res) {
       if (!record.title || !record.slug)
         return json(res, 422, { error: "Title and slug are required" });
       record.slug=await availableSlug(record.slug);
-      const configurationError=bookingConfigurationError(record);
+      const configurationError=bookingConfigurationError(record)||pricingError(record);
       if(configurationError)return json(res,422,{error:configurationError});
       const inserted = await supabaseRequest("packages", {
         method: "POST",
@@ -173,7 +174,7 @@ export default async function handler(req, res) {
       if (!uuidPattern.test(body.id))
         return json(res, 422, { error: "Invalid package" });
       const record=packageRecord(body);
-      const configurationError=bookingConfigurationError(record);
+      const configurationError=bookingConfigurationError(record)||pricingError(record);
       if(configurationError)return json(res,422,{error:configurationError});
       const updated = await supabaseRequest(`packages?id=eq.${body.id}`, {
         method: "PATCH",

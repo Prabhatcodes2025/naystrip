@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import { requireAdmin } from "../_admin.js";
 import { json, supabaseRequest } from "../_shared.js";
 import { bookingReference, clean, uuidPattern } from "../_validation.js";
+import { deliverNotification } from "../_notifications.js";
 
 const publicQuoteUrl = (quote, token) =>
   `${(process.env.PUBLIC_SITE_URL || "https://www.naystrip.com").replace(/\/$/, "")}/quotation/${quote.reference}?token=${token}`;
@@ -31,18 +32,25 @@ export default async function handler(req, res) {
     return json(res, 200, { updated: true });
   }
 
-  if (["preview", "share"].includes(action)) {
+  if (["preview", "share", "email"].includes(action)) {
     const token = crypto.randomBytes(24).toString("base64url");
     const hash = crypto.createHash("sha256").update(token).digest("hex");
     await supabaseRequest(`quotations?id=eq.${id}`, {
       method: "PATCH",
       body: JSON.stringify({
         access_token_hash: hash,
-        ...(action === "share" && quote.status === "draft" ? { status: "sent" } : {}),
+        ...(["share", "email"].includes(action) && quote.status === "draft" ? { status: "sent" } : {}),
         updated_at: new Date().toISOString(),
       }),
     });
-    return json(res, 200, { url: publicQuoteUrl(quote, token) });
+    const url=publicQuoteUrl(quote,token);
+    if(action==="email"){
+      if(!quote.customer_email)return json(res,422,{error:"Customer email is missing"});
+      const delivery=await deliverNotification({quotationId:quote.id,event:"quotation_sent",recipient:quote.customer_email,payload:{reference:quote.reference,url},idempotencyKey:`${quote.reference}:quotation:${quote.customer_email}:${crypto.randomUUID()}`});
+      if(delivery.status!=="sent")return json(res,delivery.status==="skipped_not_configured"?503:502,{error:delivery.error||"Email delivery is not configured"});
+      return json(res,200,{sent:true,url,recipient:quote.customer_email});
+    }
+    return json(res, 200, { url });
   }
 
   if (action === "convert") {
