@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import Seo from "../components/shared/Seo";
 import { PageLoader } from "../components/shared/Loading";
+import AvailableDateSelector from "../components/booking/AvailableDateSelector";
 import { getToken, openCashfree, portalFetch } from "../utils/portal";
 import { clearCheckoutDraft, readCheckoutDraft, saveCheckoutDraft } from "../utils/checkoutDraft";
 const emptyTraveller = (type = "adult") => ({
@@ -218,7 +219,7 @@ export default function BookingCheckout() {
         </h1>
         <p className="mt-4 max-w-xl text-slate-600">
           {options.booking_state?.code==="departure_required"
-            ? "No dates are currently available for this package. Please try another date/package or contact us for assistance."
+            ? "No dates are currently available for this package. Please try another date or contact us for assistance."
             : options.booking_state?.reason || "NaysTrip will confirm the live price, hotel and vehicle before collecting payment."}
         </p>
         <Link to={`/custom-trip?package=${slug}`} className="btn-primary mt-6">
@@ -266,32 +267,7 @@ export default function BookingCheckout() {
                     Choose your trip
                   </h1>
                   <div className="mt-6 grid gap-5 sm:grid-cols-2">
-                    {options.package_departures?.length > 0 ? (
-                      <label>
-                        <span className="label-field">Available booking date</span>
-                        <select
-                          value={form.departureId}
-                          required
-                          onChange={(e) => {
-                            const departure = options.package_departures.find(
-                              (item) => item.id === e.target.value,
-                            );
-                            setForm({
-                              ...form,
-                              departureId: e.target.value,
-                              travelDate: departure.start_date,
-                            });
-                          }}
-                          className="input-field"
-                        >
-                          {options.package_departures.map((item) => (
-                            <option key={item.id} value={item.id}>
-                              {new Date(`${item.start_date}T00:00:00`).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})} · {item.available_seats} seats{item.price_override!=null?` · INR ${Number(item.price_override).toLocaleString("en-IN")}`:""}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                    ) : null}
+                    {options.package_departures?.length > 0&&<AvailableDateSelector departures={options.package_departures} value={form.departureId} mode={options.booking_state?.mode} onChange={departure=>setForm({...form,departureId:departure.id,travelDate:departure.start_date})}/>}
                     <label>
                       <span className="label-field">Departure city</span>
                       <input

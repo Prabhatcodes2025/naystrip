@@ -83,10 +83,11 @@ async function replaceChildren(packageId, body) {
   const items = [];
   for (const type of service?["inclusion", "note", "faq"]:["inclusion", "exclusion", "note", "faq"])
     for (const [index, value] of (body[`${type}s`] || []).entries())
-      items.push({
+      if(type!=="faq"||clean(typeof value==="object"?value.question:value,2000))items.push({
         package_id: packageId,
         item_type: type,
-        body: clean(value, 2000),
+        title: type==="faq"&&typeof value==="object"?clean(value.question,2000)||null:null,
+        body: type==="faq"&&typeof value==="object"?clean(value.answer,5000):clean(value,2000),
         sort_order: index,
       });
   if (items.length)
@@ -150,7 +151,7 @@ export default async function handler(req, res) {
           .map((item) => item.body),
         faqs: (items || [])
           .filter((item) => item.item_type === "faq")
-          .map((item) => item.body),
+          .map((item) => source.package_type==="service"?{question:item.title||item.body,answer:item.title?item.body:""}:item.body),
       });
       return json(res, 201, { package: created });
     }

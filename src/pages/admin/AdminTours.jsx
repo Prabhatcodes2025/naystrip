@@ -145,9 +145,7 @@ export default function AdminTours({serviceMode=false}) {
       notes: (item.items || [])
         .filter((x) => x.item_type === "note")
         .map((x) => x.body),
-      faqs: (item.items || [])
-        .filter((x) => x.item_type === "faq")
-        .map((x) => x.body),
+      faqs: (item.items || []).filter((x) => x.item_type === "faq").map((x) => item.package_type==="service"?{question:x.title||x.body,answer:x.title?x.body:""}:x.body),
       policies: { ...(item.policies || {}), primaryPlacement: packagePrimaryPlacement(item), menuCategoryIds: item.policies?.menuCategoryIds || [] },
       seo: item.seo || {},
     });
@@ -604,7 +602,7 @@ export default function AdminTours({serviceMode=false}) {
                 </div>
               </section>}
               <div className="grid gap-4 sm:grid-cols-2">
-                {(serviceMode?[["Requirements / documents required", "inclusions"],["Process / how it works", "notes"],["FAQs", "faqs"]]:[["Inclusions", "inclusions"],["Exclusions", "exclusions"],["Notes", "notes"],["FAQs", "faqs"]]).map(([label, key]) => (
+                {(serviceMode?[["Requirements / documents required", "inclusions"],["Process / how it works", "notes"]]:[["Inclusions", "inclusions"],["Exclusions", "exclusions"],["Notes", "notes"],["FAQs", "faqs"]]).map(([label, key]) => (
                   <label key={key}>
                     <span className="label-field">{label}, one per line</span>
                     <textarea
@@ -618,6 +616,7 @@ export default function AdminTours({serviceMode=false}) {
                   </label>
                 ))}
               </div>
+              {serviceMode&&<section><div className="flex items-center justify-between gap-3"><h3 className="font-bold">Frequently asked questions</h3><button type="button" className="btn-secondary" onClick={()=>setForm({...form,faqs:[...form.faqs,{question:"",answer:""}]})}><Plus size={14}/>Add FAQ</button></div><div className="mt-4 space-y-4">{form.faqs.map((faq,index)=><fieldset key={index} className="rounded-2xl border p-4"><legend className="px-2 text-sm font-bold">FAQ {index+1}</legend><label><span className="label-field">Question</span><textarea rows="2" value={faq.question} onChange={event=>setForm({...form,faqs:form.faqs.map((item,i)=>i===index?{...item,question:event.target.value}:item)})} className="input-field"/></label><label className="mt-3 block"><span className="label-field">Answer</span><textarea rows="4" value={faq.answer} onChange={event=>setForm({...form,faqs:form.faqs.map((item,i)=>i===index?{...item,answer:event.target.value}:item)})} className="input-field"/></label><button type="button" onClick={()=>setForm({...form,faqs:form.faqs.filter((_,i)=>i!==index)})} className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-rose-600"><Trash2 size={14}/>Remove FAQ</button></fieldset>)}</div></section>}
               <button disabled={busy} className="btn-primary">
                 {busy ? "Saving…" : `Save ${serviceMode?"service":"package"}`}
               </button>
