@@ -129,6 +129,7 @@ export default function App() {
       <Route path="/admin" element={<AdminErrorBoundary><AdminLayout /></AdminErrorBoundary>}>
         <Route index element={<AdminDashboard />} />
         <Route path="tours" element={<AdminTours />} />
+        <Route path="travel-services" element={<AdminTours serviceMode />} />
         <Route path="monthly-picks" element={<AdminMonthlyPicks />} />
         <Route path="events" element={<AdminEvents />} />
         <Route path="menu-options" element={<AdminMenuOptions />} />

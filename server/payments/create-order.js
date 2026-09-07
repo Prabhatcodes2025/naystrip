@@ -3,6 +3,11 @@ import {requirePortalUser} from "../_auth.js";
 import {clean,money} from "../_validation.js";
 import {cashfreeConfiguration,cashfreeRequest,readCashfreeResponse,safeCashfreeError} from "./_cashfree.js";
 
+export function isBookingDateAvailable(booking,now=new Date()){
+  const departure=booking?.departure;
+  return Boolean(departure&&departure.id===booking.departure_id&&departure.package_id===booking.package_id&&departure.start_date===booking.travel_date&&["open","filling_fast"].includes(departure.status)&&Number(departure.available_seats)>0&&(!departure.booking_cutoff||new Date(departure.booking_cutoff)>now));
+}
+
 export default async function handler(req,res){
   if(!guard(req,res))return;
   const session=await requirePortalUser(req,res,"customer");if(!session)return;
@@ -10,9 +15,10 @@ export default async function handler(req,res){
   if(!bookingReference)return json(res,422,{error:"Booking reference is required"});
   const configuration=cashfreeConfiguration();
   if(!configuration.clientId||!configuration.clientSecret)return json(res,503,{error:"Online payment is not configured"});
-  const bookingResponse=await supabaseRequest(`bookings?reference=eq.${encodeURIComponent(bookingReference)}&customer_id=eq.${session.user.id}&select=id,reference,total,advance_required,amount_paid,balance_due,currency,operational_status,billing&limit=1`);
+  const bookingResponse=await supabaseRequest(`bookings?reference=eq.${encodeURIComponent(bookingReference)}&customer_id=eq.${session.user.id}&select=id,reference,package_id,departure_id,travel_date,total,advance_required,amount_paid,balance_due,currency,operational_status,billing,departure:package_departures(id,package_id,start_date,status,available_seats,booking_cutoff)&limit=1`);
   const [booking]=await bookingResponse.json();
   if(!bookingResponse.ok||!booking||["cancelled","completed","refunded"].includes(booking.operational_status))return json(res,404,{error:"Payable booking not found"});
+  if(!isBookingDateAvailable(booking))return json(res,409,{error:"This date is currently unavailable. Please choose another available date or contact us for assistance."});
   const payable=purpose==="balance"?money(booking.balance_due):money(Math.max(0,booking.advance_required-booking.amount_paid));
   if(payable<1)return json(res,422,{error:"No payable balance is available"});
   const existingResponse=await supabaseRequest(`payments?booking_id=eq.${booking.id}&gateway=eq.cashfree&payment_purpose=eq.${purpose}&status=in.(created,pending)&amount=eq.${payable}&select=gateway_order_id,amount,currency,raw_status&order=created_at.desc&limit=1`);

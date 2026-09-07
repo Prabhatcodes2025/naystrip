@@ -70,9 +70,10 @@ const LEH_ADVISORY=`High-altitude preparation
 
 Connectivity
 Postpaid mobile connections are generally more reliable in Ladakh. Coverage is strongest around Leh and major towns and may be unavailable in remote areas. Inform family before travel and carry a power bank.`;
-export default function AdminTours() {
+export default function AdminTours({serviceMode=false}) {
+  const blank=serviceMode?{...empty,packageType:"service",days:1,nights:0,bookingMode:"enquiry_only",itinerary:[],policies:{...empty.policies,primaryPlacement:"travel-services"}}:empty;
   const [packages, setPackages] = useState([]);
-  const [form, setForm] = useState(empty);
+  const [form, setForm] = useState(blank);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [readiness, setReadiness] = useState("all");
@@ -86,7 +87,7 @@ export default function AdminTours() {
     try {
       const [packageData,settings]=await Promise.all([request("/api/admin/packages"),loadSiteSettings()]);
       setPackages(packageData.packages || []);
-      setMenuOptions(settings.headerMenuOptions || []);
+      setMenuOptions((settings.headerMenuOptions || []).filter(option=>!serviceMode||option.section==="services"));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -162,7 +163,7 @@ export default function AdminTours() {
         body: JSON.stringify(form),
       });
       setOpen(false);
-      setForm(empty);
+      setForm(blank);
       await load();
     } catch (err) {
       setError(err.message);
@@ -197,30 +198,30 @@ export default function AdminTours() {
   };
   const filtered = useMemo(
     () => packages.filter((item) =>
-        (readiness === "all" || readinessCode(item) === readiness) && `${item.title} ${(item.destination_names || []).join(" ")}`
+        (serviceMode?item.package_type==="service":item.package_type!=="service") && (readiness === "all" || readinessCode(item) === readiness) && `${item.title} ${(item.destination_names || []).join(" ")}`
           .toLowerCase()
           .includes(search.toLowerCase())),
-    [packages, search, readiness],
+    [packages, search, readiness, serviceMode],
   );
   return (
     <div>
       <div className="flex flex-wrap justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl">Package Management</h1>
+          <h1 className="font-display text-2xl">{serviceMode?"Travel Services":"Package Management"}</h1>
           <p className="text-sm text-navy-500">
-            Database-backed catalogue, itinerary and booking rules.
+            {serviceMode?"Manage enquiry-led services using the existing header service categories.":"Database-backed catalogue, itinerary and booking rules."}
           </p>
         </div>
         <button
           onClick={() => {
-            setForm(empty);
+            setForm(blank);
             setSlugTouched(false);
             setOpen(true);
           }}
           className="btn-primary"
         >
           <Plus size={15} />
-          Add package
+          Add {serviceMode?"service":"package"}
         </button>
       </div>
       {error && <p className="mt-4 bg-rose-50 p-3 text-sm">{error}</p>}
@@ -313,17 +314,15 @@ export default function AdminTours() {
               <X />
             </button>
             <h2 className="font-display text-3xl">
-              {form.id ? "Edit" : "Create"} package
+              {form.id ? "Edit" : "Create"} {serviceMode?"travel service":"package"}
             </h2>
             <form onSubmit={save} className="mt-6 space-y-7">
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <label><span className="label-field">Package type</span><select value={form.packageType} onChange={(event)=>setForm({...form,packageType:event.target.value})} className="input-field"><option value="tour">Trip / tour</option><option value="villa">Villa / weekend getaway</option><option value="trek">Trek</option><option value="expedition">Expedition</option><option value="service">Travel service</option></select></label>
+                {serviceMode?<input type="hidden" value="service"/>:<label><span className="label-field">Package type</span><select value={form.packageType} onChange={(event)=>setForm({...form,packageType:event.target.value})} className="input-field"><option value="tour">Trip / tour</option><option value="villa">Villa / weekend getaway</option><option value="trek">Trek</option><option value="expedition">Expedition</option></select></label>}
                 {[
                   ["Title", "title"],
                   ["Slug", "slug"],
-                  ["Route", "route"],
-                  ["Start point", "startPoint"],
-                  ["End point", "endPoint"],
+                  ...(serviceMode?[]:[["Route", "route"],["Start point", "startPoint"],["End point", "endPoint"]]),
                 ].map(([label, key]) => (
                   <label key={key}>
                     <span className="label-field">{label}</span>
@@ -335,7 +334,7 @@ export default function AdminTours() {
                     />
                   </label>
                 ))}
-                <label>
+                {!serviceMode&&<label>
                   <span className="label-field">
                     Destinations, one per line
                   </span>
@@ -346,8 +345,8 @@ export default function AdminTours() {
                     }
                     className="input-field"
                   />
-                </label>
-                <label>
+                </label>}
+                {!serviceMode&&<label>
                   <span className="label-field">Days</span>
                   <input
                     type="number"
@@ -358,8 +357,8 @@ export default function AdminTours() {
                     }
                     className="input-field"
                   />
-                </label>
-                <label>
+                </label>}
+                {!serviceMode&&<label>
                   <span className="label-field">Nights</span>
                   <input
                     type="number"
@@ -370,7 +369,7 @@ export default function AdminTours() {
                     }
                     className="input-field"
                   />
-                </label>
+                </label>}
                 <label>
                   <span className="label-field">Original price / MRP</span>
                   <input type="number" min="0" value={form.originalPrice} placeholder="10000" onChange={(e)=>setForm({...form,originalPrice:e.target.value})} className="input-field" />
@@ -448,9 +447,9 @@ export default function AdminTours() {
                 />
               </label>
               <div className="grid gap-4 lg:grid-cols-2"><label><span className="label-field">Short marketing description</span><textarea rows="3" value={form.shortDescription} onChange={(e)=>setForm({...form,shortDescription:e.target.value})} className="input-field" maxLength="500"/></label><label><span className="label-field">Highlights, one per line</span><textarea rows="3" value={form.highlights.join("\n")} onChange={(e)=>setForm({...form,highlights:split(e.target.value)})} className="input-field"/></label></div>
-              <section className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5"><div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end"><div><h3 className="font-bold text-[#173c34]">Travel advisory / important information</h3><p className="mt-1 text-xs text-slate-500">Attach only when relevant. This appears on the trip page and in its PDF.</p></div><select aria-label="Advisory preset" value="" onChange={(e)=>{if(e.target.value==="leh")setForm({...form,policies:{...form.policies,travel_advisory:LEH_ADVISORY}})}} className="input-field max-w-xs"><option value="">Choose a preset…</option><option value="leh">Leh / Ladakh high altitude</option></select></div><textarea rows="8" value={form.policies?.travel_advisory||""} onChange={(e)=>setForm({...form,policies:{...form.policies,travel_advisory:e.target.value}})} className="input-field mt-4" placeholder="Destination-specific advice, packing, connectivity and preparation guidance"/></section>
+              {!serviceMode&&<section className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5"><div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end"><div><h3 className="font-bold text-[#173c34]">Travel advisory / important information</h3><p className="mt-1 text-xs text-slate-500">Attach only when relevant. This appears on the trip page and in its PDF.</p></div><select aria-label="Advisory preset" value="" onChange={(e)=>{if(e.target.value==="leh")setForm({...form,policies:{...form.policies,travel_advisory:LEH_ADVISORY}})}} className="input-field max-w-xs"><option value="">Choose a preset…</option><option value="leh">Leh / Ladakh high altitude</option></select></div><textarea rows="8" value={form.policies?.travel_advisory||""} onChange={(e)=>setForm({...form,policies:{...form.policies,travel_advisory:e.target.value}})} className="input-field mt-4" placeholder="Destination-specific advice, packing, connectivity and preparation guidance"/></section>}
               <div className="flex flex-wrap gap-6">
-                <label>
+                {!serviceMode?<label>
                   <span className="label-field">Booking mode</span>
                   <select
                     value={form.bookingMode}
@@ -466,7 +465,7 @@ export default function AdminTours() {
                   <span className="mt-1 block max-w-md text-xs text-navy-400">
                     Flexible-date booking requires an approved “Price from”. Fixed-departure booking requires a live departure with capacity and either a departure price or package price.
                   </span>
-                </label>
+                </label>:<p className="text-sm text-slate-500">Travel services use enquiry / quote CTAs and are not sent directly to payment.</p>}
                 <label>
                   <input
                     type="checkbox"
@@ -478,7 +477,7 @@ export default function AdminTours() {
                   Featured
                 </label>
               </div>
-              <section>
+              {!serviceMode&&<section>
                 <div className="flex justify-between">
                   <h3 className="font-bold">Itinerary builder</h3>
                   <button
@@ -605,7 +604,7 @@ export default function AdminTours() {
                     </fieldset>
                   ))}
                 </div>
-              </section>
+              </section>}
               <div className="grid gap-4 sm:grid-cols-2">
                 {[
                   ["Inclusions", "inclusions"],
@@ -627,7 +626,7 @@ export default function AdminTours() {
                 ))}
               </div>
               <button disabled={busy} className="btn-primary">
-                {busy ? "Saving…" : "Save package"}
+                {busy ? "Saving…" : `Save ${serviceMode?"service":"package"}`}
               </button>
             </form>
           </section>

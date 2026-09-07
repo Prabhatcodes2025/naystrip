@@ -1,6 +1,5 @@
 import { supabaseRequest } from "./_shared.js";
 import { money, uuidPattern } from "./_validation.js";
-import { bookingMode } from "./_booking-state.js";
 export async function calculateBooking({
   packageId,
   departureId,
@@ -27,7 +26,7 @@ export async function calculateBooking({
     )
       throw new Error("DEPARTURE_UNAVAILABLE");
   }
-  if (bookingMode(pkg) === "fixed_departure" && !departure)
+  if (!departure)
     throw new Error("DEPARTURE_UNAVAILABLE");
   if (departure?.price_override == null && pkg.price_from == null)
     throw new Error("PACKAGE_NOT_BOOKABLE");

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Copy, Download, Eye, Mail, MessageCircle, Pencil, Plus, Trash2 } from "lucide-react";
+import { downloadCsv } from "../../utils/csv";
 const empty = {
   customerName: "",
   customerEmail: "",
@@ -92,6 +93,7 @@ export default function AdminQuotations() {
     Math.max(0, subtotal - Number(form.discount || 0)) *
     (1 + Number(form.taxPercent || 0) / 100);
   const filteredQuotes=useMemo(()=>{const term=listFilters.search.trim().toLowerCase();return quotes.filter((quote)=>(!listFilters.status||quote.status===listFilters.status)&&(!term||[quote.reference,quote.customer_name,quote.customer_email,quote.customer_phone,quote.destination,quote.agent?.business_name,quote.agent_id,quote.inquiry?.enquiry_source,quote.created_at].join(" ").toLowerCase().includes(term)))},[quotes,listFilters]);
+  const exportQuotes=()=>downloadCsv(`naystrip-quotations-${new Date().toISOString().slice(0,10)}.csv`,["Reference","Customer","Email","Phone","Destination","Travel start","Travel end","Travellers","Subtotal","Discount","Tax","Total","Status","Created"],filteredQuotes.map(quote=>[quote.reference,quote.customer_name,quote.customer_email,quote.customer_phone,quote.destination,quote.travel_start,quote.travel_end,quote.traveller_count,quote.subtotal,quote.discount,quote.tax,quote.total,quote.status,quote.created_at]));
   const pageCount=Math.max(1,Math.ceil(filteredQuotes.length/pageSize));const visibleQuotes=filteredQuotes.slice((Math.min(page,pageCount)-1)*pageSize,Math.min(page,pageCount)*pageSize);
   const updateLine = (index, key, value) =>
     setForm({
@@ -377,7 +379,7 @@ export default function AdminQuotations() {
         </div>
       </form>
       <section className="mt-8">
-        <h2 className="font-display text-xl">All quotations</h2><div className="mt-3 grid gap-3 sm:grid-cols-3"><label><span className="label-field">Search</span><input className="input-field" value={listFilters.search} onChange={e=>{setListFilters({...listFilters,search:e.target.value});setPage(1)}} placeholder="Reference, customer, agent, destination"/></label><label><span className="label-field">Status</span><select className="input-field" value={listFilters.status} onChange={e=>{setListFilters({...listFilters,status:e.target.value});setPage(1)}}><option value="">All statuses</option>{["draft","sent","accepted","rejected","expired","cancelled"].map(value=><option key={value}>{value}</option>)}</select></label><label><span className="label-field">Agent ID</span><input className="input-field" value={agentFilter} onChange={e=>setAgentFilter(e.target.value)} placeholder="Full Agent ID (optional)"/></label></div><p className="mt-3 text-sm text-slate-500">{filteredQuotes.length} quotation{filteredQuotes.length===1?"":"s"} · newest first</p>
+        <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="font-display text-xl">All quotations</h2><button type="button" disabled={!filteredQuotes.length} onClick={exportQuotes} className="btn-secondary"><Download size={15}/>Export filtered CSV</button></div><div className="mt-3 grid gap-3 sm:grid-cols-3"><label><span className="label-field">Search</span><input className="input-field" value={listFilters.search} onChange={e=>{setListFilters({...listFilters,search:e.target.value});setPage(1)}} placeholder="Reference, customer, agent, destination"/></label><label><span className="label-field">Status</span><select className="input-field" value={listFilters.status} onChange={e=>{setListFilters({...listFilters,status:e.target.value});setPage(1)}}><option value="">All statuses</option>{["draft","sent","accepted","rejected","expired","cancelled"].map(value=><option key={value}>{value}</option>)}</select></label><label><span className="label-field">Agent ID</span><input className="input-field" value={agentFilter} onChange={e=>setAgentFilter(e.target.value)} placeholder="Full Agent ID (optional)"/></label></div><p className="mt-3 text-sm text-slate-500">{filteredQuotes.length} quotation{filteredQuotes.length===1?"":"s"} · newest first</p>
         <div className="mt-3 overflow-x-auto rounded-2xl border bg-white">
           <table className="w-full min-w-[1050px] text-sm">
             <thead>
