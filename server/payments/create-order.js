@@ -5,7 +5,8 @@ import {cashfreeConfiguration,cashfreeRequest,readCashfreeResponse,safeCashfreeE
 
 export function isBookingDateAvailable(booking,now=new Date()){
   const departure=booking?.departure;
-  return Boolean(departure&&departure.id===booking.departure_id&&departure.package_id===booking.package_id&&departure.start_date===booking.travel_date&&["open","filling_fast"].includes(departure.status)&&Number(departure.available_seats)>0&&(!departure.booking_cutoff||new Date(departure.booking_cutoff)>now));
+  const today=now.toISOString().slice(0,10);
+  return Boolean(departure&&departure.id===booking.departure_id&&departure.package_id===booking.package_id&&departure.start_date===booking.travel_date&&departure.start_date>=today&&["open","filling_fast"].includes(departure.status)&&Number(departure.available_seats)>0&&(!departure.booking_cutoff||new Date(departure.booking_cutoff)>now));
 }
 
 export default async function handler(req,res){

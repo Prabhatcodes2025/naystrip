@@ -3,21 +3,24 @@ import { Link } from "react-router-dom";
 import SmartImage from "../shared/SmartImage";
 
 export default function PackageCard({ tour, commercial, priority = false }) {
-  const online = Boolean(commercial?.booking_state?.online);
+  const service=(commercial?.package_type||tour.package_type||tour.type)==="service";
+  const online = !service&&Boolean(commercial?.booking_state?.online);
+  const detailPath=service?`/services/${tour.slug}`:`/tours/${tour.slug}`;
   const price = commercial?.price_from ?? tour.price;
   const original=Number(commercial?.policies?.originalPrice),selling=Number(price),discount=original>selling&&selling>=0?Math.round((original-selling)*100/original):0;
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_12px_36px_rgba(19,52,45,.08)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_52px_rgba(19,52,45,.13)]">
-      <Link to={`/tours/${tour.slug}`} className="relative block aspect-[4/3] overflow-hidden bg-slate-100">
-        <SmartImage src={commercial?.hero_image || tour.image} context={`${tour.title} ${tour.destinations.join(" ")}`} alt={`${tour.title} tour`} className="object-cover transition duration-700 group-hover:scale-105" loading={priority ? "eager" : "lazy"} />
-        <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[.12em] text-[#173c34]">{tour.duration}</span>
+      <Link to={detailPath} className="relative block aspect-[4/3] overflow-hidden bg-slate-100">
+        <SmartImage src={commercial?.hero_image || tour.image} context={`${tour.title} ${(tour.destinations||[]).join(" ")}`} alt={tour.title} className="object-cover transition duration-700 group-hover:scale-105" loading={priority ? "eager" : "lazy"} />
+        <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-[.12em] text-[#173c34]">{service?"Travel service":tour.duration}</span>
       </Link>
       <div className="flex flex-1 flex-col p-5 sm:p-6">
-        <p className="flex items-center gap-2 text-xs font-semibold text-slate-500"><MapPin size={14} className="text-orange-600" />{tour.destinations.slice(0, 3).join(" · ")}</p>
-        <h3 className="mt-3 line-clamp-2 font-display text-2xl leading-tight text-[#173c34]"><Link to={`/tours/${tour.slug}`}>{tour.title}</Link></h3>
+        {!service&&<p className="flex items-center gap-2 text-xs font-semibold text-slate-500"><MapPin size={14} className="text-orange-600" />{(tour.destinations||[]).slice(0, 3).join(" · ")}</p>}
+        <h3 className="mt-3 line-clamp-2 font-display text-2xl leading-tight text-[#173c34]"><Link to={detailPath}>{tour.title}</Link></h3>
+        {service&&commercial?.short_description&&<p className="mt-3 line-clamp-2 text-sm text-slate-500">{commercial.short_description}</p>}
         <div className="mt-auto flex items-end justify-between gap-4 border-t border-slate-100 pt-4">
-          <div><span className="block text-[10px] font-bold uppercase tracking-[.14em] text-slate-400">{price != null ? "Per person" : "Pricing"}</span>{discount>0&&<span className="text-sm text-slate-400 line-through">₹{original.toLocaleString("en-IN")}</span>}<strong className="mt-1 block text-lg text-[#173c34]">{price != null ? `₹${Number(price).toLocaleString("en-IN")}` : "Price on request"}</strong>{discount>0&&<span className="text-xs font-extrabold text-emerald-700">{discount}% OFF</span>}</div>
-          <Link to={online ? `/checkout/${tour.slug}` : `/tours/${tour.slug}`} className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-4 py-2.5 text-xs font-extrabold text-white hover:bg-orange-600">{online ? <CalendarDays size={14}/> : null}{online ? "Book now" : "View & enquire"}<ArrowRight size={14}/></Link>
+          <div><span className="block text-[10px] font-bold uppercase tracking-[.14em] text-slate-400">{price != null ? (service?"Starting price":"Per person") : "Pricing"}</span>{!service&&discount>0&&<span className="text-sm text-slate-400 line-through">₹{original.toLocaleString("en-IN")}</span>}<strong className="mt-1 block text-lg text-[#173c34]">{price != null ? `₹${Number(price).toLocaleString("en-IN")}` : "Price on request"}</strong>{!service&&discount>0&&<span className="text-xs font-extrabold text-emerald-700">{discount}% OFF</span>}</div>
+          <Link to={online ? `/checkout/${tour.slug}` : detailPath} className="inline-flex items-center gap-2 rounded-full bg-orange-500 px-4 py-2.5 text-xs font-extrabold text-white hover:bg-orange-600">{online ? <CalendarDays size={14}/> : null}{online ? "Book now" : "View & enquire"}<ArrowRight size={14}/></Link>
         </div>
       </div>
     </article>

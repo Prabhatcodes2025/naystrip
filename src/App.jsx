@@ -9,6 +9,7 @@ const Home = lazy(() => import("./pages/Home"));
 const ToursListing = lazy(() => import("./pages/ToursListing"));
 const TourCategoryPage = lazy(() => import("./pages/TourCategoryPage"));
 const TourDetails = lazy(() => import("./pages/TourDetails"));
+const ServiceDetails = lazy(() => import("./pages/ServiceDetails"));
 const PackageCategoryPage = lazy(() => import("./pages/PackageCategoryPage"));
 const DestinationsListing = lazy(() => import("./pages/DestinationsListing"));
 const DestinationDetail = lazy(() => import("./pages/DestinationDetail"));
@@ -76,6 +77,7 @@ export default function App() {
         <Route path="/tours/international" element={<TourCategoryPage kind="international" />} />
         <Route path="/tours/:slug" element={<TourDetails />} />
         <Route path="/trips/:slug" element={<TourDetails shareable />} />
+        <Route path="/services/:slug" element={<ServiceDetails />} />
         <Route path="/packages/:category" element={<PackageCategoryPage />} />
         <Route path="/destinations" element={<DestinationsListing />} />
         <Route path="/destinations/:slug" element={<DestinationDetail />} />

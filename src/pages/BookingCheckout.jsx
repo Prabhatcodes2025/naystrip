@@ -73,8 +73,8 @@ export default function BookingCheckout() {
         if (first)
           setForm((current) => ({
             ...current,
-            departureId: current.departureId || first.id,
-            travelDate: current.travelDate || first.start_date,
+            departureId: data.package.package_departures.some(item=>item.id===current.departureId)?current.departureId:first.id,
+            travelDate: data.package.package_departures.find(item=>item.id===current.departureId)?.start_date||first.start_date,
           }));
       })
       .catch((err) => setError(err.message))
@@ -217,8 +217,9 @@ export default function BookingCheckout() {
           This route is customised before booking.
         </h1>
         <p className="mt-4 max-w-xl text-slate-600">
-          {options.booking_state?.reason ||
-            "NaysTrip will confirm the live price, hotel and vehicle before collecting payment."}
+          {options.booking_state?.code==="departure_required"
+            ? "No dates are currently available for this package. Please try another date/package or contact us for assistance."
+            : options.booking_state?.reason || "NaysTrip will confirm the live price, hotel and vehicle before collecting payment."}
         </p>
         <Link to={`/custom-trip?package=${slug}`} className="btn-primary mt-6">
           Customise this package
@@ -267,9 +268,10 @@ export default function BookingCheckout() {
                   <div className="mt-6 grid gap-5 sm:grid-cols-2">
                     {options.package_departures?.length > 0 ? (
                       <label>
-                        <span className="label-field">Departure</span>
+                        <span className="label-field">Available booking date</span>
                         <select
                           value={form.departureId}
+                          required
                           onChange={(e) => {
                             const departure = options.package_departures.find(
                               (item) => item.id === e.target.value,
@@ -284,25 +286,12 @@ export default function BookingCheckout() {
                         >
                           {options.package_departures.map((item) => (
                             <option key={item.id} value={item.id}>
-                              {item.start_date} · {item.available_seats} seats
+                              {new Date(`${item.start_date}T00:00:00`).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"})} · {item.available_seats} seats{item.price_override!=null?` · INR ${Number(item.price_override).toLocaleString("en-IN")}`:""}
                             </option>
                           ))}
                         </select>
                       </label>
-                    ) : (
-                      <label>
-                        <span className="label-field">Travel date</span>
-                        <input
-                          type="date"
-                          min={new Date().toISOString().slice(0, 10)}
-                          value={form.travelDate}
-                          onChange={(e) =>
-                            setForm({ ...form, travelDate: e.target.value })
-                          }
-                          className="input-field"
-                        />
-                      </label>
-                    )}
+                    ) : null}
                     <label>
                       <span className="label-field">Departure city</span>
                       <input

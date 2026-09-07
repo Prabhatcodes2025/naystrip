@@ -22,7 +22,9 @@ export async function calculateBooking({
     if (
       !response.ok ||
       !departure ||
-      departure.available_seats < counts.adults + counts.children
+      departure.available_seats < counts.adults + counts.children ||
+      departure.start_date < new Date().toISOString().slice(0,10) ||
+      (departure.booking_cutoff && new Date(departure.booking_cutoff) <= new Date())
     )
       throw new Error("DEPARTURE_UNAVAILABLE");
   }

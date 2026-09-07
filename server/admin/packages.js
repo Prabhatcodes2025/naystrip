@@ -8,12 +8,13 @@ const slugify = (value) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 const packageRecord = (body) => {
+  const packageType=clean(body.packageType || "tour", 30);
   const requestedMode=["enquiry_only","flexible_date","fixed_departure"].includes(body.bookingMode)?body.bookingMode:null;
-  const mode=requestedMode||(body.bookingEnabled&&!body.customEnquiryOnly?"flexible_date":"enquiry_only");
+  const mode=packageType==="service"?"enquiry_only":requestedMode||(body.bookingEnabled&&!body.customEnquiryOnly?"flexible_date":"enquiry_only");
   return ({
   slug: slugify(body.slug || body.title),
   title: clean(body.title, 200),
-  package_type: clean(body.packageType || "tour", 30),
+  package_type: packageType,
   destination_names: (body.destinations || [])
     .map((item) => clean(item, 80))
     .filter(Boolean)
@@ -55,13 +56,14 @@ const upstreamError=async(response,fallback)=>{const body=await response.text();
 async function availableSlug(base){let slug=base;for(let suffix=2;suffix<1000;suffix++){const response=await supabaseRequest(`packages?slug=eq.${encodeURIComponent(slug)}&select=id&limit=1`);if(!response.ok)throw new Error(await upstreamError(response,"Package slug could not be checked"));const rows=await response.json();if(!rows.length)return slug;slug=`${base}-${suffix}`}throw new Error("Unable to generate a unique package slug")}
 
 async function replaceChildren(packageId, body) {
+  const service=body.packageType==="service";
   await supabaseRequest(`package_itinerary_days?package_id=eq.${packageId}`, {
     method: "DELETE",
   });
   await supabaseRequest(`package_items?package_id=eq.${packageId}`, {
     method: "DELETE",
   });
-  if (body.itinerary?.length) {
+  if (!service&&body.itinerary?.length) {
     const days = body.itinerary.map((day, index) => ({
       package_id: packageId,
       day_number: index + 1,
@@ -79,7 +81,7 @@ async function replaceChildren(packageId, body) {
     });
   }
   const items = [];
-  for (const type of ["inclusion", "exclusion", "note", "faq"])
+  for (const type of service?["inclusion", "note", "faq"]:["inclusion", "exclusion", "note", "faq"])
     for (const [index, value] of (body[`${type}s`] || []).entries())
       items.push({
         package_id: packageId,
@@ -133,6 +135,7 @@ export default async function handler(req, res) {
       });
       const [created] = await inserted.json();
       await replaceChildren(created.id, {
+        packageType: source.package_type,
         itinerary: (itinerary || [])
           .sort((a, b) => a.sort_order - b.sort_order)
           .map((day) => ({ ...day })),

@@ -188,8 +188,8 @@ export default function AdminTours({serviceMode=false}) {
     });
     await load();
   };
-  const publicUrl=(item)=>`${window.location.origin}/trips/${item.slug}`;
-  const shareMessage=(item)=>{const departure=(item.departures||[]).filter((entry)=>entry.status!=="cancelled").sort((a,b)=>String(a.start_date).localeCompare(String(b.start_date)))[0];const date=departure?.start_date?new Date(`${departure.start_date}T00:00:00`).toLocaleDateString("en-IN",{day:"numeric",month:"short"}).toUpperCase():"DATES ON REQUEST";const highlights=(item.highlights||[]).slice(0,5).map((value)=>`✨ ${value}`).join("\n");return `🌍 ${item.title.toUpperCase()}\n\n📅 ${date}\n⏱️ ${item.days} DAYS / ${item.nights} NIGHTS\n${highlights?`${highlights}\n`:""}${item.price_from!=null?`💰 FROM ₹${Number(item.price_from).toLocaleString("en-IN")}\n`:"💬 PRICE ON REQUEST\n"}\n⚡ Limited availability\n\n🔗 ${publicUrl(item)}\n\n📞 Bookings & Queries\n+91 8097132424`;};
+  const publicUrl=(item)=>`${window.location.origin}/${item.package_type==="service"?"services":"trips"}/${item.slug}`;
+  const shareMessage=(item)=>{const service=item.package_type==="service";const departure=(item.departures||[]).filter((entry)=>entry.status!=="cancelled").sort((a,b)=>String(a.start_date).localeCompare(String(b.start_date)))[0];const date=departure?.start_date?new Date(`${departure.start_date}T00:00:00`).toLocaleDateString("en-IN",{day:"numeric",month:"short"}).toUpperCase():"DATES ON REQUEST";const highlights=(item.highlights||[]).slice(0,5).map((value)=>`✨ ${value}`).join("\n");return `🌍 ${item.title.toUpperCase()}\n\n${service?"":`📅 ${date}\n⏱️ ${item.days} DAYS / ${item.nights} NIGHTS\n`}${highlights?`${highlights}\n`:""}${item.price_from!=null?`💰 FROM ₹${Number(item.price_from).toLocaleString("en-IN")}\n`:"💬 PRICE ON REQUEST\n"}\n${service?"Request a personalised quote":"⚡ Limited availability"}\n\n🔗 ${publicUrl(item)}\n\n📞 Bookings & Queries\n+91 8097132424`;};
   const copyText=async(value,label)=>{await navigator.clipboard.writeText(value);setNotice(`${label} copied`);window.setTimeout(()=>setNotice(""),2200)};
   const readinessCode = (item) => {
     if (item.price_from == null) return "price_missing";
@@ -240,9 +240,9 @@ export default function AdminTours({serviceMode=false}) {
           <thead>
             <tr className="border-b text-left">
               <th className="p-4">Package</th>
-              <th className="p-4">Duration</th>
+              {!serviceMode&&<th className="p-4">Duration</th>}
               <th className="p-4">Price</th>
-              <th className="p-4">Booking</th>
+              {!serviceMode&&<th className="p-4">Booking</th>}
               <th className="p-4">Status</th>
               <th className="p-4">Actions</th>
             </tr>
@@ -256,15 +256,15 @@ export default function AdminTours({serviceMode=false}) {
                     {(item.destination_names || []).join(", ")}
                   </span>
                 </td>
-                <td className="p-4">
+                {!serviceMode&&<td className="p-4">
                   {item.days}D / {item.nights}N
-                </td>
+                </td>}
                 <td className="p-4">
                   {item.price_from == null
                     ? "On request"
                     : `INR ${Number(item.price_from).toLocaleString("en-IN")}`}
                 </td>
-                <td className="p-4"><span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-extrabold tracking-wide ${readinessCode(item) === "online_ready" ? "bg-emerald-50 text-emerald-700" : readinessCode(item) === "price_missing" ? "bg-amber-50 text-amber-800" : "bg-slate-100 text-slate-600"}`}>{readinessCode(item) === "online_ready" ? "ONLINE BOOKING READY" : readinessCode(item) === "price_missing" ? "PRICE MISSING" : "ENQUIRY ONLY"}</span></td>
+                {!serviceMode&&<td className="p-4"><span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-extrabold tracking-wide ${readinessCode(item) === "online_ready" ? "bg-emerald-50 text-emerald-700" : readinessCode(item) === "price_missing" ? "bg-amber-50 text-amber-800" : "bg-slate-100 text-slate-600"}`}>{readinessCode(item) === "online_ready" ? "ONLINE BOOKING READY" : readinessCode(item) === "price_missing" ? "PRICE MISSING" : "ENQUIRY ONLY"}</span></td>}
                 <td className="p-4">{item.status}</td>
                 <td className="p-4">
                   <div className="flex flex-wrap gap-2">
@@ -284,7 +284,7 @@ export default function AdminTours({serviceMode=false}) {
                     <button onClick={()=>copyText(publicUrl(item),"Trip URL")} title="Copy public trip URL" className="grid h-10 w-10 place-items-center bg-emerald-50 text-emerald-700"><ExternalLink size={15}/></button>
                     <button onClick={()=>copyText(shareMessage(item),"Share message")} title="Generate and copy share message" className="grid h-10 w-10 place-items-center bg-sky-50 text-sky-700"><MessageCircle size={15}/></button>
                     <a href={`https://wa.me/?text=${encodeURIComponent(shareMessage(item))}`} target="_blank" rel="noopener noreferrer" title="Open WhatsApp" className="grid h-10 w-10 place-items-center bg-green-50 text-green-700"><MessageCircle size={15}/></a>
-                    <a href={`/api/documents/itinerary?slug=${encodeURIComponent(item.slug)}`} title="Download itinerary PDF" className="grid h-10 w-10 place-items-center bg-orange-50 text-orange-700"><Download size={15}/></a>
+                    {!serviceMode&&<a href={`/api/documents/itinerary?slug=${encodeURIComponent(item.slug)}`} title="Download itinerary PDF" className="grid h-10 w-10 place-items-center bg-orange-50 text-orange-700"><Download size={15}/></a>}
                     <button
                       onClick={() => archive(item.id)}
                       title="Archive"
@@ -370,10 +370,10 @@ export default function AdminTours({serviceMode=false}) {
                     className="input-field"
                   />
                 </label>}
-                <label>
+                {!serviceMode&&<label>
                   <span className="label-field">Original price / MRP</span>
                   <input type="number" min="0" value={form.originalPrice} placeholder="10000" onChange={(e)=>setForm({...form,originalPrice:e.target.value})} className="input-field" />
-                </label>
+                </label>}
                 <label>
                   <span className="label-field">Price from</span>
                   <input
@@ -387,7 +387,7 @@ export default function AdminTours({serviceMode=false}) {
                     className="input-field"
                   />
                 </label>
-                <label>
+                {!serviceMode&&<label>
                   <span className="label-field">Tax %</span>
                   <input
                     type="number"
@@ -397,8 +397,8 @@ export default function AdminTours({serviceMode=false}) {
                     }
                     className="input-field"
                   />
-                </label>
-                <label>
+                </label>}
+                {!serviceMode&&<label>
                   <span className="label-field">Advance %</span>
                   <input
                     type="number"
@@ -408,7 +408,7 @@ export default function AdminTours({serviceMode=false}) {
                     }
                     className="input-field"
                   />
-                </label>
+                </label>}
                 <label>
                   <span className="label-field">Status</span>
                   <select
@@ -425,10 +425,8 @@ export default function AdminTours({serviceMode=false}) {
                 </label>
               </div>
               <section className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                <h3 className="font-bold text-[#173c34]">Website and header placement</h3>
-                <p className="mt-1 text-xs text-slate-500">Choose one primary site placement. Destination and region menu categories are assigned separately.</p>
-                <label className="mt-4 block max-w-lg"><span className="label-field">Primary placement</span><select value={form.policies?.primaryPlacement||packagePrimaryPlacement(form)} onChange={(event)=>setForm({...form,policies:{...form.policies,primaryPlacement:event.target.value}})} className="input-field">{[...new Set(primaryPlacements.map(item=>item.group))].map(group=><optgroup key={group} label={group}>{primaryPlacements.filter(item=>item.group===group).map(item=><option key={item.value} value={item.value}>{item.label}</option>)}</optgroup>)}</select></label>
-                <fieldset className="mt-4"><legend className="label-field">Header destination / region options</legend><div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{menuOptions.filter(option=>option.published!==false).map(option=><label key={option.id} className="flex items-start gap-2 rounded-xl bg-white p-3 text-sm"><input type="checkbox" className="mt-1" checked={(form.policies?.menuCategoryIds||[]).includes(option.id)} onChange={(event)=>{const current=form.policies?.menuCategoryIds||[];const menuCategoryIds=event.target.checked?[...current,option.id]:current.filter(value=>value!==option.id);setForm({...form,policies:{...form.policies,menuCategoryIds}})}}/><span>{option.label}<small className="block text-slate-400">{option.section}{option.subgroup?` / ${option.subgroup}`:""}</small></span></label>)}</div></fieldset>
+                <h3 className="font-bold text-[#173c34]">{serviceMode?"Service category":"Website and header placement"}</h3>
+                {serviceMode?<label className="mt-4 block max-w-lg"><span className="label-field">Header service category</span><select required value={form.policies?.menuCategoryIds?.[0]||""} onChange={(event)=>setForm({...form,policies:{...form.policies,primaryPlacement:"travel-services",menuCategoryIds:event.target.value?[event.target.value]:[]}})} className="input-field"><option value="">Choose category</option>{menuOptions.filter(option=>option.published!==false).map(option=><option key={option.id} value={option.id}>{option.label}</option>)}</select></label>:<><p className="mt-1 text-xs text-slate-500">Choose one primary site placement. Destination and region menu categories are assigned separately.</p><label className="mt-4 block max-w-lg"><span className="label-field">Primary placement</span><select value={form.policies?.primaryPlacement||packagePrimaryPlacement(form)} onChange={(event)=>setForm({...form,policies:{...form.policies,primaryPlacement:event.target.value}})} className="input-field">{[...new Set(primaryPlacements.map(item=>item.group))].map(group=><optgroup key={group} label={group}>{primaryPlacements.filter(item=>item.group===group).map(item=><option key={item.value} value={item.value}>{item.label}</option>)}</optgroup>)}</select></label><fieldset className="mt-4"><legend className="label-field">Header destination / region options</legend><div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{menuOptions.filter(option=>option.published!==false).map(option=><label key={option.id} className="flex items-start gap-2 rounded-xl bg-white p-3 text-sm"><input type="checkbox" className="mt-1" checked={(form.policies?.menuCategoryIds||[]).includes(option.id)} onChange={(event)=>{const current=form.policies?.menuCategoryIds||[];const menuCategoryIds=event.target.checked?[...current,option.id]:current.filter(value=>value!==option.id);setForm({...form,policies:{...form.policies,menuCategoryIds}})}}/><span>{option.label}<small className="block text-slate-400">{option.section}{option.subgroup?` / ${option.subgroup}`:""}</small></span></label>)}</div></fieldset></>}
               </section>
               <div className="grid gap-6 lg:grid-cols-2">
                 <MediaUploader label="Hero / cover image" value={form.heroImage} onChange={(heroImage) => setForm({ ...form, heroImage })} scope={`packages/${form.id || form.slug || "draft"}/hero`} context={`${form.title} ${form.destinations.join(" ")}`} />
@@ -436,7 +434,7 @@ export default function AdminTours({serviceMode=false}) {
               </div>
               <MediaUploader multiple label="Package gallery" value={form.gallery} onChange={(gallery) => setForm({ ...form, gallery })} scope={`packages/${form.id || form.slug || "draft"}/gallery`} context={`${form.title} ${form.destinations.join(" ")}`} />
               <label>
-                <span className="label-field">Overview</span>
+                <span className="label-field">{serviceMode?"Service details":"Overview"}</span>
                 <textarea
                   rows="4"
                   value={form.overview}
@@ -446,7 +444,7 @@ export default function AdminTours({serviceMode=false}) {
                   className="input-field"
                 />
               </label>
-              <div className="grid gap-4 lg:grid-cols-2"><label><span className="label-field">Short marketing description</span><textarea rows="3" value={form.shortDescription} onChange={(e)=>setForm({...form,shortDescription:e.target.value})} className="input-field" maxLength="500"/></label><label><span className="label-field">Highlights, one per line</span><textarea rows="3" value={form.highlights.join("\n")} onChange={(e)=>setForm({...form,highlights:split(e.target.value)})} className="input-field"/></label></div>
+              <div className="grid gap-4 lg:grid-cols-2"><label><span className="label-field">{serviceMode?"Short description":"Short marketing description"}</span><textarea rows="3" value={form.shortDescription} onChange={(e)=>setForm({...form,shortDescription:e.target.value})} className="input-field" maxLength="500"/></label><label><span className="label-field">{serviceMode?"Key benefits":"Highlights"}, one per line</span><textarea rows="3" value={form.highlights.join("\n")} onChange={(e)=>setForm({...form,highlights:split(e.target.value)})} className="input-field"/></label></div>
               {!serviceMode&&<section className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5"><div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end"><div><h3 className="font-bold text-[#173c34]">Travel advisory / important information</h3><p className="mt-1 text-xs text-slate-500">Attach only when relevant. This appears on the trip page and in its PDF.</p></div><select aria-label="Advisory preset" value="" onChange={(e)=>{if(e.target.value==="leh")setForm({...form,policies:{...form.policies,travel_advisory:LEH_ADVISORY}})}} className="input-field max-w-xs"><option value="">Choose a preset…</option><option value="leh">Leh / Ladakh high altitude</option></select></div><textarea rows="8" value={form.policies?.travel_advisory||""} onChange={(e)=>setForm({...form,policies:{...form.policies,travel_advisory:e.target.value}})} className="input-field mt-4" placeholder="Destination-specific advice, packing, connectivity and preparation guidance"/></section>}
               <div className="flex flex-wrap gap-6">
                 {!serviceMode?<label>
@@ -606,12 +604,7 @@ export default function AdminTours({serviceMode=false}) {
                 </div>
               </section>}
               <div className="grid gap-4 sm:grid-cols-2">
-                {[
-                  ["Inclusions", "inclusions"],
-                  ["Exclusions", "exclusions"],
-                  ["Notes", "notes"],
-                  ["FAQs", "faqs"],
-                ].map(([label, key]) => (
+                {(serviceMode?[["Requirements / documents required", "inclusions"],["Process / how it works", "notes"],["FAQs", "faqs"]]:[["Inclusions", "inclusions"],["Exclusions", "exclusions"],["Notes", "notes"],["FAQs", "faqs"]]).map(([label, key]) => (
                   <label key={key}>
                     <span className="label-field">{label}, one per line</span>
                     <textarea

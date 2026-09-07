@@ -52,11 +52,12 @@ test("seeded Maharashtra slug resolves and reports honest enquiry-only state",as
 
 test("booking CTA state requires real owner-controlled configuration",()=>{
   const base={status:"published",booking_enabled:true,custom_enquiry_only:false,price_from:12500,policies:{booking_mode:"flexible_date"}};
+  const future=new Date(Date.now()+86400000*30).toISOString().slice(0,10);
   assert.equal(calculateBookingState(base,[]).online,false);
   assert.equal(calculateBookingState(base,[]).code,"departure_required");
-  assert.equal(calculateBookingState(base,[{status:"open",available_seats:5,price_override:null}]).online,true);
+  assert.equal(calculateBookingState(base,[{start_date:future,status:"open",available_seats:5,price_override:null}]).online,true);
   assert.equal(calculateBookingState({...base,policies:{booking_mode:"fixed_departure"}},[]).code,"departure_required");
-  assert.equal(calculateBookingState({...base,price_from:null,policies:{booking_mode:"fixed_departure"}},[{status:"open",available_seats:5,price_override:14000}]).online,true);
+  assert.equal(calculateBookingState({...base,price_from:null,policies:{booking_mode:"fixed_departure"}},[{start_date:future,status:"open",available_seats:5,price_override:14000}]).online,true);
 });
 
 test("catch-all router dispatches separate contact, custom-trip, package and quick quote enquiries",async()=>{

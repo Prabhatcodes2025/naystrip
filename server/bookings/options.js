@@ -24,8 +24,10 @@ export default async function handler(req, res) {
     }
     const [pkg] = rows;
     if (!pkg) return json(res, 404, { error: "Package not found" });
+    const today=new Date().toISOString().slice(0,10);
     pkg.package_departures = (pkg.package_departures || []).filter(
       (departure) =>
+        departure.start_date>=today &&
         ["open", "filling_fast"].includes(departure.status) &&
         Number(departure.available_seats) > 0 &&
         (!departure.booking_cutoff ||

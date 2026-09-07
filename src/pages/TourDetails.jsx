@@ -15,7 +15,7 @@ import {
   SlidersHorizontal,
   X,
 } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import Seo from "../components/shared/Seo";
 import SmartImage from "../components/shared/SmartImage";
 import { PageLoader } from "../components/shared/Loading";
@@ -83,6 +83,7 @@ export default function TourDetails({ shareable = false }) {
         </Link>
       </main>
     );
+  if(tour.type==="service")return <Navigate to={`/services/${tour.slug}`} replace/>;
   const submit = async (e) => {
     e.preventDefault();
     setState({ status: "loading", message: "" });

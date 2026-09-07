@@ -9,7 +9,21 @@ test("only Admin-configured matching dates pass payment availability",()=>{
  assert.equal(isBookingDateAvailable(booking,new Date("2026-12-01")),true);
  assert.equal(isBookingDateAvailable({...booking,travel_date:"2026-12-13"},new Date("2026-12-01")),false);
  assert.equal(isBookingDateAvailable({...booking,departure:{...booking.departure,status:"closed"}},new Date("2026-12-01")),false);
+ assert.equal(isBookingDateAvailable({...booking,travel_date:"2026-11-30",departure:{...booking.departure,start_date:"2026-11-30"}},new Date("2026-12-01")),false);
  assert.equal(calculateBookingState({status:"published",booking_enabled:true,custom_enquiry_only:false,price_from:1000,policies:{booking_mode:"flexible_date"}},[]).online,false);
+});
+
+test("travel services use service-only admin and public presentation",()=>{
+ const admin=readFileSync(new URL("../src/pages/admin/AdminTours.jsx",import.meta.url),"utf8"),service=readFileSync(new URL("../src/pages/ServiceDetails.jsx",import.meta.url),"utf8"),card=readFileSync(new URL("../src/components/tours/PackageCard.jsx",import.meta.url),"utf8");
+ assert.match(admin,/serviceMode\?\[\["Requirements \/ documents required"/);
+ assert.match(service,/Service details/);assert.doesNotMatch(service,/Day 1|departure schedule|cancellationSlabs/);
+ assert.match(card,/`\/services\/\$\{tour\.slug\}`/);
+});
+
+test("booking options hide past, sold-out, blocked, and cutoff dates",()=>{
+ const options=readFileSync(new URL("../server/bookings/options.js",import.meta.url),"utf8"),checkout=readFileSync(new URL("../src/pages/BookingCheckout.jsx",import.meta.url),"utf8");
+ assert.match(options,/departure\.start_date>=today/);assert.match(options,/\["open", "filling_fast"\]/);assert.match(options,/available_seats\) > 0/);
+ assert.match(checkout,/Available booking date/);assert.match(checkout,/No dates are currently available for this package/);
 });
 
 test("date rejection occurs before the Cashfree order call",()=>{
